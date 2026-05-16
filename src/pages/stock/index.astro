@@ -1,0 +1,46 @@
+---
+import Site from '../../layouts/Site.astro'
+import { getForSaleCaravans } from '../../lib/sanity.js'
+
+const caravans = await getForSaleCaravans()
+---
+
+<Site title="Stock">
+  <div class="page-header">
+    <div class="container">
+      <h1>Caravans for Sale</h1>
+      <p>{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} available</p>
+    </div>
+  </div>
+
+  <div class="container">
+    {caravans.length === 0 ? (
+      <div style="padding: 80px 0; text-align: center; color: var(--text-muted);">
+        <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">Stock listings coming soon</p>
+        <p>We are currently loading our caravan inventory. Check back shortly.</p>
+      </div>
+    ) : (
+      <div class="stock-grid">
+        {caravans.map((c) => (
+          <a href={`/stock/${c.slug.current}`} class="caravan-card">
+            {c.mainImage ? (
+              <img src={c.mainImage} alt={c.title} loading="lazy" />
+            ) : (
+              <div style="aspect-ratio:16/10; background:#e5ddd4; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.85rem;">No photo yet</div>
+            )}
+            <div class="card-body">
+              {c.brand && <div class="card-brand">{c.brand}</div>}
+              <div class="card-title">{c.title}</div>
+              <div class="card-price">${c.price?.toLocaleString('en-AU')}</div>
+              <div class="card-specs">
+                {c.specs?.sleeps && <span>Sleeps {c.specs.sleeps}</span>}
+                {c.specs?.length && <span>{c.specs.length}ft</span>}
+                {c.specs?.tareWeight && <span>{c.specs.tareWeight}kg</span>}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</Site>

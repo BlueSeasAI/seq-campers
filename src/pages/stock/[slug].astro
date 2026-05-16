@@ -1,0 +1,121 @@
+---
+import Site from '../../layouts/Site.astro'
+import { getAllCaravanPaths, getCaravan } from '../../lib/sanity.js'
+
+export async function getStaticPaths() {
+  const caravans = await getAllCaravanPaths()
+  return caravans.map((c) => ({ params: { slug: c.slug } }))
+}
+
+const { slug } = Astro.params
+const caravan = await getCaravan(slug)
+
+if (!caravan) return Astro.redirect('/stock')
+
+const videos = caravan.videos ?? []
+const videoCount = Math.min(videos.length, 3)
+
+function youtubeEmbed(url) {
+  const match = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/)
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null
+}
+---
+
+<Site title={caravan.title}>
+  <div class="page-header">
+    <div class="container">
+      {caravan.brand && <div style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--sand); margin-bottom:8px;">{caravan.brand}</div>}
+      <h1>{caravan.title}</h1>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="listing-grid">
+
+      <!-- Left: photos + description + videos -->
+      <div>
+        {caravan.photos?.length > 0 && (
+          <div class="photo-gallery">
+            {caravan.photos.slice(0, 5).map((url, i) => (
+              <img src={url} alt={`${caravan.title} photo ${i + 1}`} loading={i === 0 ? 'eager' : 'lazy'} />
+            ))}
+          </div>
+        )}
+
+        {caravan.description && (
+          <div style="margin-top:32px;">
+            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">About this caravan</h2>
+            <p style="color:var(--text-muted); line-height:1.8;">{caravan.description}</p>
+          </div>
+        )}
+
+        {caravan.features?.length > 0 && (
+          <div style="margin-top:28px;">
+            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">Features</h2>
+            <ul style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; padding-left:18px;">
+              {caravan.features.map((f) => <li style="font-size:0.9rem; color:var(--text-muted);">{f}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {videoCount > 0 && (
+          <div style="margin-top:36px;">
+            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:16px;">Videos</h2>
+            <div class={`video-grid videos-${videoCount}`}>
+              {videos.slice(0, 3).map((v) => {
+                const embedUrl = youtubeEmbed(v.url)
+                return embedUrl ? (
+                  <div class="video-embed">
+                    <iframe src={embedUrl} title={v.label ?? caravan.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                  </div>
+                ) : null
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <!-- Right: price + specs + enquire -->
+      <div class="listing-sidebar">
+        <div class="listing-price">${caravan.price?.toLocaleString('en-AU')}</div>
+        {caravan.brand && <div class="listing-brand">{caravan.brand}</div>}
+
+        {caravan.specs && (
+          <div class="specs-grid">
+            {caravan.specs.sleeps && (
+              <div class="spec-item">
+                <span class="spec-label">Sleeps</span>
+                <span class="spec-value">{caravan.specs.sleeps}</span>
+              </div>
+            )}
+            {caravan.specs.length && (
+              <div class="spec-item">
+                <span class="spec-label">Length</span>
+                <span class="spec-value">{caravan.specs.length}ft</span>
+              </div>
+            )}
+            {caravan.specs.tareWeight && (
+              <div class="spec-item">
+                <span class="spec-label">Tare weight</span>
+                <span class="spec-value">{caravan.specs.tareWeight}kg</span>
+              </div>
+            )}
+            {caravan.specs.atm && (
+              <div class="spec-item">
+                <span class="spec-label">ATM</span>
+                <span class="spec-value">{caravan.specs.atm}kg</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <a href="/contact" class="btn-enquire">Enquire about this caravan</a>
+
+        <p style="margin-top:16px; font-size:0.78rem; color:var(--text-muted); text-align:center;">
+          Or call us on <a href="tel:0755300234" style="color:var(--rust);">(07) 5300 2344</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</Site>
