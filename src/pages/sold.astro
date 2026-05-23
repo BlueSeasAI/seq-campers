@@ -1,0 +1,49 @@
+---
+import Site from '../layouts/Site.astro'
+import { getSoldCaravans } from '../lib/sanity.js'
+
+let sold = []
+try {
+  sold = await getSoldCaravans()
+} catch (err) {
+  console.warn('Sanity unreachable on build - sold list empty:', err.message)
+}
+---
+
+<Site title="Sold caravans" description="Recently sold caravans at SEQ Campers - a record of stock that has gone to good homes.">
+  <div class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">Archive</div>
+      <h1>Recently sold</h1>
+      <p>{sold.length} caravan{sold.length !== 1 ? 's' : ''} delivered to happy owners</p>
+    </div>
+  </div>
+
+  <div class="container section">
+    {sold.length === 0 ? (
+      <div class="empty-state">
+        <div class="empty-title">No sold caravans archived yet</div>
+        <p>As we move stock through the site you will see it here. Looking for what is currently available?</p>
+        <p style="margin-top:16px;"><a href="/stock" class="section-link">See current stock →</a></p>
+      </div>
+    ) : (
+      <div class="stock-grid">
+        {sold.map((c) => (
+          <div class="caravan-card" style="opacity:0.85;">
+            {c.mainImage ? (
+              <img src={c.mainImage} alt={c.title} loading="lazy" />
+            ) : (
+              <div style="aspect-ratio:16/10; background:#E8E0D0; display:flex; align-items:center; justify-content:center; color:#8B6A40; font-size:0.85rem;">No photo</div>
+            )}
+            <div class="card-body">
+              {c.brand && <div class="card-brand">{c.brand}</div>}
+              <div class="card-title">{c.title}</div>
+              <div class="card-price" style="text-decoration:line-through; color:#8B6A40;">${c.price?.toLocaleString('en-AU')}</div>
+              <div style="margin-top:8px; font-size:0.78rem; font-weight:700; color:#C0341A; text-transform:uppercase; letter-spacing:0.08em;">Sold</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</Site>

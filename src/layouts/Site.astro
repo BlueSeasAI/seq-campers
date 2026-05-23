@@ -1,25 +1,39 @@
 ---
-const { title = 'SEQ Campers' } = Astro.props
+import '../styles/global.css'
+
+const { title = 'Premium Off-Road Caravans', description = 'Queensland\'s home for premium off-road caravans. Kimberley Kampers, Stockman, and more.' } = Astro.props
+
+const pathname = Astro.url.pathname
+const isActive = (path) => {
+  if (path === '/') return pathname === '/'
+  return pathname === path || pathname.startsWith(path + '/')
+}
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
   <title>{title} | SEQ Campers</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles/global.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
 </head>
 <body>
   <header class="site-header">
     <div class="container">
       <a href="/" class="logo">SEQ Campers</a>
       <nav>
-        <a href="/stock">Stock</a>
-        <a href="/sold">Sold</a>
-        <a href="/about">About</a>
-        <a href="/contact">Contact</a>
+        <a href="/" class={isActive('/') ? 'is-active' : ''}>Home</a>
+        <a href="/stock" class={isActive('/stock') ? 'is-active' : ''}>Stock</a>
+        <a href="/sold" class={isActive('/sold') ? 'is-active' : ''}>Sold</a>
+        <a href="/about" class={isActive('/about') ? 'is-active' : ''}>About</a>
+        <a href="/contact" class="nav-cta">Get a quote</a>
       </nav>
     </div>
   </header>
@@ -30,7 +44,12 @@ const { title = 'SEQ Campers' } = Astro.props
 
   <footer class="site-footer">
     <div class="container">
-      <p>&copy; {new Date().getFullYear()} SEQ Campers. All rights reserved.</p>
+      <div>&copy; {new Date().getFullYear()} SEQ Campers. Queensland, Australia.</div>
+      <div class="footer-links">
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="tel:0753002344">(07) 5300 2344</a>
+      </div>
     </div>
   </footer>
 </body>

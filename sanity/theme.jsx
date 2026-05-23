@@ -5,8 +5,8 @@ export const SeqCampersLogo = () => (
     gap: '10px',
   }}>
     <div style={{
-      background: '#b85c38',
-      color: '#f5f0eb',
+      background: '#C0341A',
+      color: '#F4EDE0',
       fontWeight: '800',
       fontSize: '13px',
       padding: '5px 9px',
@@ -27,7 +27,7 @@ export const SeqCampersLogo = () => (
       </div>
       <div style={{
         fontSize: '10px',
-        color: '#aaaaaa',
+        color: '#D4943A',
         letterSpacing: '0.06em',
         textTransform: 'uppercase',
       }}>

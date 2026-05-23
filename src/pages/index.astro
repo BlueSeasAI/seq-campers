@@ -1,0 +1,91 @@
+---
+import Site from '../layouts/Site.astro'
+import { getFeaturedCaravans } from '../lib/sanity.js'
+
+let featured = []
+try {
+  featured = await getFeaturedCaravans()
+} catch (err) {
+  console.warn('Sanity unreachable on build - featured caravans empty:', err.message)
+}
+---
+
+<Site title="Premium Off-Road Caravans">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="page-eyebrow">SEQ Campers · Queensland</div>
+        <h1>Off-road caravans built for the long way home.</h1>
+        <p>
+          Kimberley Kampers and Stockman caravans, hand-picked and inspected
+          by Shane and the SEQ team. Thirty years on the Sunshine Coast and
+          still going further than most.
+        </p>
+        <div class="hero-btns">
+          <a href="/stock" class="btn-primary">View current stock</a>
+          <a href="/contact" class="btn-ghost">Talk to Shane</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured caravans -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured stock</h2>
+        <a href="/stock" class="section-link">See all caravans →</a>
+      </div>
+
+      {featured.length === 0 ? (
+        <div class="empty-state">
+          <div class="empty-title">Featured listings coming soon</div>
+          <p>We are loading our caravan inventory into the new site. Check back shortly, or browse the full stock list.</p>
+          <p style="margin-top:16px;"><a href="/stock" class="section-link">Browse all stock →</a></p>
+        </div>
+      ) : (
+        <div class="stock-grid">
+          {featured.map((c) => (
+            <a href={`/stock/${c.slug.current}`} class="caravan-card">
+              {c.mainImage ? (
+                <img src={c.mainImage} alt={c.title} loading="lazy" />
+              ) : (
+                <div style="aspect-ratio:16/10; background:#E8E0D0; display:flex; align-items:center; justify-content:center; color:#8B6A40; font-size:0.85rem;">No photo yet</div>
+              )}
+              <div class="card-body">
+                {c.brand && <div class="card-brand">{c.brand}</div>}
+                <div class="card-title">{c.title}</div>
+                <div class="card-price">${c.price?.toLocaleString('en-AU')}</div>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Why SEQ band -->
+  <section class="band-dark">
+    <div class="container">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:32px; text-align:center;">
+        <div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">30+</div>
+          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">Years in the industry</div>
+        </div>
+        <div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">2,000+</div>
+          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">YouTube subscribers</div>
+        </div>
+        <div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">QLD</div>
+          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">Sunshine Coast dealer</div>
+        </div>
+        <div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">2</div>
+          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">Premier brands stocked</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Site>
