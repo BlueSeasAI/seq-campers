@@ -123,6 +123,50 @@ export default {
     },
 
     {
+      name: 'videos',
+      title: 'Videos (YouTube)',
+      type: 'array',
+      description:
+        'Paste up to 3 YouTube links. The first 3 display in a row on the listing page.',
+      of: [
+        {
+          type: 'object',
+          name: 'video',
+          fields: [
+            {
+              name: 'url',
+              title: 'YouTube URL',
+              type: 'url',
+              description: 'Full YouTube link, e.g. https://www.youtube.com/watch?v=abc123',
+              validation: (Rule) =>
+                Rule.required().uri({
+                  scheme: ['http', 'https'],
+                  allowRelative: false,
+                }),
+            },
+            {
+              name: 'label',
+              title: 'Short label (optional)',
+              type: 'string',
+              description: 'e.g. "Off-road walkaround" or "Interior tour"',
+            },
+          ],
+          preview: {
+            select: { title: 'label', subtitle: 'url' },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || 'Video',
+                subtitle: subtitle || '',
+              }
+            },
+          },
+        },
+      ],
+      validation: (Rule) =>
+        Rule.max(3).warning('Only the first 3 videos display on the listing page'),
+    },
+
+    {
       name: 'configurator',
       title: 'Available configurations',
       type: 'array',
