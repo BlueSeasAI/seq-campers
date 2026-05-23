@@ -1,21 +1,59 @@
 ---
 import '../styles/global.css'
 
-const { title = 'Premium Off-Road Caravans', description = 'Queensland\'s home for premium off-road caravans. Kimberley Kampers, Stockman, and more.' } = Astro.props
+const {
+  title = 'Premium Off-Road Caravans',
+  description = "Queensland's home for premium off-road caravans. Kimberley Kampers, Stockman, and more.",
+  ogImage,
+  ogType = 'website',
+  noindex = false,
+} = Astro.props
 
 const pathname = Astro.url.pathname
 const isActive = (path) => {
   if (path === '/') return pathname === '/'
   return pathname === path || pathname.startsWith(path + '/')
 }
+
+// Build canonical + absolute OG image URLs from site base
+const siteBase = Astro.site ?? new URL('https://seqcampers.com.au')
+const canonicalUrl = new URL(pathname, siteBase).href
+const absoluteOgImage = ogImage
+  ? (ogImage.startsWith('http') ? ogImage : new URL(ogImage, siteBase).href)
+  : null
+
+const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Campers`
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content={Astro.generator} />
+
+  <title>{fullTitle}</title>
   <meta name="description" content={description} />
-  <title>{title} | SEQ Campers</title>
+  <link rel="canonical" href={canonicalUrl} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+  <!-- Open Graph -->
+  <meta property="og:type" content={ogType} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:site_name" content="SEQ Campers" />
+  <meta property="og:locale" content="en_AU" />
+  {absoluteOgImage && <meta property="og:image" content={absoluteOgImage} />}
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content={absoluteOgImage ? 'summary_large_image' : 'summary'} />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  {absoluteOgImage && <meta name="twitter:image" content={absoluteOgImage} />}
+
+  <!-- Theme + favicon hooks -->
+  <meta name="theme-color" content="#2A1608" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,6 +61,8 @@ const isActive = (path) => {
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800;900&display=swap"
     rel="stylesheet"
   />
+
+  <slot name="head" />
 </head>
 <body>
   <header class="site-header">

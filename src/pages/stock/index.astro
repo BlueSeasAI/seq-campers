@@ -3,9 +3,10 @@ import Site from '../../layouts/Site.astro'
 import { getForSaleCaravans } from '../../lib/sanity.js'
 
 const caravans = await getForSaleCaravans()
+const description = `Browse ${caravans.length} premium off-road caravan${caravans.length === 1 ? '' : 's'} for sale at SEQ Campers in Queensland. Kimberley Kampers, Stockman, and hand-picked stock - inspected, ready to tow.`
 ---
 
-<Site title="Stock">
+<Site title="Caravans for Sale" description={description} ogType="website">
   <div class="page-header">
     <div class="container">
       <h1>Caravans for Sale</h1>

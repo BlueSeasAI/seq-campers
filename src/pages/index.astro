@@ -8,9 +8,84 @@ try {
 } catch (err) {
   console.warn('Sanity unreachable on build - featured caravans empty:', err.message)
 }
+
+// LocalBusiness schema - tells Google/AI "we are an Australian caravan dealer"
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'AutoDealer',
+  '@id': 'https://seqcampers.com.au/#business',
+  name: 'SEQ Campers',
+  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman stock. Thirty years in the industry.",
+  url: 'https://seqcampers.com.au',
+  telephone: '+61-7-5300-2344',
+  email: 'enquiries@seqcampers.com.au',
+  areaServed: { '@type': 'State', name: 'Queensland, Australia' },
+  address: {
+    '@type': 'PostalAddress',
+    addressRegion: 'QLD',
+    addressCountry: 'AU',
+  },
+  openingHours: 'Mo-Sa 08:00-17:00',
+  priceRange: '$$$',
+  knowsAbout: ['Kimberley Kampers', 'Stockman Caravans', 'Off-road caravans', 'Caravan inspections', 'Sunshine Coast caravan dealer'],
+  sameAs: ['https://www.youtube.com/@seqcampers'],
+}
+
+// FAQ schema - direct answers AI search engines can quote
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What brands of caravan does SEQ Campers stock?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SEQ Campers specialises in premium off-road caravans from Kimberley Kampers and Stockman Caravans. Every van on the lot is hand-picked, inspected, and prepared by Shane and the SEQ team before it goes on sale.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Where is SEQ Campers located?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SEQ Campers operates from the Sunshine Coast in Queensland, Australia. Visits are by appointment. Call (07) 5300 2344 to book a time.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Are SEQ Campers caravans inspected before sale?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Shane personally inspects every caravan that comes through SEQ Campers. We have on-site mechanics, roadworthy inspections, and full pre-delivery preparation as part of the sale process.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How long has SEQ Campers been operating?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "SEQ Campers has been on the Sunshine Coast for over thirty years. We also run a YouTube channel with more than 2,000 subscribers where Shane walks through every caravan in detail.",
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can SEQ Campers help with caravan handover and delivery?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Handover happens on the SEQ premises. We walk you through the van, run you through the systems, and have mechanics on site if anything needs adjusting before you tow it home.',
+      },
+    },
+  ],
+}
 ---
 
-<Site title="Premium Off-Road Caravans">
+<Site
+  title="Premium Off-Road Caravans"
+  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Kampers and Stockman stock, hand-inspected by Shane. Thirty years on the Sunshine Coast."
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
   <!-- Hero -->
   <section class="hero">
     <div class="container">

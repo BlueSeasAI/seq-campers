@@ -19,9 +19,67 @@ function youtubeEmbed(url) {
   const match = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/)
   return match ? `https://www.youtube.com/embed/${match[1]}` : null
 }
+
+// Build a meta description from structured data
+const specsBits = []
+if (caravan.specs?.sleeps) specsBits.push(`sleeps ${caravan.specs.sleeps}`)
+if (caravan.specs?.length) specsBits.push(`${caravan.specs.length}m`)
+if (caravan.specs?.tareWeight) specsBits.push(`${caravan.specs.tareWeight}kg tare`)
+const specsLine = specsBits.length ? ' - ' + specsBits.join(', ') + '.' : '.'
+const priceLine = caravan.price ? ` Priced at $${caravan.price.toLocaleString('en-AU')} AUD.` : ''
+const brandLine = caravan.brand ? ` ${caravan.brand}.` : ''
+const metaDescription = `${caravan.title} for sale at SEQ Campers in Queensland.${brandLine}${specsLine}${priceLine} Inspections welcome - call (07) 5300 2344.`
+
+const ogImage = caravan.photos?.[0] ?? null
+
+// Schema.org Product JSON-LD for AEO / AI search visibility
+const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
+const availabilityMap = {
+  'for-sale': 'https://schema.org/InStock',
+  'sold': 'https://schema.org/SoldOut',
+  'on-hold': 'https://schema.org/LimitedAvailability',
+  'coming-soon': 'https://schema.org/PreOrder',
+}
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: caravan.title,
+  ...(caravan.brand && { brand: { '@type': 'Brand', name: caravan.brand } }),
+  ...(caravan.photos?.length && { image: caravan.photos }),
+  description: metaDescription,
+  category: 'Off-road caravan',
+  ...(caravan.price && {
+    offers: {
+      '@type': 'Offer',
+      url: `${siteBase}/stock/${slug}`,
+      priceCurrency: 'AUD',
+      price: caravan.price,
+      availability: availabilityMap[caravan.status] ?? 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/UsedCondition',
+      seller: {
+        '@type': 'AutoDealer',
+        name: 'SEQ Campers',
+        telephone: '+61-7-5300-2344',
+        areaServed: 'Queensland, Australia',
+      },
+    },
+  }),
+  ...(caravan.specs && {
+    additionalProperty: [
+      caravan.specs.year && { '@type': 'PropertyValue', name: 'Year', value: caravan.specs.year },
+      caravan.specs.sleeps && { '@type': 'PropertyValue', name: 'Sleeps', value: caravan.specs.sleeps },
+      caravan.specs.length && { '@type': 'PropertyValue', name: 'Length (m)', value: caravan.specs.length },
+      caravan.specs.tareWeight && { '@type': 'PropertyValue', name: 'Tare weight (kg)', value: caravan.specs.tareWeight },
+      caravan.specs.atm && { '@type': 'PropertyValue', name: 'ATM (kg)', value: caravan.specs.atm },
+      caravan.specs.payload && { '@type': 'PropertyValue', name: 'Payload (kg)', value: caravan.specs.payload },
+      caravan.specs.ballWeight && { '@type': 'PropertyValue', name: 'Ball weight (kg)', value: caravan.specs.ballWeight },
+    ].filter(Boolean),
+  }),
+}
 ---
 
-<Site title={caravan.title}>
+<Site title={caravan.title} description={metaDescription} ogImage={ogImage} ogType="product">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(productSchema)} />
   <div class="page-header">
     <div class="container">
       {caravan.brand && <div style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--sand); margin-bottom:8px;">{caravan.brand}</div>}
