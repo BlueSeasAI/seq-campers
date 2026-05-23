@@ -1,6 +1,6 @@
 ---
 import Site from '../layouts/Site.astro'
-import { getSoldCaravans } from '../lib/sanity.js'
+import { getSoldCaravans, sanityImage, sanitySrcset } from '../lib/sanity.js'
 
 let sold = []
 try {
@@ -31,7 +31,13 @@ try {
         {sold.map((c) => (
           <div class="caravan-card" style="opacity:0.85;">
             {c.mainImage ? (
-              <img src={c.mainImage} alt={c.title} loading="lazy" />
+              <img
+                src={sanityImage(c.mainImage, { w: 640 })}
+                srcset={sanitySrcset(c.mainImage, [320, 480, 640])}
+                sizes="(max-width: 640px) 100vw, 33vw"
+                alt={c.title}
+                loading="lazy"
+              />
             ) : (
               <div style="aspect-ratio:16/10; background:#E8E0D0; display:flex; align-items:center; justify-content:center; color:#8B6A40; font-size:0.85rem;">No photo</div>
             )}

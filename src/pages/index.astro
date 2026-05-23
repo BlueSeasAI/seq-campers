@@ -1,6 +1,6 @@
 ---
 import Site from '../layouts/Site.astro'
-import { getFeaturedCaravans } from '../lib/sanity.js'
+import { getFeaturedCaravans, sanityImage, sanitySrcset, conditionLabel } from '../lib/sanity.js'
 
 let featured = []
 try {
@@ -87,10 +87,87 @@ const faqSchema = {
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
   <!-- Hero -->
-  <section class="hero">
+  <section class="hero hero-landscape">
+    <!-- Sunset / outback landscape SVG (matches Maud's signoff mockup) -->
+    <svg class="hero-svg" viewBox="0 0 1440 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3B1A2A" />
+          <stop offset="12%" stop-color="#6B2D38" />
+          <stop offset="26%" stop-color="#A84828" />
+          <stop offset="42%" stop-color="#C87040" />
+          <stop offset="58%" stop-color="#D4883A" />
+          <stop offset="72%" stop-color="#B85A28" />
+          <stop offset="86%" stop-color="#7A2E12" />
+          <stop offset="100%" stop-color="#2A1208" />
+        </linearGradient>
+        <linearGradient id="leftfade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#1A0A04" stop-opacity="0.9" />
+          <stop offset="40%" stop-color="#1A0A04" stop-opacity="0.55" />
+          <stop offset="70%" stop-color="#1A0A04" stop-opacity="0.1" />
+          <stop offset="100%" stop-color="#1A0A04" stop-opacity="0" />
+        </linearGradient>
+        <linearGradient id="groundfade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2A1208" stop-opacity="0" />
+          <stop offset="100%" stop-color="#2A1208" stop-opacity="0.85" />
+        </linearGradient>
+        <radialGradient id="sunhalo" cx="68%" cy="28%" r="38%">
+          <stop offset="0%" stop-color="#E8901A" stop-opacity="0.32" />
+          <stop offset="100%" stop-color="#E8901A" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+
+      <rect width="1440" height="600" fill="url(#sky)" />
+
+      <!-- horizontal cloud bands -->
+      <rect y="80" width="1440" height="22" fill="#C87850" opacity="0.18" />
+      <rect y="120" width="1440" height="14" fill="#D48840" opacity="0.14" />
+      <rect y="160" width="1440" height="18" fill="#B86030" opacity="0.16" />
+      <ellipse cx="1090" cy="105" rx="280" ry="22" fill="#D49058" opacity="0.20" />
+      <ellipse cx="930" cy="135" rx="220" ry="14" fill="#C87848" opacity="0.16" />
+      <ellipse cx="1200" cy="165" rx="190" ry="12" fill="#B86030" opacity="0.14" />
+
+      <!-- sun halo -->
+      <rect width="1440" height="600" fill="url(#sunhalo)" />
+
+      <!-- Uluru-style mesa -->
+      <path d="M830,420 Q855,260 950,240 Q1055,220 1145,250 Q1240,278 1310,310 Q1370,335 1440,370 L1440,600 L818,600 Z" fill="#7A2E14" opacity="0.55" />
+      <path d="M880,420 Q900,265 990,245 Q1080,228 1180,258 Q1265,283 1345,318 L1440,600 L860,600 Z" fill="#A03820" opacity="0.35" />
+      <path d="M905,415 Q925,267 1010,250 Q1095,232 1185,260 Q1270,287 1345,322" fill="none" stroke="#D4943A" stroke-width="2" opacity="0.22" />
+
+      <!-- mid-distance hills -->
+      <polygon points="600,600 800,345 920,415 1040,355 1170,425 1310,365 1440,425 1440,600" fill="#3A4818" opacity="0.30" />
+      <polygon points="640,600 830,360 955,425 1075,370 1200,440 1440,600" fill="#566030" opacity="0.18" />
+
+      <!-- foreground earth -->
+      <rect y="520" width="1440" height="80" fill="#1e0c06" opacity="0.78" />
+      <rect y="505" width="1440" height="12" fill="#7A4018" opacity="0.22" />
+      <rect y="492" width="1440" height="8" fill="#906028" opacity="0.15" />
+
+      <!-- layered mountain silhouettes -->
+      <polygon points="0,600 200,430 410,600" fill="#2e3a14" opacity="0.22" />
+      <polygon points="370,600 620,390 870,600" fill="#3a4a1a" opacity="0.18" />
+      <polygon points="0,600 240,400 500,600" fill="#6B7A3A" opacity="0.32" />
+      <polygon points="410,600 670,370 935,600" fill="#566030" opacity="0.22" />
+      <polygon points="935,600 1160,420 1390,600" fill="#C8861A" opacity="0.28" />
+      <polygon points="1040,600 1245,448 1440,600" fill="#D4943A" opacity="0.18" />
+
+      <!-- hero red centre peak -->
+      <polygon points="475,600 805,340 1135,600" fill="#7B2E16" opacity="0.5" />
+      <polygon points="520,600 840,358 1160,600" fill="#C0341A" opacity="0.28" />
+
+      <!-- ground strip -->
+      <rect y="585" width="1440" height="15" fill="#1e0c06" opacity="0.65" />
+
+      <!-- left fade for text legibility -->
+      <rect width="1440" height="600" fill="url(#leftfade)" />
+      <!-- bottom ground fade -->
+      <rect y="460" width="1440" height="140" fill="url(#groundfade)" />
+    </svg>
+
     <div class="container">
       <div class="hero-content">
-        <div class="page-eyebrow">SEQ Campers · Queensland</div>
+        <div class="page-eyebrow">SEQ Campers · Sunshine Coast, Queensland</div>
         <h1>Off-road caravans built for the long way home.</h1>
         <p>
           Kimberley Kampers and Stockman caravans, hand-picked and inspected
@@ -124,11 +201,20 @@ const faqSchema = {
           {featured.map((c) => (
             <a href={`/stock/${c.slug.current}`} class="caravan-card">
               {c.mainImage ? (
-                <img src={c.mainImage} alt={c.title} loading="lazy" />
+                <img
+                  src={sanityImage(c.mainImage, { w: 640 })}
+                  srcset={sanitySrcset(c.mainImage, [320, 480, 640, 960])}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  alt={c.title}
+                  loading="lazy"
+                />
               ) : (
                 <div style="aspect-ratio:16/10; background:#E8E0D0; display:flex; align-items:center; justify-content:center; color:#8B6A40; font-size:0.85rem;">No photo yet</div>
               )}
               <div class="card-body">
+                {c.condition && conditionLabel(c.condition) && (
+                  <span class={`condition-badge condition-${c.condition}`}>{conditionLabel(c.condition)}</span>
+                )}
                 {c.brand && <div class="card-brand">{c.brand}</div>}
                 <div class="card-title">{c.title}</div>
                 <div class="card-price">${c.price?.toLocaleString('en-AU')}</div>

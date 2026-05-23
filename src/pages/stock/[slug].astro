@@ -1,6 +1,6 @@
 ---
 import Site from '../../layouts/Site.astro'
-import { getAllCaravanPaths, getCaravan } from '../../lib/sanity.js'
+import { getAllCaravanPaths, getCaravan, sanityImage, sanitySrcset, conditionLabel } from '../../lib/sanity.js'
 
 export async function getStaticPaths() {
   const caravans = await getAllCaravanPaths()
@@ -95,7 +95,13 @@ const productSchema = {
         {caravan.photos?.length > 0 && (
           <div class="photo-gallery">
             {caravan.photos.slice(0, 5).map((url, i) => (
-              <img src={url} alt={`${caravan.title} photo ${i + 1}`} loading={i === 0 ? 'eager' : 'lazy'} />
+              <img
+                src={sanityImage(url, { w: i === 0 ? 1200 : 600 })}
+                srcset={sanitySrcset(url, i === 0 ? [640, 960, 1200, 1600] : [320, 480, 640])}
+                sizes={i === 0 ? '(max-width: 1024px) 100vw, 65vw' : '(max-width: 1024px) 50vw, 32vw'}
+                alt={`${caravan.title} photo ${i + 1}`}
+                loading={i === 0 ? 'eager' : 'lazy'}
+              />
             ))}
           </div>
         )}
@@ -135,6 +141,11 @@ const productSchema = {
 
       <!-- Right: price + specs + enquire -->
       <div class="listing-sidebar">
+        {caravan.condition && conditionLabel(caravan.condition) && (
+          <span class={`condition-badge condition-${caravan.condition}`} style="margin-bottom:14px;">
+            {conditionLabel(caravan.condition)} condition
+          </span>
+        )}
         <div class="listing-price">${caravan.price?.toLocaleString('en-AU')}</div>
         {caravan.brand && <div class="listing-brand">{caravan.brand}</div>}
 

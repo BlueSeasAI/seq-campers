@@ -1,0 +1,33 @@
+---
+import Site from '../layouts/Site.astro'
+---
+
+<Site
+  title="Thanks for getting in touch"
+  description="Your enquiry has been received. We will get back to you within one business day."
+  noindex={true}
+>
+  <div class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">Enquiry received</div>
+      <h1>Thanks. We will be in touch.</h1>
+      <p>Your message is with the SEQ team.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container" style="max-width:680px; text-align:center;">
+      <p style="font-size:1.1rem; line-height:1.7; color:#2A1608; margin-bottom:24px;">
+        We have received your enquiry and will get back to you within one business day - usually faster.
+      </p>
+      <p style="color:#8B6A40; margin-bottom:32px;">
+        If your enquiry is urgent, give us a call directly on
+        <a href="tel:0753002344" style="color:#C0341A; font-weight:600; text-decoration:none;">(07) 5300 2344</a>.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="/stock" class="btn-primary">Browse stock</a>
+        <a href="/" class="btn-ghost" style="background:rgba(42,22,8,0.06); color:#2A1608; border-color:#DCCBA8;">Back to home</a>
+      </div>
+    </div>
+  </section>
+</Site>

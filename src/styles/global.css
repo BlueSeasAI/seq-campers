@@ -160,6 +160,16 @@ nav a.is-active {
   overflow: hidden;
 }
 
+.hero-landscape { padding: 140px 0 120px; min-height: 520px; }
+
+.hero-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
 .hero-content { max-width: 560px; position: relative; z-index: 2; }
 
 .hero h1 {
@@ -312,6 +322,205 @@ nav a.is-active {
   font-size: 0.78rem;
   color: var(--muted);
   flex-wrap: wrap;
+}
+
+/* ============================================================
+   Condition badge (on cards + listing detail)
+   ============================================================ */
+.condition-badge {
+  display: inline-block;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.condition-excellent { background: #D4EDDA; color: #155724; }
+.condition-very-good { background: #E8F5E9; color: #2E7D32; }
+.condition-good      { background: #FFF3CD; color: #856404; }
+.condition-fair      { background: #FFE0B2; color: #8B3A00; }
+.condition-project   { background: #F8D7DA; color: #721C24; }
+
+/* ============================================================
+   Filter bar (stock page)
+   ============================================================ */
+.filter-bar {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin: 24px 0 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  align-items: end;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-field { display: flex; flex-direction: column; gap: 6px; }
+
+.filter-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.filter-bar select,
+.filter-bar input[type='number'] {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  padding: 9px 12px;
+  border: 1px solid var(--tan-border);
+  border-radius: 5px;
+  background: var(--sand);
+  color: var(--ink);
+  width: 100%;
+}
+
+.filter-bar select:focus,
+.filter-bar input[type='number']:focus {
+  outline: none;
+  border-color: var(--rust);
+  background: #fff;
+}
+
+.filter-price-range {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.filter-price-range input { flex: 1; min-width: 0; }
+.filter-price-range span { color: var(--muted); font-size: 0.85rem; }
+
+.filter-actions { display: flex; gap: 10px; align-items: center; }
+
+.filter-reset {
+  background: transparent;
+  border: 1.5px solid var(--tan-border);
+  border-radius: 5px;
+  padding: 9px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.filter-reset:hover { border-color: var(--ink); color: var(--ink); }
+
+.filter-results {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.filter-empty {
+  background: var(--sand-deep);
+  border: 1px dashed var(--tan-border);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ============================================================
+   Contact form + map
+   ============================================================ */
+.enquiry-form {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  display: grid;
+  gap: 14px;
+}
+
+.enquiry-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .enquiry-form .form-row { grid-template-columns: 1fr; }
+}
+
+.enquiry-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.enquiry-form input,
+.enquiry-form select,
+.enquiry-form textarea {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  padding: 11px 14px;
+  border: 1px solid var(--tan-border);
+  border-radius: 5px;
+  background: var(--sand);
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.enquiry-form input:focus,
+.enquiry-form select:focus,
+.enquiry-form textarea:focus {
+  outline: none;
+  border-color: var(--rust);
+  background: #fff;
+}
+
+.enquiry-form textarea { min-height: 120px; resize: vertical; }
+
+.enquiry-form button[type='submit'] {
+  background: var(--rust);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 14px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.enquiry-form button[type='submit']:hover { background: var(--rust-dark); }
+
+.enquiry-form .hp { display: none; }
+
+.map-embed {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--tan-border);
+  box-shadow: var(--shadow-sm);
+  margin-top: 24px;
+}
+
+.map-embed iframe {
+  display: block;
+  width: 100%;
+  height: 320px;
+  border: 0;
 }
 
 /* ============================================================

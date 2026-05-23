@@ -64,6 +64,23 @@ export default {
     },
 
     {
+      name: 'condition',
+      title: 'Condition rating',
+      type: 'string',
+      description: 'Honest assessment of overall condition. Shown as a badge on the listing.',
+      options: {
+        list: [
+          { title: 'Excellent - as-new', value: 'excellent' },
+          { title: 'Very Good', value: 'very-good' },
+          { title: 'Good', value: 'good' },
+          { title: 'Fair', value: 'fair' },
+          { title: 'Project - needs work', value: 'project' },
+        ],
+        layout: 'dropdown',
+      },
+    },
+
+    {
       name: 'photos',
       title: 'Photos',
       type: 'array',

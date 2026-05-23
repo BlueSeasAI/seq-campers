@@ -1,47 +1,184 @@
 ---
 import Site from '../../layouts/Site.astro'
-import { getForSaleCaravans } from '../../lib/sanity.js'
+import {
+  getForSaleCaravans,
+  getDistinctBrands,
+  sanityImage,
+  sanitySrcset,
+  conditionLabel,
+} from '../../lib/sanity.js'
 
 const caravans = await getForSaleCaravans()
+const brands = await getDistinctBrands()
 const description = `Browse ${caravans.length} premium off-road caravan${caravans.length === 1 ? '' : 's'} for sale at SEQ Campers in Queensland. Kimberley Kampers, Stockman, and hand-picked stock - inspected, ready to tow.`
 ---
 
-<Site title="Caravans for Sale" description={description} ogType="website">
+<Site title="Caravans for Sale" description={description}>
   <div class="page-header">
     <div class="container">
-      <h1>Caravans for Sale</h1>
-      <p>{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} available</p>
+      <div class="page-eyebrow">Stock</div>
+      <h1>Caravans for sale</h1>
+      <p id="result-count">{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} available</p>
     </div>
   </div>
 
   <div class="container">
     {caravans.length === 0 ? (
-      <div style="padding: 80px 0; text-align: center; color: var(--text-muted);">
-        <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">Stock listings coming soon</p>
+      <div class="empty-state">
+        <div class="empty-title">Stock listings coming soon</div>
         <p>We are currently loading our caravan inventory. Check back shortly.</p>
       </div>
     ) : (
-      <div class="stock-grid">
-        {caravans.map((c) => (
-          <a href={`/stock/${c.slug.current}`} class="caravan-card">
-            {c.mainImage ? (
-              <img src={c.mainImage} alt={c.title} loading="lazy" />
-            ) : (
-              <div style="aspect-ratio:16/10; background:#e5ddd4; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.85rem;">No photo yet</div>
-            )}
-            <div class="card-body">
-              {c.brand && <div class="card-brand">{c.brand}</div>}
-              <div class="card-title">{c.title}</div>
-              <div class="card-price">${c.price?.toLocaleString('en-AU')}</div>
-              <div class="card-specs">
-                {c.specs?.sleeps && <span>Sleeps {c.specs.sleeps}</span>}
-                {c.specs?.length && <span>{c.specs.length}ft</span>}
-                {c.specs?.tareWeight && <span>{c.specs.tareWeight}kg</span>}
-              </div>
+      <>
+        <form class="filter-bar" id="stock-filters" aria-label="Filter stock">
+          <div class="filter-field">
+            <label class="filter-label" for="filter-brand">Brand</label>
+            <select id="filter-brand" name="brand">
+              <option value="">All brands</option>
+              {brands.map((b) => <option value={b}>{b}</option>)}
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label class="filter-label" for="filter-status">Status</label>
+            <select id="filter-status" name="status">
+              <option value="">All</option>
+              <option value="for-sale">For Sale</option>
+              <option value="on-hold">On Hold</option>
+              <option value="coming-soon">Coming Soon</option>
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label class="filter-label" for="filter-price-min">Price (AUD)</label>
+            <div class="filter-price-range">
+              <input id="filter-price-min" name="priceMin" type="number" placeholder="Min" min="0" step="1000" />
+              <span>to</span>
+              <input id="filter-price-max" name="priceMax" type="number" placeholder="Max" min="0" step="1000" />
             </div>
-          </a>
-        ))}
-      </div>
+          </div>
+
+          <div class="filter-field">
+            <label class="filter-label">&nbsp;</label>
+            <button type="reset" class="filter-reset">Reset filters</button>
+          </div>
+        </form>
+
+        <div class="stock-grid" id="stock-grid">
+          {caravans.map((c) => (
+            <a
+              href={`/stock/${c.slug.current}`}
+              class="caravan-card"
+              data-brand={c.brand || ''}
+              data-status={c.status || ''}
+              data-price={c.price || 0}
+              data-condition={c.condition || ''}
+            >
+              {c.mainImage ? (
+                <img
+                  src={sanityImage(c.mainImage, { w: 640 })}
+                  srcset={sanitySrcset(c.mainImage, [320, 480, 640, 960])}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  alt={c.title}
+                  loading="lazy"
+                />
+              ) : (
+                <div style="aspect-ratio:16/10; background:#E8E0D0; display:flex; align-items:center; justify-content:center; color:#8B6A40; font-size:0.85rem;">No photo yet</div>
+              )}
+              <div class="card-body">
+                {c.condition && conditionLabel(c.condition) && (
+                  <span class={`condition-badge condition-${c.condition}`}>{conditionLabel(c.condition)}</span>
+                )}
+                {c.brand && <div class="card-brand">{c.brand}</div>}
+                <div class="card-title">{c.title}</div>
+                <div class="card-price">${c.price?.toLocaleString('en-AU')}</div>
+                <div class="card-specs">
+                  {c.specs?.sleeps && <span>Sleeps {c.specs.sleeps}</span>}
+                  {c.specs?.length && <span>{c.specs.length}m</span>}
+                  {c.specs?.tareWeight && <span>{c.specs.tareWeight}kg</span>}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="filter-empty" id="filter-empty-state" style="display:none;">
+          <p>No caravans match these filters. Try widening the price range or clearing a filter.</p>
+        </div>
+      </>
     )}
   </div>
+
+  <script is:inline>
+    (function () {
+      const form = document.getElementById('stock-filters')
+      if (!form) return
+      const cards = Array.from(document.querySelectorAll('#stock-grid .caravan-card'))
+      const countEl = document.getElementById('result-count')
+      const emptyState = document.getElementById('filter-empty-state')
+      const grid = document.getElementById('stock-grid')
+      const total = cards.length
+
+      function readFilters() {
+        const data = new FormData(form)
+        return {
+          brand: (data.get('brand') || '').toString().trim(),
+          status: (data.get('status') || '').toString().trim(),
+          priceMin: parseFloat(data.get('priceMin')) || 0,
+          priceMax: parseFloat(data.get('priceMax')) || Infinity,
+        }
+      }
+
+      function applyFilters() {
+        const f = readFilters()
+        let visible = 0
+        cards.forEach(function (c) {
+          const brand = c.dataset.brand || ''
+          const status = c.dataset.status || ''
+          const price = parseFloat(c.dataset.price) || 0
+          const match =
+            (!f.brand || brand === f.brand) &&
+            (!f.status || status === f.status) &&
+            price >= f.priceMin &&
+            price <= f.priceMax
+          c.style.display = match ? '' : 'none'
+          if (match) visible++
+        })
+        if (countEl) {
+          countEl.textContent =
+            visible === total
+              ? total + ' caravan' + (total !== 1 ? 's' : '') + ' available'
+              : visible + ' of ' + total + ' caravan' + (total !== 1 ? 's' : '')
+        }
+        if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none'
+        if (grid) grid.style.display = visible === 0 ? 'none' : ''
+        syncUrl(f)
+      }
+
+      function syncUrl(f) {
+        const params = new URLSearchParams()
+        if (f.brand) params.set('brand', f.brand)
+        if (f.status) params.set('status', f.status)
+        if (f.priceMin) params.set('priceMin', String(f.priceMin))
+        if (f.priceMax && Number.isFinite(f.priceMax)) params.set('priceMax', String(f.priceMax))
+        const qs = params.toString()
+        history.replaceState(null, '', qs ? '?' + qs : window.location.pathname)
+      }
+
+      function applyUrlToForm() {
+        const params = new URLSearchParams(window.location.search)
+        if (params.has('brand')) form.brand.value = params.get('brand')
+        if (params.has('status')) form.status.value = params.get('status')
+        if (params.has('priceMin')) form.priceMin.value = params.get('priceMin')
+        if (params.has('priceMax')) form.priceMax.value = params.get('priceMax')
+      }
+
+      applyUrlToForm()
+      applyFilters()
+      form.addEventListener('input', applyFilters)
+      form.addEventListener('reset', function () {
+        setTimeout(applyFilters, 0)
+      })
+    })()
+  </script>
 </Site>

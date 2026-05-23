@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SEQ Campers">
+  <rect width="64" height="64" rx="12" fill="#C0341A"/>
+  <text
+    x="32"
+    y="44"
+    text-anchor="middle"
+    font-family="'Inter Tight', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-weight="800"
+    font-size="28"
+    letter-spacing="-0.5"
+    fill="#F4EDE0"
+  >SEQ</text>
+</svg>
