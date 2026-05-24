@@ -1,12 +1,7 @@
 ---
 import Site from '../../layouts/Site.astro'
-import {
-  getForSaleCaravans,
-  getDistinctBrands,
-  sanityImage,
-  sanitySrcset,
-  conditionLabel,
-} from '../../lib/sanity.js'
+import CaravanCard from '../../components/CaravanCard.astro'
+import { getForSaleCaravans, getDistinctBrands } from '../../lib/sanity.js'
 
 const caravans = await getForSaleCaravans()
 const brands = await getDistinctBrands()
@@ -65,41 +60,7 @@ const description = `Browse ${caravans.length} premium off-road caravan${caravan
         </form>
 
         <div class="stock-grid" id="stock-grid">
-          {caravans.map((c) => (
-            <a
-              href={`/stock/${c.slug.current}`}
-              class="caravan-card"
-              data-brand={c.brand || ''}
-              data-status={c.status || ''}
-              data-price={c.price || 0}
-              data-condition={c.condition || ''}
-            >
-              {c.mainImage ? (
-                <img
-                  src={sanityImage(c.mainImage, { w: 640 })}
-                  srcset={sanitySrcset(c.mainImage, [320, 480, 640, 960])}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  alt={c.title}
-                  loading="lazy"
-                />
-              ) : (
-                <div style="aspect-ratio:16/10; background:#E8E0D0; display:flex; align-items:center; justify-content:center; color:#8B6A40; font-size:0.85rem;">No photo yet</div>
-              )}
-              <div class="card-body">
-                {c.condition && conditionLabel(c.condition) && (
-                  <span class={`condition-badge condition-${c.condition}`}>{conditionLabel(c.condition)}</span>
-                )}
-                {c.brand && <div class="card-brand">{c.brand}</div>}
-                <div class="card-title">{c.title}</div>
-                <div class="card-price">${c.price?.toLocaleString('en-AU')}</div>
-                <div class="card-specs">
-                  {c.specs?.sleeps && <span>Sleeps {c.specs.sleeps}</span>}
-                  {c.specs?.length && <span>{c.specs.length}m</span>}
-                  {c.specs?.tareWeight && <span>{c.specs.tareWeight}kg</span>}
-                </div>
-              </div>
-            </a>
-          ))}
+          {caravans.map((c) => <CaravanCard caravan={c} showSpecs />)}
         </div>
 
         <div class="filter-empty" id="filter-empty-state" style="display:none;">

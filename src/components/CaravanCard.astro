@@ -1,0 +1,75 @@
+---
+/**
+ * Reusable caravan card. Used on home (featured), stock (listing), sold archive.
+ *
+ * Props:
+ *   caravan  - the caravan object (id, title, slug, brand, price, mainImage,
+ *              status, condition, specs?)
+ *   variant  - "stock" (default, linked, active state) | "sold" (non-linked, faded)
+ *   showSpecs - boolean, show the small Sleeps/Length/Tare row under the price
+ */
+import { sanityImage, sanitySrcset, conditionLabel } from '../lib/sanity.js'
+
+const { caravan: c, variant = 'stock', showSpecs = false } = Astro.props
+const isSold = variant === 'sold'
+const slugStr = typeof c.slug === 'string' ? c.slug : c.slug?.current
+const href = !isSold && slugStr ? `/stock/${slugStr}` : null
+---
+
+{href ? (
+  <a
+    href={href}
+    class="caravan-card"
+    data-brand={c.brand || ''}
+    data-status={c.status || ''}
+    data-price={c.price || 0}
+    data-condition={c.condition || ''}
+  >
+    {c.mainImage ? (
+      <img
+        src={sanityImage(c.mainImage, { w: 640 })}
+        srcset={sanitySrcset(c.mainImage, [320, 480, 640, 960])}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        alt={c.title}
+        loading="lazy"
+      />
+    ) : (
+      <div class="caravan-card-noimg">No photo yet</div>
+    )}
+    <div class="card-body">
+      {c.condition && conditionLabel(c.condition) && (
+        <span class={`condition-badge condition-${c.condition}`}>{conditionLabel(c.condition)}</span>
+      )}
+      {c.brand && <div class="card-brand">{c.brand}</div>}
+      <div class="card-title">{c.title}</div>
+      <div class="card-price">${c.price?.toLocaleString('en-AU')}</div>
+      {showSpecs && (
+        <div class="card-specs">
+          {c.specs?.sleeps && <span>Sleeps {c.specs.sleeps}</span>}
+          {c.specs?.length && <span>{c.specs.length}m</span>}
+          {c.specs?.tareWeight && <span>{c.specs.tareWeight}kg</span>}
+        </div>
+      )}
+    </div>
+  </a>
+) : (
+  <div class="caravan-card caravan-card-sold">
+    {c.mainImage ? (
+      <img
+        src={sanityImage(c.mainImage, { w: 640 })}
+        srcset={sanitySrcset(c.mainImage, [320, 480, 640])}
+        sizes="(max-width: 640px) 100vw, 33vw"
+        alt={c.title}
+        loading="lazy"
+      />
+    ) : (
+      <div class="caravan-card-noimg">No photo</div>
+    )}
+    <div class="card-body">
+      {c.brand && <div class="card-brand">{c.brand}</div>}
+      <div class="card-title">{c.title}</div>
+      <div class="card-price card-price-sold">${c.price?.toLocaleString('en-AU')}</div>
+      <div class="card-sold-tag">Sold</div>
+    </div>
+  </div>
+)}
