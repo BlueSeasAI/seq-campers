@@ -317,6 +317,42 @@ export default {
     },
 
     {
+      name: 'faqs',
+      title: 'FAQs for this caravan (optional)',
+      type: 'array',
+      description:
+        'Optional. If left empty, the site uses a smart default FAQ set tailored to this caravan (brand, model, specs). Add custom Q&As here when you want to answer something specific - e.g. "Does this van have the optional Cape York pack?" Each Q&A is also exposed as Schema.org FAQPage data so AI search engines can quote the answers directly.',
+      of: [
+        {
+          type: 'object',
+          name: 'faq',
+          fields: [
+            {
+              name: 'q',
+              title: 'Question',
+              type: 'string',
+              description: 'Phrase as a natural search query.',
+              validation: (Rule) => Rule.required().min(8).max(180),
+            },
+            {
+              name: 'a',
+              title: 'Answer',
+              type: 'text',
+              rows: 3,
+              description: 'Direct answer in 40-80 words. First sentence should answer the question outright.',
+              validation: (Rule) => Rule.required().min(20).max(800),
+            },
+          ],
+          preview: {
+            select: { title: 'q', subtitle: 'a' },
+          },
+        },
+      ],
+      validation: (Rule) =>
+        Rule.max(8).warning('More than 8 FAQs makes the listing harder to scan - aim for 5-6'),
+    },
+
+    {
       name: 'features',
       title: 'Key features',
       type: 'array',

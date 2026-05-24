@@ -1,0 +1,40 @@
+# SEQ Campers
+
+Premium off-road caravan dealer on the Sunshine Coast, Queensland, Australia.
+Three decades selling hand-picked Kimberley Kampers and Stockman Caravans.
+
+## Contact
+- Phone: +61 7 5300 2344
+- Email: office@seqcampers.com.au
+- Website: https://seqcampers.com.au
+- YouTube: https://www.youtube.com/@seqcampers
+
+## What we sell
+- Kimberley Kampers - premium off-road caravans, made in Australia
+- Stockman Caravans - off-road caravans, made in Australia
+- All stock is hand-picked, inspected, and prepared by Shane personally before listing
+- 30+ years industry experience, 2,000+ subscribers on YouTube
+
+## Key pages
+- /                - Home with featured caravans and 5 FAQs about the business
+- /stock           - Current caravan inventory with brand/status/price filters
+- /stock/[slug]    - Per-caravan listing pages with full specs, photos, configurator, and 5+ FAQs
+- /sold            - Archive of recently sold caravans
+- /about           - Company background and team
+- /contact         - Phone, email, enquiry form, and map
+
+## How buyers work with us
+Every buyer can use the on-page configurator to tick upgrade options
+and receive an indicative price. We follow up with a written quote
+within one business day. Inspections welcome on the Sunshine Coast
+by appointment only - call (07) 5300 2344 to book.
+
+## Schema markup available
+- Product (per caravan, with Offer, AutoDealer seller, additionalProperty specs)
+- AutoDealer / LocalBusiness (homepage)
+- FAQPage (homepage + every caravan detail page)
+- BreadcrumbList (caravan detail pages)
+- Open Graph + Twitter Card on every page
+
+## Service area
+Queensland (primary), all Australian states (delivery available).

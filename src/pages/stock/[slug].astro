@@ -49,6 +49,9 @@ const metaDescription = `${caravan.title} for sale at SEQ Campers in Queensland.
 
 const ogImage = caravan.photos?.[0] ?? null
 
+// Canonical site base URL used by Schema.org JSON-LD blocks below
+const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
+
 // Description is Portable Text (rich text blocks). Render to clean HTML.
 const descriptionHtml = portableTextToHtml(caravan.description)
 
@@ -56,6 +59,57 @@ const configuratorOptions = caravan.configurator?.length
   ? caravan.configurator
   : PLACEHOLDER_CONFIGURATOR_OPTIONS
 const configuratorIsPlaceholder = !caravan.configurator?.length
+
+// FAQs - use per-caravan custom FAQs from Sanity if present, otherwise
+// generate a smart default set from the caravan's structured data.
+const defaultFaqs = [
+  {
+    q: `Is the ${caravan.title} suitable for off-road touring?`,
+    a: `Yes. The ${caravan.title} is an off-road caravan built for Australian conditions${caravan.brand ? ` by ${caravan.brand}` : ''}. It handles corrugations, river crossings and outback tracks. We test and inspect every caravan on the lot before listing.`,
+  },
+  {
+    q: `Can I inspect the ${caravan.title} before buying?`,
+    a: `Absolutely. We strongly encourage on-site inspection at SEQ Campers in Queensland. Call (07) 5300 2344 or email office@seqcampers.com.au to book a time. Shane personally walks every buyer through the van.`,
+  },
+  {
+    q: `Does the listed price include on-road costs and registration?`,
+    a: `The listed price is the caravan only. On-road costs (registration transfer, stamp duty, delivery) are confirmed in writing as part of your formal quote. Use the "Build your spec" tool on this page to send through your selections.`,
+  },
+  ...(caravan.specs?.atm
+    ? [{
+        q: `What can I tow the ${caravan.title} with?`,
+        a: `Check the ATM (maximum loaded weight) against your tow vehicle's tow rating. The ${caravan.title} has an ATM of ${caravan.specs.atm}kg${caravan.specs.tareWeight ? ` and tare of ${caravan.specs.tareWeight}kg` : ''}. A dual-cab ute or 4WD wagon with at least ${Math.ceil(caravan.specs.atm / 1000) * 1000}kg tow rating is typically required.`,
+      }]
+    : []),
+  {
+    q: `Does SEQ Campers accept trade-ins?`,
+    a: `Yes. SEQ Campers accepts trade-ins on most caravans. Send photos and details of your current van with your enquiry and we will come back with a trade-in valuation as part of the quote.`,
+  },
+]
+const caravanFaqs = caravan.faqs?.length ? caravan.faqs : defaultFaqs
+const faqIsCustom = caravan.faqs?.length > 0
+
+// BreadcrumbList schema for AI search hierarchy signal
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteBase}/` },
+    { '@type': 'ListItem', position: 2, name: 'Caravans for Sale', item: `${siteBase}/stock` },
+    { '@type': 'ListItem', position: 3, name: caravan.title, item: `${siteBase}/stock/${slug}` },
+  ],
+}
+
+// FAQPage schema (lets AI quote answers verbatim)
+const faqPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: caravanFaqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+}
 
 // Battery type pretty label
 const batteryTypeLabel = {
@@ -66,8 +120,7 @@ const batteryTypeLabel = {
   mixed: 'Mixed',
 }[caravan.power?.batteryType] || null
 
-// Schema.org Product JSON-LD for AEO / AI search visibility
-const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
+// Schema.org Product JSON-LD for AEO / AI search visibility (siteBase declared above)
 const availabilityMap = {
   'for-sale': 'https://schema.org/InStock',
   'sold': 'https://schema.org/SoldOut',
@@ -118,6 +171,8 @@ const productSchema = {
 
 <Site title={caravan.title} description={metaDescription} ogImage={ogImage} ogType="product">
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(productSchema)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqPageSchema)} />
   <div class="page-header">
     <div class="container">
       {caravan.brand && <div style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--sand); margin-bottom:8px;">{caravan.brand}</div>}
@@ -284,5 +339,25 @@ const productSchema = {
         isPlaceholder={configuratorIsPlaceholder}
       />
     </div>
+
+    <!-- FAQ section (FAQPage schema is in <head>) -->
+    <section class="faq-section" aria-label="Frequently asked questions">
+      <div class="page-eyebrow" style="color:var(--rust);">Common questions</div>
+      <h2 class="faq-title">About this caravan</h2>
+      <div class="faq-list">
+        {caravanFaqs.map((f) => (
+          <details class="faq-item">
+            <summary>{f.q}</summary>
+            <div class="faq-answer">{f.a}</div>
+          </details>
+        ))}
+      </div>
+      {!faqIsCustom && (
+        <p class="faq-note">
+          Have a question not answered here? <a href="/contact">Get in touch</a>
+          - we will reply within one business day.
+        </p>
+      )}
+    </section>
   </div>
 </Site>

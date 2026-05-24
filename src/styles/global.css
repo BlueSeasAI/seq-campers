@@ -950,6 +950,81 @@ a:focus-visible, button:focus-visible {
 }
 
 /* ============================================================
+   FAQ section (caravan detail page)
+   ============================================================ */
+.faq-section {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 24px 0 48px;
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin: 8px 0 24px;
+}
+
+.faq-list { display: flex; flex-direction: column; gap: 4px; }
+
+.faq-item {
+  border-top: 1px solid var(--tan-border);
+  padding: 4px 0;
+}
+.faq-item:last-of-type { border-bottom: 1px solid var(--tan-border); }
+
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 36px 16px 0;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  position: relative;
+  transition: color 0.15s;
+}
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-item summary::after {
+  content: '+';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--rust);
+  font-size: 1.4rem;
+  font-weight: 400;
+  transition: transform 0.2s;
+}
+
+.faq-item[open] summary::after { content: '−'; }
+
+.faq-item summary:hover { color: var(--rust); }
+
+.faq-answer {
+  padding: 0 0 20px;
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.faq-note {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.faq-note a { color: var(--rust); font-weight: 600; }
+
+/* ============================================================
    Footer
    ============================================================ */
 .site-footer {
