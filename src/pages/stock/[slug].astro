@@ -1,6 +1,23 @@
 ---
 import Site from '../../layouts/Site.astro'
 import { getAllCaravanPaths, getCaravan, sanityImage, sanitySrcset, conditionLabel } from '../../lib/sanity.js'
+import Configurator from '../../components/Configurator.jsx'
+
+// PLACEHOLDER configurator options. Used only when a caravan does not yet
+// have its own configurator data loaded in Sanity. Remove the fallback once
+// Q-07 (Maud's real per-caravan add-on list) lands and is in the CMS.
+const PLACEHOLDER_CONFIGURATOR_OPTIONS = [
+  { name: 'Solar package upgrade (300W roof + 200W portable)', priceAdd: 3200 },
+  { name: 'Lithium battery upgrade (200Ah LiFePO4)', priceAdd: 4800 },
+  { name: 'Diesel heater (Webasto)', priceAdd: 1900 },
+  { name: 'Air conditioner (rooftop reverse cycle)', priceAdd: 2400 },
+  { name: 'External shower kit + hot water', priceAdd: 650 },
+  { name: 'Bike rack (3-bike rear-mount)', priceAdd: 600 },
+  { name: 'Roll-out awning (Dometic 4m)', priceAdd: 1850 },
+  { name: 'Stone deflector + rock tamer', priceAdd: 880 },
+  { name: 'Off-road jockey wheel + sand pegs kit', priceAdd: 420 },
+  { name: 'Premium mattress upgrade (memory foam)', priceAdd: 1100 },
+]
 
 export async function getStaticPaths() {
   const caravans = await getAllCaravanPaths()
@@ -31,6 +48,11 @@ const brandLine = caravan.brand ? ` ${caravan.brand}.` : ''
 const metaDescription = `${caravan.title} for sale at SEQ Campers in Queensland.${brandLine}${specsLine}${priceLine} Inspections welcome - call (07) 5300 2344.`
 
 const ogImage = caravan.photos?.[0] ?? null
+
+const configuratorOptions = caravan.configurator?.length
+  ? caravan.configurator
+  : PLACEHOLDER_CONFIGURATOR_OPTIONS
+const configuratorIsPlaceholder = !caravan.configurator?.length
 
 // Schema.org Product JSON-LD for AEO / AI search visibility
 const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
@@ -178,13 +200,27 @@ const productSchema = {
           </div>
         )}
 
-        <a href="/contact" class="btn-enquire">Enquire about this caravan</a>
+        <a href="#configurator" class="btn-enquire">Build your spec + get a quote</a>
 
         <p style="margin-top:16px; font-size:0.78rem; color:var(--text-muted); text-align:center;">
           Or call us on <a href="tel:0755300234" style="color:var(--rust);">(07) 5300 2344</a>
         </p>
       </div>
 
+    </div>
+
+    <!-- Configurator (React component, client-side hydrated for live total) -->
+    <div id="configurator">
+      <Configurator
+        client:load
+        basePrice={caravan.price}
+        options={configuratorOptions}
+        caravanTitle={caravan.title}
+        caravanSlug={slug}
+        contactEmail="office@seqcampers.com.au"
+        siteBase={siteBase}
+        isPlaceholder={configuratorIsPlaceholder}
+      />
     </div>
   </div>
 </Site>
