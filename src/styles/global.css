@@ -642,6 +642,55 @@ nav a.is-active {
 }
 
 /* ============================================================
+   Rich text (Portable Text rendered from Sanity)
+   ============================================================ */
+.rich-text { color: var(--muted); line-height: 1.8; font-size: 0.98rem; }
+.rich-text > * + * { margin-top: 14px; }
+.rich-text p { color: var(--muted); line-height: 1.8; }
+.rich-text h2 {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 22px;
+}
+.rich-text h3 {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 18px;
+}
+.rich-text h4 {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 16px;
+}
+.rich-text ul, .rich-text ol {
+  padding-left: 22px;
+  color: var(--muted);
+}
+.rich-text li { margin-bottom: 4px; }
+.rich-text a {
+  color: var(--rust);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.rich-text blockquote {
+  margin-left: 0;
+  padding: 12px 18px;
+  border-left: 3px solid var(--gold);
+  background: rgba(212, 148, 58, 0.06);
+  font-style: italic;
+  color: var(--ink);
+}
+.rich-text strong { color: var(--ink); font-weight: 700; }
+
+/* ============================================================
    Caravan configurator (interactive React component on detail pages)
    ============================================================ */
 .configurator {

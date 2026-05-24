@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
+import { toHTML } from '@portabletext/to-html'
 
 export const client = createClient({
   projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
@@ -32,6 +33,42 @@ export function sanityImage(url, opts = {}) {
 export function sanitySrcset(url, widths) {
   if (!url) return null
   return widths.map((w) => `${sanityImage(url, { w })} ${w}w`).join(', ')
+}
+
+/**
+ * Render Sanity Portable Text (the array-of-blocks structure used by rich
+ * text fields like description) as a clean HTML string. Use with Astro's
+ * set:html directive.
+ *
+ * Handles: paragraphs, headings (h2/h3/h4), bold, italic, links, lists.
+ * Returns empty string for null/undefined/empty input so safe to inline.
+ */
+export function portableTextToHtml(blocks) {
+  if (!blocks || (Array.isArray(blocks) && blocks.length === 0)) return ''
+  if (typeof blocks === 'string') return blocks
+  try {
+    return toHTML(blocks, {
+      components: {
+        block: {
+          normal: ({ children }) => `<p>${children}</p>`,
+          h1: ({ children }) => `<h2>${children}</h2>`,
+          h2: ({ children }) => `<h2>${children}</h2>`,
+          h3: ({ children }) => `<h3>${children}</h3>`,
+          h4: ({ children }) => `<h4>${children}</h4>`,
+          blockquote: ({ children }) => `<blockquote>${children}</blockquote>`,
+        },
+        marks: {
+          link: ({ children, value }) => {
+            const href = value?.href || '#'
+            return `<a href="${href}" rel="noopener" target="_blank">${children}</a>`
+          },
+        },
+      },
+    })
+  } catch (err) {
+    console.warn('portableTextToHtml failed:', err.message)
+    return ''
+  }
 }
 
 /**

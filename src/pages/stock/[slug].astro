@@ -1,6 +1,6 @@
 ---
 import Site from '../../layouts/Site.astro'
-import { getAllCaravanPaths, getCaravan, sanityImage, sanitySrcset, conditionLabel } from '../../lib/sanity.js'
+import { getAllCaravanPaths, getCaravan, sanityImage, sanitySrcset, conditionLabel, portableTextToHtml } from '../../lib/sanity.js'
 import Configurator from '../../components/Configurator.jsx'
 
 // PLACEHOLDER configurator options. Used only when a caravan does not yet
@@ -48,6 +48,9 @@ const brandLine = caravan.brand ? ` ${caravan.brand}.` : ''
 const metaDescription = `${caravan.title} for sale at SEQ Campers in Queensland.${brandLine}${specsLine}${priceLine} Inspections welcome - call (07) 5300 2344.`
 
 const ogImage = caravan.photos?.[0] ?? null
+
+// Description is Portable Text (rich text blocks). Render to clean HTML.
+const descriptionHtml = portableTextToHtml(caravan.description)
 
 const configuratorOptions = caravan.configurator?.length
   ? caravan.configurator
@@ -141,10 +144,10 @@ const productSchema = {
           </div>
         )}
 
-        {caravan.description && (
+        {descriptionHtml && (
           <div style="margin-top:32px;">
             <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">About this caravan</h2>
-            <p style="color:var(--muted); line-height:1.8;">{caravan.description}</p>
+            <div class="rich-text" set:html={descriptionHtml} />
           </div>
         )}
 
