@@ -148,6 +148,96 @@ export async function getAllCaravanPaths() {
 }
 
 /**
+ * Extract the YouTube video ID from any of the standard URL formats.
+ * Returns null for invalid / non-YouTube URLs.
+ */
+export function youtubeId(url) {
+  if (!url) return null
+  const m = String(url).match(/(?:v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
+/** YouTube thumbnail URL (high quality JPEG, publicly accessible). */
+export function youtubeThumb(url) {
+  const id = youtubeId(url)
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null
+}
+
+/** YouTube embed URL (autoplay + muted ready for hero loops). */
+export function youtubeEmbedUrl(url, opts = {}) {
+  const id = youtubeId(url)
+  if (!id) return null
+  const params = new URLSearchParams()
+  if (opts.autoplay) { params.set('autoplay', '1'); params.set('mute', '1') }
+  if (opts.loop) { params.set('loop', '1'); params.set('playlist', id) }
+  if (opts.controls === false) params.set('controls', '0')
+  const qs = params.toString()
+  return `https://www.youtube.com/embed/${id}${qs ? '?' + qs : ''}`
+}
+
+// ---------------------------------------------------------------------------
+// Video library queries
+// ---------------------------------------------------------------------------
+
+export async function getAllVideos() {
+  return client.fetch(`
+    *[_type == "video"]
+    | order(category asc, order asc, _createdAt desc) {
+      _id, title, youtubeUrl, description, category, featured, order
+    }
+  `)
+}
+
+export async function getFeaturedVideos(limit = 3) {
+  return client.fetch(
+    `
+    *[_type == "video" && featured == true]
+    | order(order asc, _createdAt desc)
+    [0...$limit] {
+      _id, title, youtubeUrl, description, category
+    }
+  `,
+    { limit }
+  )
+}
+
+export async function getVideosByCategory() {
+  const all = await getAllVideos()
+  const groups = {}
+  all.forEach((v) => {
+    const key = v.category || 'uncategorised'
+    if (!groups[key]) groups[key] = []
+    groups[key].push(v)
+  })
+  return groups
+}
+
+// ---------------------------------------------------------------------------
+// Site Settings singleton
+// ---------------------------------------------------------------------------
+
+export async function getSiteSettings() {
+  return client.fetch(`
+    *[_id == "siteSettings"][0] {
+      heroVideo,
+      "shanesPick": shanesPick {
+        originalPrice,
+        shanesQuote,
+        "caravan": caravan->{
+          _id, title, slug, price, status, condition, featured,
+          "brand": brand->name,
+          "mainImage": photos[0].asset->url,
+          specs { sleeps, length, tareWeight }
+        }
+      },
+      workshopHours,
+      showroomHours,
+      streetAddress
+    }
+  `)
+}
+
+/**
  * Distinct brand names of for-sale caravans (used by the stock page filter bar).
  */
 export async function getDistinctBrands() {

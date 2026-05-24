@@ -1,0 +1,168 @@
+---
+import Site from '../layouts/Site.astro'
+import { getSiteSettings } from '../lib/sanity.js'
+
+let settings = {}
+try { settings = await getSiteSettings() ?? {} } catch (err) {
+  console.warn('Sanity unreachable on build:', err.message)
+}
+const workshopHours = settings.workshopHours || 'Mon to Fri, 8am to 4:30pm AEST'
+
+const services = [
+  {
+    title: 'Scheduled Service',
+    body: 'Regular maintenance to keep your rig running like the day you picked it up. Bearings, brakes, lights, hoses, gas, electrics - the full pre-trip check.',
+  },
+  {
+    title: 'Warranty Work',
+    body: 'Authorised warranty service for Kimberley Kampers and Stockman Products. Done right, done locally, sorted directly with the manufacturer.',
+  },
+  {
+    title: 'Custom Modifications',
+    body: 'Solar upgrades, lithium battery swap-outs, awning setups, bike racks, storage solutions. We\'ll set your rig up exactly the way you travel.',
+  },
+]
+
+const whyUs = [
+  { title: '30 years selling and servicing off-road campers', body: 'We know what fails, what doesn\'t, and what\'s worth doing now versus later.' },
+  { title: 'Genuine Kimberley and Stockman parts in stock', body: 'No waiting weeks for an obscure component - most jobs we have the part on the shelf.' },
+  { title: 'Transparent pricing', body: 'We\'ll tell you what it needs, what it\'ll cost, and what can wait. No surprises on the invoice.' },
+  { title: 'Loaner available', body: 'Need to keep moving while yours is in? We can usually sort a loaner. Just ask when you book.' },
+]
+
+const recentJobs = [
+  { title: 'Solar + battery upgrade', body: '400W rooftop array with dual lithium batteries and a new MPPT charge controller. Same-day install, signed off and tested.' },
+  { title: 'Full pre-trip service', body: 'Service, bearing check, brake adjustment, gas certification and electrical test. Customer left for Cape York the following morning.' },
+  { title: 'Custom roof rack build', body: 'Built to carry two kayaks and a rooftop awning. Powdercoated to match the chassis, all welds checked.' },
+]
+---
+
+<Site
+  title="Workshop & Service"
+  description="SEQ Campers' on-site workshop services off-road campers and caravans on the Sunshine Coast. Scheduled service, warranty work, custom modifications. Book online or call (07) 5370 7933."
+>
+  <div class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">Workshop</div>
+      <h1>We don't just sell them. We service them for life.</h1>
+      <p>Sunshine Coast workshop - {workshopHours}</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="services-grid">
+        {services.map((s) => (
+          <div class="service-card">
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band-dark">
+    <div class="container">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:28px;">
+        {whyUs.map((w) => (
+          <div>
+            <h3 style="font-family:'Inter Tight', sans-serif; color:var(--sand); margin-bottom:6px; font-size:1.05rem;">{w.title}</h3>
+            <p style="color:var(--gold); font-size:0.92rem; line-height:1.55;">{w.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Recent jobs through the workshop</h2>
+        <a href="/whats-happening" class="section-link">More from the workshop →</a>
+      </div>
+      <div class="services-grid">
+        {recentJobs.map((j) => (
+          <div class="service-card service-card-job">
+            <h3>{j.title}</h3>
+            <p>{j.body}</p>
+          </div>
+        ))}
+      </div>
+      <div class="configurator-placeholder-note" style="margin-top:24px;">
+        Recent workshop jobs shown are samples. Maud and Shane: send through your real job stories (photos welcome) and we'll move these to Sanity so you can update them as you go.
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking form (Netlify Forms) -->
+  <section class="section" style="background:var(--sand-deep);">
+    <div class="container" style="max-width:760px;">
+      <div class="section-header" style="text-align:center; display:block;">
+        <div class="page-eyebrow" style="color:var(--rust);">Book it in</div>
+        <h2 class="section-title" style="margin-top:6px;">Get your rig booked into the workshop</h2>
+        <p style="color:var(--muted); margin-top:8px;">
+          Whether it's a regular service, a pre-trip check, or something you've been meaning to get sorted - tell us what you need and we'll call you back.
+        </p>
+      </div>
+
+      <form
+        class="enquiry-form"
+        name="workshop-booking"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/thanks/"
+        style="margin-top:24px;"
+      >
+        <input type="hidden" name="form-name" value="workshop-booking" />
+        <p class="hp"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+        <div class="form-row">
+          <label>
+            Your name
+            <input type="text" name="name" required autocomplete="name" />
+          </label>
+          <label>
+            Phone
+            <input type="tel" name="phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
+          </label>
+        </div>
+
+        <label>
+          Email
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+
+        <div class="form-row">
+          <label>
+            Make / Model
+            <input type="text" name="caravan_model" placeholder="e.g. Kimberley Karavan 2022" />
+          </label>
+          <label>
+            What's needed?
+            <select name="service_type" required>
+              <option value="">-- Pick one --</option>
+              <option value="scheduled-service">Scheduled service</option>
+              <option value="pre-trip-check">Pre-trip check</option>
+              <option value="warranty-work">Warranty work</option>
+              <option value="custom-mod">Custom modification</option>
+              <option value="repair">Repair / fault</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Anything specific we should know?
+          <textarea name="message" placeholder="Recent symptoms, upcoming trip dates, parts already sourced, etc."></textarea>
+        </label>
+
+        <button type="submit">Send booking request</button>
+        <p style="font-size:0.78rem; color:var(--muted); text-align:center;">
+          We'll call you back within one business day to confirm the booking date and any parts we need to order ahead.
+        </p>
+      </form>
+    </div>
+  </section>
+</Site>

@@ -1,14 +1,54 @@
 ---
 import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
-import { getFeaturedCaravans } from '../lib/sanity.js'
+import VideoCard from '../components/VideoCard.astro'
+import { getFeaturedCaravans, getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
 
 let featured = []
+let featuredVideos = []
+let settings = null
 try {
-  featured = await getFeaturedCaravans()
+  ;[featured, featuredVideos, settings] = await Promise.all([
+    getFeaturedCaravans(),
+    getFeaturedVideos(3),
+    getSiteSettings(),
+  ])
 } catch (err) {
-  console.warn('Sanity unreachable on build - featured caravans empty:', err.message)
+  console.warn('Sanity unreachable on build:', err.message)
 }
+
+// Placeholder videos for home grid until Maud marks any video as Featured
+const PLACEHOLDER_VIDEO = 'https://www.youtube.com/watch?v=dQw4w9WcXgQ'
+if (!featuredVideos || featuredVideos.length === 0) {
+  featuredVideos = [
+    { _id: 'p1', title: 'The New 2026 Stockman Rover 02 is Here!', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Every upgrade, every improvement - Shane walks you through it all.', category: 'deep-dive' },
+    { _id: 'p2', title: 'Can a Mercedes Van Handle Deep Mud?', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Testing the Kimberley Kruiswagen where it\'s supposed to go.', category: 'on-the-road' },
+    { _id: 'p3', title: 'Touring the Sleek "Night Storm" Interior', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Luxury finishes, Corian benchtops, and dimmable lighting.', category: 'deep-dive' },
+  ]
+}
+
+// Shane's Pick - resolve from siteSettings, fall back to first featured caravan
+const shanesPick = settings?.shanesPick?.caravan
+  ? {
+      caravan: settings.shanesPick.caravan,
+      originalPrice: settings.shanesPick.originalPrice,
+      quote: settings.shanesPick.shanesQuote,
+      isPlaceholder: false,
+    }
+  : (featured[0]
+      ? {
+          caravan: featured[0],
+          originalPrice: null,
+          quote: 'One of the best examples we\'ve had through the lot. Full service history, immaculate condition - the kind of caravan I\'d happily hand the keys to a family member on.',
+          isPlaceholder: true,
+        }
+      : null)
+
+const upcomingNews = [
+  { date: '10 May', type: 'New Arrival', title: 'New Stockman Rover 02 arrival', body: 'The 2026 model is in the showroom. Come see the upgrades in person.' },
+  { date: '17 May', type: 'Handover', title: 'Mitchell family handover', body: 'Another family heading out on their first big trip. Safe travels!' },
+  { date: '07 Jun', type: 'Event', title: 'Suncoast Outdoor Adventure Expo', body: 'Live walkthroughs and exclusive show pricing.' },
+]
 
 // LocalBusiness schema - tells Google/AI "we are an Australian caravan dealer"
 const localBusiness = {
@@ -18,7 +58,7 @@ const localBusiness = {
   name: 'SEQ Campers',
   description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman stock. Thirty years in the industry.",
   url: 'https://seqcampers.com.au',
-  telephone: '+61-7-5300-2344',
+  telephone: '+61-7-5370-7933',
   email: 'office@seqcampers.com.au',
   areaServed: { '@type': 'State', name: 'Queensland, Australia' },
   address: {
@@ -29,7 +69,7 @@ const localBusiness = {
   openingHours: 'Mo-Sa 08:00-17:00',
   priceRange: '$$$',
   knowsAbout: ['Kimberley Kampers', 'Stockman Caravans', 'Off-road caravans', 'Caravan inspections', 'Sunshine Coast caravan dealer'],
-  sameAs: ['https://www.youtube.com/@seqcampers'],
+  sameAs: ['https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg'],
 }
 
 // FAQ schema - direct answers AI search engines can quote
@@ -50,7 +90,7 @@ const faqSchema = {
       name: 'Where is SEQ Campers located?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SEQ Campers operates from the Sunshine Coast in Queensland, Australia. Visits are by appointment. Call (07) 5300 2344 to book a time.',
+        text: 'SEQ Campers operates from the Sunshine Coast in Queensland, Australia. Visits are by appointment. Call (07) 5370 7933 to book a time.',
       },
     },
     {
@@ -172,22 +212,148 @@ const faqSchema = {
         <h1>Off-road caravans built for the long way home.</h1>
         <p>
           Kimberley Kampers and Stockman caravans, hand-picked and inspected
-          by Shane and the SEQ team. Thirty years on the Sunshine Coast and
+          by the SEQ team. Thirty years on the Sunshine Coast and
           still going further than most.
         </p>
         <div class="hero-btns">
           <a href="/stock" class="btn-primary">View current stock</a>
-          <a href="/contact" class="btn-ghost">Talk to Shane</a>
+          <a href="/contact" class="btn-ghost">Talk to the team</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Featured caravans -->
-  <section class="section">
+  <!-- Why SEQ + intro pitch -->
+  <section class="section" style="padding-bottom:32px;">
+    <div class="container" style="max-width:840px; text-align:center;">
+      <div class="page-eyebrow" style="color:var(--rust); margin-bottom:12px;">Why SEQ Campers</div>
+      <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.8rem; font-weight:600; color:var(--ink); letter-spacing:-0.01em; margin-bottom:18px;">
+        Buying a caravan is a big decision.
+      </h2>
+      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75; margin-bottom:18px;">
+        You're looking at spending $50,000 to $200,000+ on something your family will use for the next 20 years.
+        You want to see it, touch it, hear from someone who's actually used it - not just read specs on a page.
+      </p>
+      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75;">
+        That's why we put everything on video. Every model, every feature, setup and pack-down. So by the time you walk into our showroom,
+        you already know what you're looking at - and you can spend your time asking the questions that actually matter to you.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3 steps -->
+  <section class="section" style="padding-top:24px;">
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px;">
+        <div class="page-eyebrow" style="color:var(--rust);">How it works</div>
+        <h2 class="section-title">Three steps to your next adventure</h2>
+      </div>
+      <div class="three-steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3>Watch</h3>
+          <p>Browse our video library. See every model inside and out. Get a feel for what suits your travel style before you visit.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3>Visit</h3>
+          <p>Book a walkthrough at our Sunshine Coast showroom. No pressure, no rush. Shane and Maud will match you to the right caravan.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3>Adventure</h3>
+          <p>Hit the road knowing you've made the right call. And when it's time for a service, we're right here on the Sunshine Coast.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latest from YouTube -->
+  <section class="section" style="background:var(--sand-deep); padding-top:48px; padding-bottom:48px;">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Featured stock</h2>
+        <div>
+          <div class="page-eyebrow" style="color:var(--rust);">Watch before you visit</div>
+          <h2 class="section-title">Latest from our YouTube channel</h2>
+        </div>
+        <a href="/videos" class="section-link">All videos →</a>
+      </div>
+      <div class="video-grid">
+        {featuredVideos.map((v) => <VideoCard video={v} />)}
+      </div>
+      <p style="text-align:center; color:var(--muted); margin-top:24px; font-size:0.95rem;">
+        Join <strong style="color:var(--ink);">2,000+ off-road enthusiasts</strong> on our YouTube channel -
+        <a href="https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg" target="_blank" rel="noopener" style="color:var(--rust); font-weight:600;">subscribe here</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Shane's Pick / Sale of the Week -->
+  {shanesPick && (
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="page-eyebrow" style="color:var(--rust);">Sale of the week</div>
+            <h2 class="section-title">Shane's Pick</h2>
+          </div>
+          <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="section-link">View this listing →</a>
+        </div>
+
+        <div class="shanes-pick">
+          <div class="shanes-pick-photo">
+            {shanesPick.caravan.mainImage ? (
+              <img src={sanityImage(shanesPick.caravan.mainImage, { w: 800 })} alt={shanesPick.caravan.title} />
+            ) : (
+              <div class="caravan-card-noimg">No photo yet</div>
+            )}
+            <span class="shanes-pick-badge">Shane's Pick</span>
+          </div>
+          <div class="shanes-pick-body">
+            {shanesPick.caravan.condition && conditionLabel(shanesPick.caravan.condition) && (
+              <span class={`condition-badge condition-${shanesPick.caravan.condition}`}>{conditionLabel(shanesPick.caravan.condition)}</span>
+            )}
+            {shanesPick.caravan.brand && <div class="card-brand" style="margin-top:8px;">{shanesPick.caravan.brand}</div>}
+            <h3 class="shanes-pick-title">{shanesPick.caravan.title}</h3>
+            <div class="shanes-pick-prices">
+              {shanesPick.originalPrice && (
+                <span class="shanes-pick-original">${shanesPick.originalPrice.toLocaleString('en-AU')}</span>
+              )}
+              <span class="shanes-pick-price">${shanesPick.caravan.price?.toLocaleString('en-AU')}</span>
+            </div>
+            {shanesPick.quote && (
+              <blockquote class="shanes-pick-quote">
+                "{shanesPick.quote}"
+                <cite>— SEQ team</cite>
+              </blockquote>
+            )}
+            {shanesPick.caravan.specs && (
+              <div class="shanes-pick-specs">
+                {shanesPick.caravan.specs.sleeps && <div><span>Sleeps</span><strong>{shanesPick.caravan.specs.sleeps}</strong></div>}
+                {shanesPick.caravan.specs.length && <div><span>Length</span><strong>{shanesPick.caravan.specs.length}m</strong></div>}
+                {shanesPick.caravan.specs.tareWeight && <div><span>Tare</span><strong>{shanesPick.caravan.specs.tareWeight}kg</strong></div>}
+              </div>
+            )}
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+              <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="btn-primary">View this listing</a>
+              <a href="/stock" class="btn-ghost" style="background:rgba(42,22,8,0.06); color:var(--ink); border-color:var(--tan-border);">See all stock</a>
+            </div>
+            {shanesPick.isPlaceholder && (
+              <p style="font-size:0.75rem; color:var(--muted); margin-top:14px; font-style:italic;">
+                Auto-picked from your featured stock. Set a specific Shane's Pick in Sanity Studio → Site Settings.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Featured caravans -->
+  <section class="section" style="background:var(--sand-deep);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">More featured stock</h2>
         <a href="/stock" class="section-link">See all caravans →</a>
       </div>
 
@@ -205,27 +371,42 @@ const faqSchema = {
     </div>
   </section>
 
-  <!-- Why SEQ band -->
-  <section class="band-dark">
+  <!-- What's Happening teaser -->
+  <section class="section">
     <div class="container">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:32px; text-align:center;">
+      <div class="section-header">
         <div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">30+</div>
-          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">Years in the industry</div>
+          <div class="page-eyebrow" style="color:var(--rust);">From the showroom floor</div>
+          <h2 class="section-title">What's happening</h2>
         </div>
-        <div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">2,000+</div>
-          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">YouTube subscribers</div>
-        </div>
-        <div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">QLD</div>
-          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">Sunshine Coast dealer</div>
-        </div>
-        <div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:2rem; font-weight:700; color:#F4EDE0;">2</div>
-          <div style="color:#D4943A; font-size:0.85rem; margin-top:6px;">Premier brands stocked</div>
-        </div>
+        <a href="/whats-happening" class="section-link">All news →</a>
+      </div>
+      <div class="news-teaser-grid">
+        {upcomingNews.map((n) => (
+          <div class="news-teaser-card">
+            <div class="news-teaser-date">{n.date}</div>
+            <span class="news-type news-type-rust">{n.type}</span>
+            <h3>{n.title}</h3>
+            <p>{n.body}</p>
+          </div>
+        ))}
       </div>
     </div>
   </section>
+
+  <!-- Service teaser -->
+  <section class="band-dark">
+    <div class="container" style="text-align:center; max-width:780px; margin:0 auto;">
+      <div class="page-eyebrow" style="color:var(--gold); margin-bottom:12px;">Workshop</div>
+      <h2 style="color:var(--sand); font-size:1.8rem; margin-bottom:16px;">
+        We don't just sell them. We service them.
+      </h2>
+      <p style="color:var(--gold); margin-bottom:28px; line-height:1.7;">
+        Our workshop handles everything from annual servicing to custom modifications.
+        You bought it here - we'll look after it for life.
+      </p>
+      <a href="/service" class="btn-primary">See workshop services</a>
+    </div>
+  </section>
+
 </Site>

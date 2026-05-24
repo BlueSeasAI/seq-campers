@@ -1,0 +1,46 @@
+---
+/**
+ * Reusable video card. Shows the YouTube thumbnail with a play overlay,
+ * title, optional category badge, and description.
+ *
+ * Props:
+ *   video - { title, youtubeUrl, description, category }
+ *   showCategory - bool (default true), hides the category badge if false
+ *   size - "default" | "small" (small drops the description for tighter grids)
+ */
+import { youtubeId, youtubeThumb } from '../lib/sanity.js'
+
+const { video: v, showCategory = true, size = 'default' } = Astro.props
+const thumb = youtubeThumb(v.youtubeUrl)
+const id = youtubeId(v.youtubeUrl)
+const watchUrl = id ? `https://www.youtube.com/watch?v=${id}` : (v.youtubeUrl || '#')
+
+const categoryLabel = {
+  'getting-started': 'Getting Started',
+  'setup': 'Setup & Packing',
+  'deep-dive': 'Product Deep-Dive',
+  'on-the-road': 'On the Road',
+}[v.category] || v.category
+---
+
+<a href={watchUrl} target="_blank" rel="noopener" class={`video-card video-card-${size}`} aria-label={`Watch on YouTube: ${v.title}`}>
+  <div class="video-thumb">
+    {thumb ? (
+      <img src={thumb} alt={v.title} loading="lazy" />
+    ) : (
+      <div class="video-thumb-fallback">
+        <span>Video coming soon</span>
+      </div>
+    )}
+    <div class="video-play-overlay" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </div>
+  </div>
+  <div class="video-meta">
+    {showCategory && categoryLabel && <span class="video-category">{categoryLabel}</span>}
+    <h3 class="video-title">{v.title}</h3>
+    {size !== 'small' && v.description && <p class="video-desc">{v.description}</p>}
+  </div>
+</a>

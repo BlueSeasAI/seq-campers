@@ -67,16 +67,54 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
 <body>
   <header class="site-header">
     <div class="container">
-      <a href="/" class="logo">SEQ Campers</a>
-      <nav>
+      <a href="/" class="logo" aria-label="SEQ Campers home">
+        <img src="/seq-logo.webp" alt="SEQ Campers" width="2048" height="399" />
+      </a>
+
+      <button
+        class="nav-toggle"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+        type="button"
+      >
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+
+      <nav id="primary-nav">
         <a href="/" class={isActive('/') ? 'is-active' : ''}>Home</a>
         <a href="/stock" class={isActive('/stock') ? 'is-active' : ''}>Stock</a>
-        <a href="/sold" class={isActive('/sold') ? 'is-active' : ''}>Sold</a>
+        <a href="/videos" class={isActive('/videos') ? 'is-active' : ''}>Videos</a>
+        <a href="/service" class={isActive('/service') ? 'is-active' : ''}>Service</a>
+        <a href="/whats-happening" class={isActive('/whats-happening') ? 'is-active' : ''}>News</a>
         <a href="/about" class={isActive('/about') ? 'is-active' : ''}>About</a>
-        <a href="/contact" class="nav-cta">Get a quote</a>
+        <a href="/contact" class="nav-cta">Book a walkthrough</a>
       </nav>
     </div>
   </header>
+
+  <script is:inline>
+    (function () {
+      const btn = document.querySelector('.nav-toggle')
+      const nav = document.getElementById('primary-nav')
+      if (!btn || !nav) return
+      btn.addEventListener('click', function () {
+        const open = nav.classList.toggle('is-open')
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false')
+        document.body.style.overflow = open ? 'hidden' : ''
+      })
+      // Close nav when any link is clicked (mobile flow)
+      nav.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', function () {
+          nav.classList.remove('is-open')
+          btn.setAttribute('aria-expanded', 'false')
+          document.body.style.overflow = ''
+        })
+      })
+    })()
+  </script>
 
   <main>
     <slot />
@@ -90,7 +128,7 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         <a href="/contact">Contact</a>
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
-        <a href="tel:0753002344">(07) 5300 2344</a>
+        <a href="tel:0753707933">(07) 5370 7933</a>
       </div>
     </div>
   </footer>

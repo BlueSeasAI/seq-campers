@@ -1,6 +1,6 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
-import { TagIcon, ClockIcon, PauseIcon, CheckmarkCircleIcon, StarIcon, OlistIcon } from '@sanity/icons'
+import { TagIcon, ClockIcon, PauseIcon, CheckmarkCircleIcon, StarIcon, OlistIcon, PlayIcon, CogIcon } from '@sanity/icons'
 import { schemaTypes } from './schemas/index.js'
 import { SeqCampersLogo } from './theme.jsx'
 
@@ -72,6 +72,20 @@ export default defineConfig({
               ),
             S.divider(),
             S.listItem()
+              .title('Videos (library)')
+              .icon(PlayIcon)
+              .schemaType('video')
+              .child(
+                S.documentList()
+                  .title('Videos')
+                  .schemaType('video')
+                  .filter('_type == "video"')
+                  .defaultOrdering([
+                    { field: 'category', direction: 'asc' },
+                    { field: 'order', direction: 'asc' },
+                  ])
+              ),
+            S.listItem()
               .title('Brands')
               .icon(OlistIcon)
               .schemaType('brand')
@@ -81,6 +95,16 @@ export default defineConfig({
                   .schemaType('brand')
                   .filter('_type == "brand"')
                   .defaultOrdering([{ field: 'name', direction: 'asc' }])
+              ),
+            S.divider(),
+            S.listItem()
+              .title('Site Settings')
+              .icon(CogIcon)
+              .child(
+                S.editor()
+                  .id('siteSettings')
+                  .schemaType('siteSettings')
+                  .documentId('siteSettings')
               ),
           ]),
     }),
