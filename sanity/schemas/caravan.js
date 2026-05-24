@@ -132,6 +132,98 @@ export default {
     },
 
     {
+      name: 'compliance',
+      title: 'Compliance and identifiers',
+      type: 'object',
+      description: 'Helps buyers trust the listing - VIN enables PPSR/NEVDIS lookup.',
+      options: { columns: 2 },
+      fields: [
+        {
+          name: 'vin',
+          title: 'VIN (17 characters)',
+          type: 'string',
+          description: 'Vehicle Identification Number, exactly 17 characters.',
+          validation: (Rule) =>
+            Rule.custom((v) => {
+              if (!v) return true
+              if (v.length !== 17) return 'Should be exactly 17 characters'
+              return true
+            }),
+        },
+        {
+          name: 'registrationState',
+          title: 'Registration state',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'QLD - Queensland', value: 'QLD' },
+              { title: 'NSW - New South Wales', value: 'NSW' },
+              { title: 'VIC - Victoria', value: 'VIC' },
+              { title: 'WA - Western Australia', value: 'WA' },
+              { title: 'SA - South Australia', value: 'SA' },
+              { title: 'TAS - Tasmania', value: 'TAS' },
+              { title: 'ACT - Australian Capital Territory', value: 'ACT' },
+              { title: 'NT - Northern Territory', value: 'NT' },
+            ],
+            layout: 'dropdown',
+          },
+        },
+      ],
+    },
+
+    {
+      name: 'power',
+      title: 'Power system',
+      type: 'object',
+      description: 'Battery, solar and inverter setup. Leave blank what does not apply.',
+      options: { columns: 2 },
+      fields: [
+        {
+          name: 'batteryType',
+          title: 'Battery type',
+          type: 'string',
+          description: 'Lithium (LiFePO4) usually commands a premium - worth calling out.',
+          options: {
+            list: [
+              { title: 'Lithium (LiFePO4)', value: 'lithium' },
+              { title: 'AGM', value: 'agm' },
+              { title: 'Gel', value: 'gel' },
+              { title: 'Lead Acid', value: 'lead-acid' },
+              { title: 'Mixed', value: 'mixed' },
+            ],
+            layout: 'dropdown',
+          },
+        },
+        {
+          name: 'batteryCapacityAh',
+          title: 'Battery capacity (Ah)',
+          type: 'number',
+          description: 'Total amp-hour capacity, e.g. 200',
+        },
+        {
+          name: 'solarWatts',
+          title: 'Solar capacity (Watts)',
+          type: 'number',
+          description: 'Total wattage across roof + portable. Leave blank if no solar.',
+        },
+        {
+          name: 'inverterWatts',
+          title: 'Inverter (Watts)',
+          type: 'number',
+          description: 'Pure sine wave inverter output. Leave blank if no inverter.',
+        },
+      ],
+    },
+
+    {
+      name: 'tripHistory',
+      title: 'Trip / travel history - "Where has this van been?"',
+      type: 'text',
+      rows: 4,
+      description: 'Tell the story. Notable trips, what conditions it handled, how it performed. Buyers love the story - especially for second-hand vans. Even 2-3 sentences makes a big difference.',
+    },
+
+    {
       name: 'features',
       title: 'Key features',
       type: 'array',

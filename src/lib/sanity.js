@@ -72,6 +72,9 @@ export async function getCaravan(slug) {
       "photos": photos[].asset->url,
       "videos": videos[],
       specs,
+      compliance,
+      power,
+      tripHistory,
       configurator
     }
   `,

@@ -54,6 +54,15 @@ const configuratorOptions = caravan.configurator?.length
   : PLACEHOLDER_CONFIGURATOR_OPTIONS
 const configuratorIsPlaceholder = !caravan.configurator?.length
 
+// Battery type pretty label
+const batteryTypeLabel = {
+  lithium: 'Lithium (LiFePO4)',
+  agm: 'AGM',
+  gel: 'Gel',
+  'lead-acid': 'Lead Acid',
+  mixed: 'Mixed',
+}[caravan.power?.batteryType] || null
+
 // Schema.org Product JSON-LD for AEO / AI search visibility
 const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
 const availabilityMap = {
@@ -86,17 +95,21 @@ const productSchema = {
       },
     },
   }),
-  ...(caravan.specs && {
-    additionalProperty: [
-      caravan.specs.year && { '@type': 'PropertyValue', name: 'Year', value: caravan.specs.year },
-      caravan.specs.sleeps && { '@type': 'PropertyValue', name: 'Sleeps', value: caravan.specs.sleeps },
-      caravan.specs.length && { '@type': 'PropertyValue', name: 'Length (m)', value: caravan.specs.length },
-      caravan.specs.tareWeight && { '@type': 'PropertyValue', name: 'Tare weight (kg)', value: caravan.specs.tareWeight },
-      caravan.specs.atm && { '@type': 'PropertyValue', name: 'ATM (kg)', value: caravan.specs.atm },
-      caravan.specs.payload && { '@type': 'PropertyValue', name: 'Payload (kg)', value: caravan.specs.payload },
-      caravan.specs.ballWeight && { '@type': 'PropertyValue', name: 'Ball weight (kg)', value: caravan.specs.ballWeight },
-    ].filter(Boolean),
-  }),
+  additionalProperty: [
+    caravan.specs?.year && { '@type': 'PropertyValue', name: 'Year', value: caravan.specs.year },
+    caravan.specs?.sleeps && { '@type': 'PropertyValue', name: 'Sleeps', value: caravan.specs.sleeps },
+    caravan.specs?.length && { '@type': 'PropertyValue', name: 'Length (m)', value: caravan.specs.length },
+    caravan.specs?.tareWeight && { '@type': 'PropertyValue', name: 'Tare weight (kg)', value: caravan.specs.tareWeight },
+    caravan.specs?.atm && { '@type': 'PropertyValue', name: 'ATM (kg)', value: caravan.specs.atm },
+    caravan.specs?.payload && { '@type': 'PropertyValue', name: 'Payload (kg)', value: caravan.specs.payload },
+    caravan.specs?.ballWeight && { '@type': 'PropertyValue', name: 'Ball weight (kg)', value: caravan.specs.ballWeight },
+    caravan.compliance?.registrationState && { '@type': 'PropertyValue', name: 'Registration state', value: caravan.compliance.registrationState },
+    batteryTypeLabel && { '@type': 'PropertyValue', name: 'Battery type', value: batteryTypeLabel },
+    caravan.power?.batteryCapacityAh && { '@type': 'PropertyValue', name: 'Battery capacity (Ah)', value: caravan.power.batteryCapacityAh },
+    caravan.power?.solarWatts && { '@type': 'PropertyValue', name: 'Solar (W)', value: caravan.power.solarWatts },
+    caravan.power?.inverterWatts && { '@type': 'PropertyValue', name: 'Inverter (W)', value: caravan.power.inverterWatts },
+  ].filter(Boolean),
+  ...(caravan.compliance?.vin && { vehicleIdentificationNumber: caravan.compliance.vin }),
 }
 ---
 
@@ -131,7 +144,14 @@ const productSchema = {
         {caravan.description && (
           <div style="margin-top:32px;">
             <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">About this caravan</h2>
-            <p style="color:var(--text-muted); line-height:1.8;">{caravan.description}</p>
+            <p style="color:var(--muted); line-height:1.8;">{caravan.description}</p>
+          </div>
+        )}
+
+        {caravan.tripHistory && (
+          <div style="margin-top:28px; background:#fff; border:1px solid var(--tan-border); border-left:4px solid var(--gold); border-radius:var(--radius); padding:20px 24px;">
+            <div class="page-eyebrow" style="color:var(--gold); margin-bottom:8px;">Where this van has been</div>
+            <p style="color:var(--ink); line-height:1.75; font-style:italic;">{caravan.tripHistory}</p>
           </div>
         )}
 
@@ -195,6 +215,45 @@ const productSchema = {
               <div class="spec-item">
                 <span class="spec-label">ATM</span>
                 <span class="spec-value">{caravan.specs.atm}kg</span>
+              </div>
+            )}
+            {batteryTypeLabel && (
+              <div class="spec-item">
+                <span class="spec-label">Battery</span>
+                <span class="spec-value">{batteryTypeLabel}</span>
+              </div>
+            )}
+            {caravan.power?.batteryCapacityAh && (
+              <div class="spec-item">
+                <span class="spec-label">Capacity</span>
+                <span class="spec-value">{caravan.power.batteryCapacityAh}Ah</span>
+              </div>
+            )}
+            {caravan.power?.solarWatts && (
+              <div class="spec-item">
+                <span class="spec-label">Solar</span>
+                <span class="spec-value">{caravan.power.solarWatts}W</span>
+              </div>
+            )}
+            {caravan.power?.inverterWatts && (
+              <div class="spec-item">
+                <span class="spec-label">Inverter</span>
+                <span class="spec-value">{caravan.power.inverterWatts}W</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {(caravan.compliance?.vin || caravan.compliance?.registrationState) && (
+          <div style="margin-top:14px; padding:12px 0; border-top:1px solid var(--tan-border); font-size:0.78rem; color:var(--muted);">
+            {caravan.compliance.registrationState && (
+              <div style="margin-bottom:4px;">
+                <span style="font-weight:600;">Reg state:</span> {caravan.compliance.registrationState}
+              </div>
+            )}
+            {caravan.compliance.vin && (
+              <div style="font-family:monospace; word-break:break-all;">
+                <span style="font-weight:600; font-family:'Inter Tight', sans-serif;">VIN:</span> {caravan.compliance.vin}
               </div>
             )}
           </div>
