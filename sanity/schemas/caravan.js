@@ -42,8 +42,14 @@ export default {
       name: 'price',
       title: 'Price (AUD)',
       type: 'number',
-      description: 'Whole dollars only, no comma',
-      validation: (Rule) => Rule.required().positive(),
+      description: 'Whole dollars only, no comma. Most premium off-road vans are $40K-$200K.',
+      validation: (Rule) =>
+        Rule.required()
+          .positive()
+          .integer()
+          .min(1000)
+          .max(500000)
+          .warning('Most caravans are $20K-$200K - confirm if outside this range'),
     },
 
     {
@@ -122,12 +128,78 @@ export default {
             layout: 'dropdown',
           },
         },
-        { name: 'sleeps', title: 'Sleeps', type: 'number', validation: (Rule) => Rule.min(1).integer() },
-        { name: 'length', title: 'Length (m)', type: 'number' },
-        { name: 'tareWeight', title: 'Tare weight (kg)', type: 'number' },
-        { name: 'payload', title: 'Payload (kg)', type: 'number' },
-        { name: 'atm', title: 'ATM (kg)', type: 'number' },
-        { name: 'ballWeight', title: 'Ball weight (kg)', type: 'number' },
+        {
+          name: 'sleeps',
+          title: 'Sleeps',
+          type: 'number',
+          description: 'Number of berths (sleeping spots). Most caravans sleep 2-6.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(1)
+              .max(12)
+              .warning('Most caravans sleep 2-6 - confirm if more than 8'),
+        },
+        {
+          name: 'length',
+          title: 'Length (m)',
+          type: 'number',
+          description: 'Overall length in metres. Typical off-road caravans are 4-8m.',
+          validation: (Rule) =>
+            Rule.positive()
+              .precision(1)
+              .min(2)
+              .max(15)
+              .warning('Most caravans are 3-10m - confirm if outside this range'),
+        },
+        {
+          name: 'tareWeight',
+          title: 'Tare weight (kg)',
+          type: 'number',
+          description: 'Unloaded weight. Most off-road caravans are 1500-3000kg tare.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(200)
+              .max(6000)
+              .warning('Most caravans are 1000-3500kg tare - confirm if outside this range'),
+        },
+        {
+          name: 'payload',
+          title: 'Payload (kg)',
+          type: 'number',
+          description: 'Loading capacity (ATM minus Tare). Typically 300-1000kg.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(50)
+              .max(2500)
+              .warning('Most caravan payloads are 300-1200kg - confirm if outside this range'),
+        },
+        {
+          name: 'atm',
+          title: 'ATM (Aggregate Trailer Mass, kg)',
+          type: 'number',
+          description: 'Maximum legal loaded weight. Always greater than Tare. Typically 2000-4000kg.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(300)
+              .max(8000)
+              .warning('Most caravans have ATM of 1500-4500kg - confirm if outside this range'),
+        },
+        {
+          name: 'ballWeight',
+          title: 'Ball weight (kg)',
+          type: 'number',
+          description: 'Downward force on tow ball when hitched. Typically 8-12% of tare (i.e. 150-400kg).',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(30)
+              .max(800)
+              .warning('Most caravans have ball weights of 100-450kg - confirm if outside this range'),
+        },
       ],
     },
 
@@ -198,64 +270,40 @@ export default {
           name: 'batteryCapacityAh',
           title: 'Battery capacity (Ah)',
           type: 'number',
-          description: 'Pick the closest standard size. Most caravan setups land in the 100-400Ah range.',
-          options: {
-            list: [
-              { title: '80 Ah', value: 80 },
-              { title: '100 Ah (typical single AGM)', value: 100 },
-              { title: '120 Ah', value: 120 },
-              { title: '150 Ah', value: 150 },
-              { title: '200 Ah (typical single Lithium or paired AGM)', value: 200 },
-              { title: '250 Ah', value: 250 },
-              { title: '300 Ah', value: 300 },
-              { title: '400 Ah (large Lithium bank)', value: 400 },
-              { title: '500 Ah', value: 500 },
-              { title: '600 Ah', value: 600 },
-            ],
-            layout: 'dropdown',
-          },
-          validation: (Rule) => Rule.positive().integer(),
+          description:
+            'Total amp-hour capacity. Common sizes: 80, 100, 120, 150, 200, 250, 300, 400, 500, 600 Ah. Type any value - free input.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(1)
+              .max(2000)
+              .warning('Most caravan batteries are 80-600Ah - double check if outside this range'),
         },
         {
           name: 'solarWatts',
           title: 'Solar capacity (Watts)',
           type: 'number',
-          description: 'Total wattage across roof + portable, e.g. 200W roof + 120W portable = pick closest standard size. Most caravans are 200-800W total.',
-          options: {
-            list: [
-              { title: '100 W (single small panel)', value: 100 },
-              { title: '150 W', value: 150 },
-              { title: '200 W (typical single roof panel)', value: 200 },
-              { title: '250 W', value: 250 },
-              { title: '300 W', value: 300 },
-              { title: '400 W (typical roof + small portable)', value: 400 },
-              { title: '500 W', value: 500 },
-              { title: '600 W', value: 600 },
-              { title: '800 W (large roof + portable)', value: 800 },
-              { title: '1000 W', value: 1000 },
-              { title: '1200 W (very large bank)', value: 1200 },
-            ],
-            layout: 'dropdown',
-          },
-          validation: (Rule) => Rule.positive().integer(),
+          description:
+            'Total wattage across roof + portable. Common sizes: 100, 150, 200, 250, 300, 400, 500, 600, 800, 1000, 1200 W. Type any value - e.g. 320 means 200W roof + 120W portable.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(10)
+              .max(5000)
+              .warning('Most caravan solar setups are 100-1200W - double check if outside this range'),
         },
         {
           name: 'inverterWatts',
           title: 'Inverter (Watts)',
           type: 'number',
-          description: 'Pure sine wave inverter output. Leave blank if no inverter.',
-          options: {
-            list: [
-              { title: '300 W (USB / laptop only)', value: 300 },
-              { title: '600 W', value: 600 },
-              { title: '1000 W (typical entry-level)', value: 1000 },
-              { title: '1500 W', value: 1500 },
-              { title: '2000 W (typical full appliance use)', value: 2000 },
-              { title: '3000 W (large)', value: 3000 },
-            ],
-            layout: 'dropdown',
-          },
-          validation: (Rule) => Rule.positive().integer(),
+          description:
+            'Pure sine wave inverter output. Common sizes: 300, 600, 1000, 1500, 2000, 3000 W. Type any value. Leave blank if no inverter.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(50)
+              .max(10000)
+              .warning('Most caravan inverters are 300-3000W - double check if outside this range'),
         },
       ],
     },
@@ -329,8 +377,25 @@ export default {
         {
           type: 'object',
           fields: [
-            { name: 'name', title: 'Option name', type: 'string' },
-            { name: 'priceAdd', title: 'Add to price (AUD)', type: 'number' },
+            {
+              name: 'name',
+              title: 'Option name',
+              type: 'string',
+              validation: (Rule) => Rule.required().min(2),
+            },
+            {
+              name: 'priceAdd',
+              title: 'Add to price (AUD)',
+              type: 'number',
+              description: 'Whole dollars only. Most add-ons range $200 to $10,000.',
+              validation: (Rule) =>
+                Rule.required()
+                  .positive()
+                  .integer()
+                  .min(1)
+                  .max(50000)
+                  .warning('Most add-ons are $200-$10,000 - confirm if outside this range'),
+            },
           ],
         },
       ],
