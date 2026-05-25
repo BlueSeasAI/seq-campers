@@ -1,0 +1,161 @@
+---
+import Site from '../layouts/Site.astro'
+import TrustStrip from '../components/TrustStrip.astro'
+
+// Brisbane Caravan, Camping & Touring Supershow 2026
+// Held at the Brisbane Showgrounds (Bowen Hills) - dates per the SEQ
+// roadmap. Update the dates + stand number here when the show confirms
+// final details.
+const showDates = '3 - 5 June 2026'
+const venue = 'Brisbane Showgrounds, Bowen Hills'
+const standNumber = 'TBC - check back closer to the show'
+
+const faqs = [
+  {
+    q: 'Where will SEQ Campers be at the Brisbane Show?',
+    a: `Look for the SEQ Campers stand at ${venue}. Stand number: ${standNumber}. We will post the exact location on this page and our YouTube channel a week before doors open.`,
+  },
+  {
+    q: 'Which caravans are you bringing to the show?',
+    a: 'We are bringing a curated mix of Kimberley Kampers and Stockman stock - including at least one off-road camper trailer set up for full bush touring. Final list confirmed closer to the show.',
+  },
+  {
+    q: 'Can I book a private chat at the show?',
+    a: 'Yes - and we recommend it. Show floors get busy. If you would like a focused 20-minute walk-through of any caravan in our stock, send through the form below and we will lock in a time during the show.',
+  },
+  {
+    q: 'Will there be show pricing?',
+    a: 'Yes. We hold back specific show offers for visitors who come and see us in person. We do not list them online before the show.',
+  },
+]
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+}
+
+const eventSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: 'SEQ Campers at the Brisbane Caravan, Camping & Touring Supershow 2026',
+  startDate: '2026-06-03',
+  endDate: '2026-06-05',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  eventStatus: 'https://schema.org/EventScheduled',
+  location: {
+    '@type': 'Place',
+    name: 'Brisbane Showgrounds',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '600 Gregory Terrace',
+      addressLocality: 'Bowen Hills',
+      addressRegion: 'QLD',
+      postalCode: '4006',
+      addressCountry: 'AU',
+    },
+  },
+  organizer: {
+    '@type': 'Organization',
+    name: 'SEQ Campers',
+    url: 'https://seqcampers.com.au',
+  },
+}
+---
+
+<Site
+  title="Brisbane Caravan Show 2026"
+  description="SEQ Campers at the Brisbane Caravan, Camping & Touring Supershow, 3-5 June 2026. Kimberley Kampers, Stockman caravans, and show-only pricing. Book a private chat at the show."
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(eventSchema)} />
+
+  <div class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">Brisbane Show 2026</div>
+      <h1>See us at the Brisbane Caravan Show.</h1>
+      <p>{showDates} · {venue}</p>
+    </div>
+  </div>
+
+  <TrustStrip />
+
+  <section class="section">
+    <div class="container" style="max-width:840px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px; margin-bottom:40px;">
+        <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
+          <div class="page-eyebrow" style="color:var(--rust);">When</div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{showDates}</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Wed - Fri, doors open 9am</div>
+        </div>
+        <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
+          <div class="page-eyebrow" style="color:var(--rust);">Where</div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{venue}</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">600 Gregory Tce, Bowen Hills</div>
+        </div>
+        <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
+          <div class="page-eyebrow" style="color:var(--rust);">Stand</div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{standNumber}</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Updated closer to the show</div>
+        </div>
+      </div>
+
+      <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.5rem; font-weight:600; color:var(--ink); margin-bottom:14px;">
+        Why come and see us in person.
+      </h2>
+      <p style="color:var(--muted); line-height:1.75; margin-bottom:14px;">
+        Online videos are a great way to start. But there is no substitute for opening every cupboard, running your hand along
+        the joinery, and asking the awkward questions face-to-face. The Brisbane Show is the easiest way to do all of that in one place.
+      </p>
+      <p style="color:var(--muted); line-height:1.75; margin-bottom:32px;">
+        Shane and the SEQ team will be on the stand for all three days. We are bringing a curated lineup from our Kimberley Kampers
+        and Stockman stock - including options set up for serious off-grid touring.
+      </p>
+
+      <div style="background:var(--ink); color:var(--sand); border-radius:var(--radius); padding:28px 32px; border-left:6px solid var(--gold); margin-bottom:32px;">
+        <div class="page-eyebrow" style="color:var(--gold);">Skip the queue</div>
+        <h3 style="color:var(--sand); font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; margin:8px 0 10px;">
+          Book a private 20-minute chat at the show.
+        </h3>
+        <p style="color:var(--gold); margin-bottom:18px; line-height:1.6;">
+          Show floors get busy. If you want focused time with Shane to walk through a specific caravan, lock it in now and we will
+          confirm a slot during the show.
+        </p>
+        <a href="/contact" class="btn-primary">Request a chat at the show</a>
+      </div>
+
+      <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.5rem; font-weight:600; color:var(--ink); margin-bottom:14px;">
+        Can't make it to Brisbane?
+      </h2>
+      <p style="color:var(--muted); line-height:1.75; margin-bottom:14px;">
+        No problem. Our Sunshine Coast showroom is open by appointment year-round. Drive an hour north and you will get our
+        undivided attention - no show-floor chaos required.
+      </p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+        <a href="/stock" class="btn-primary">View current stock</a>
+        <a href="/contact" class="btn-ghost" style="background:rgba(42,22,8,0.06); color:var(--ink); border-color:var(--tan-border);">Book a Sunshine Coast visit</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--sand-deep); padding-top:40px;">
+    <div class="container" style="max-width:840px;">
+      <section class="faq-section" aria-label="Brisbane Show frequently asked questions" style="margin:0;">
+        <div class="page-eyebrow" style="color:var(--rust);">Brisbane Show FAQ</div>
+        <h2 class="faq-title">Common questions about the show</h2>
+        <div class="faq-list">
+          {faqs.map((f) => (
+            <details class="faq-item">
+              <summary>{f.q}</summary>
+              <div class="faq-answer">{f.a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+    </div>
+  </section>
+</Site>

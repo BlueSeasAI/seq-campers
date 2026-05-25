@@ -1,6 +1,7 @@
 ---
 import Site from '../../layouts/Site.astro'
 import CaravanCard from '../../components/CaravanCard.astro'
+import TrustStrip from '../../components/TrustStrip.astro'
 import { getForSaleCaravans, getDistinctBrands } from '../../lib/sanity.js'
 
 const caravans = await getForSaleCaravans()
@@ -16,6 +17,8 @@ const description = `Browse ${caravans.length} premium off-road caravan${caravan
       <p id="result-count">{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} available</p>
     </div>
   </div>
+
+  <TrustStrip />
 
   <div class="container">
     {caravans.length === 0 ? (

@@ -1,0 +1,24 @@
+---
+const { variant = 'light' } = Astro.props
+---
+
+<div class={`trust-strip trust-strip-${variant}`} role="region" aria-label="Dealer credentials">
+  <div class="container">
+    <div class="trust-strip-inner">
+      <span class="trust-item">
+        <span class="trust-tick" aria-hidden="true">✓</span>
+        Authorised Kimberley Kampers Dealer
+      </span>
+      <span class="trust-divider" aria-hidden="true"></span>
+      <span class="trust-item">
+        <span class="trust-tick" aria-hidden="true">✓</span>
+        Authorised Stockman Dealer
+      </span>
+      <span class="trust-divider" aria-hidden="true"></span>
+      <span class="trust-item">
+        <span class="trust-tick" aria-hidden="true">✓</span>
+        30 years on the Sunshine Coast
+      </span>
+    </div>
+  </div>
+</div>

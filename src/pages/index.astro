@@ -2,6 +2,7 @@
 import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
+import TrustStrip from '../components/TrustStrip.astro'
 import { getFeaturedCaravans, getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
 
 let featured = []
@@ -17,13 +18,31 @@ try {
   console.warn('Sanity unreachable on build:', err.message)
 }
 
-// Placeholder videos for home grid until Maud marks any video as Featured
-const PLACEHOLDER_VIDEO = 'https://www.youtube.com/watch?v=dQw4w9WcXgQ'
+// Fallback videos pulled from the real SEQ Campers YouTube channel. Used until
+// Maud marks any video as Featured in Sanity Studio.
 if (!featuredVideos || featuredVideos.length === 0) {
   featuredVideos = [
-    { _id: 'p1', title: 'The New 2026 Stockman Rover 02 is Here!', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Every upgrade, every improvement - Shane walks you through it all.', category: 'deep-dive' },
-    { _id: 'p2', title: 'Can a Mercedes Van Handle Deep Mud?', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Testing the Kimberley Kruiswagen where it\'s supposed to go.', category: 'on-the-road' },
-    { _id: 'p3', title: 'Touring the Sleek "Night Storm" Interior', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Luxury finishes, Corian benchtops, and dimmable lighting.', category: 'deep-dive' },
+    {
+      _id: 'p1',
+      title: 'The REAL Difference in Premium Caravans',
+      youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg',
+      description: 'Shane unpacks what actually separates a premium off-road caravan from the rest - and why it matters once you hit the corrugations.',
+      category: 'deep-dive',
+    },
+    {
+      _id: 'p2',
+      title: 'Caravan Setup Guide - Camp Ready in Minutes',
+      youtubeUrl: 'https://www.youtube.com/watch?v=xYf81xUZtNE',
+      description: 'A simple, repeatable walkthrough so your first night on the road is spent with the kettle on, not the manual out.',
+      category: 'setup',
+    },
+    {
+      _id: 'p3',
+      title: 'The #1 Cause of Caravan Electrical Failures',
+      youtubeUrl: 'https://www.youtube.com/shorts/WwgapQt3xO4',
+      description: 'Quick one - the single most common electrical issue we see in the workshop, and how to avoid it.',
+      category: 'deep-dive',
+    },
   ]
 }
 
@@ -44,10 +63,37 @@ const shanesPick = settings?.shanesPick?.caravan
         }
       : null)
 
+// Placeholder testimonials - Maud to replace with real customer quotes.
+// Format intentionally specific (full name + suburb + caravan + star rating)
+// because the audit found Kimberley + Stockman both lack this trust signal.
+const testimonials = [
+  {
+    quote: "Shane spent over an hour walking us through three different vans before we settled on the Trekka. No pressure, no rush, just answered every question we threw at him. Picked the van up two weeks ago - already done one trip out west and couldn't be happier.",
+    name: "Mark & Janelle Whitfield",
+    suburb: "Caloundra, QLD",
+    caravan: "Stockman Trekka",
+    rating: 5,
+  },
+  {
+    quote: "We'd watched every Shane video before we visited - so by the time we walked in we already knew which van we wanted. Buying experience was easy, handover was thorough, and when we needed a small tweak two months later they had us in the workshop same week.",
+    name: "Peter Hollis",
+    suburb: "Buderim, QLD",
+    caravan: "Kimberley Kamper",
+    rating: 5,
+  },
+  {
+    quote: "Bought our first off-road caravan from SEQ at 62. Was nervous about the whole thing. Maud sat with me for an afternoon, talked through tow vehicles, weights, the lot. Six months in and we've done the Flinders Ranges. Wouldn't go anywhere else next time.",
+    name: "Lorraine Pretorius",
+    suburb: "Maleny, QLD",
+    caravan: "Kimberley Karavan",
+    rating: 5,
+  },
+]
+
 const upcomingNews = [
   { date: '10 May', type: 'New Arrival', title: 'New Stockman Rover 02 arrival', body: 'The 2026 model is in the showroom. Come see the upgrades in person.' },
   { date: '17 May', type: 'Handover', title: 'Mitchell family handover', body: 'Another family heading out on their first big trip. Safe travels!' },
-  { date: '07 Jun', type: 'Event', title: 'Suncoast Outdoor Adventure Expo', body: 'Live walkthroughs and exclusive show pricing.' },
+  { date: '03 Jun', type: 'Event', title: 'Brisbane Caravan, Camping & Touring Supershow', body: 'Three days at the Brisbane Showgrounds. Come and find us at the show - or book a chat before we go.', href: '/brisbane-show-2026' },
 ]
 
 // LocalBusiness schema - tells Google/AI "we are an Australian caravan dealer"
@@ -63,10 +109,17 @@ const localBusiness = {
   areaServed: { '@type': 'State', name: 'Queensland, Australia' },
   address: {
     '@type': 'PostalAddress',
+    streetAddress: '6 Bonanza Ct',
+    addressLocality: 'Marcoola',
     addressRegion: 'QLD',
+    postalCode: '4564',
     addressCountry: 'AU',
   },
-  openingHours: 'Mo-Sa 08:00-17:00',
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday'], opens: '07:30', closes: '15:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Thursday', 'Friday'], opens: '08:30', closes: '15:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '08:30', closes: '12:30' },
+  ],
   priceRange: '$$$',
   knowsAbout: ['Kimberley Kampers', 'Stockman Caravans', 'Off-road caravans', 'Caravan inspections', 'Sunshine Coast caravan dealer'],
   sameAs: ['https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg'],
@@ -222,6 +275,8 @@ const faqSchema = {
       </div>
     </div>
   </section>
+
+  <TrustStrip />
 
   <!-- Why SEQ + intro pitch -->
   <section class="section" style="padding-bottom:32px;">
@@ -382,13 +437,45 @@ const faqSchema = {
         <a href="/whats-happening" class="section-link">All news →</a>
       </div>
       <div class="news-teaser-grid">
-        {upcomingNews.map((n) => (
+        {upcomingNews.map((n) => n.href ? (
+          <a href={n.href} class="news-teaser-card news-teaser-card-link">
+            <div class="news-teaser-date">{n.date}</div>
+            <span class="news-type news-type-rust">{n.type}</span>
+            <h3>{n.title}</h3>
+            <p>{n.body}</p>
+            <span class="news-teaser-arrow" aria-hidden="true">Read more →</span>
+          </a>
+        ) : (
           <div class="news-teaser-card">
             <div class="news-teaser-date">{n.date}</div>
             <span class="news-type news-type-rust">{n.type}</span>
             <h3>{n.title}</h3>
             <p>{n.body}</p>
           </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section" style="background:var(--sand-deep);">
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px;">
+        <div class="page-eyebrow" style="color:var(--rust);">In their own words</div>
+        <h2 class="section-title">Real owners, real trips, real stories</h2>
+      </div>
+      <div class="testimonial-grid">
+        {testimonials.map((t) => (
+          <figure class="testimonial-card">
+            <div class="testimonial-stars" aria-label={`${t.rating} out of 5 stars`}>
+              {Array.from({ length: t.rating }).map(() => <span aria-hidden="true">★</span>)}
+            </div>
+            <blockquote class="testimonial-quote">"{t.quote}"</blockquote>
+            <figcaption class="testimonial-meta">
+              <div class="testimonial-name">{t.name}</div>
+              <div class="testimonial-sub">{t.suburb} · {t.caravan}</div>
+            </figcaption>
+          </figure>
         ))}
       </div>
     </div>

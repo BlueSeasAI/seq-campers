@@ -1,8 +1,18 @@
 ---
 import Site from '../layouts/Site.astro'
 
-const mapQuery = encodeURIComponent('SEQ Campers, Sunshine Coast, QLD, Australia')
+const mapQuery = encodeURIComponent('SEQ Campers, 6 Bonanza Ct, Marcoola QLD 4564, Australia')
 const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
+
+const showroomHours = [
+  { day: 'Monday', hours: '7:30am - 3pm' },
+  { day: 'Tuesday', hours: '7:30am - 3pm' },
+  { day: 'Wednesday', hours: '7:30am - 3pm' },
+  { day: 'Thursday', hours: '8:30am - 3pm' },
+  { day: 'Friday', hours: '8:30am - 3pm' },
+  { day: 'Saturday', hours: '8:30am - 12:30pm' },
+  { day: 'Sunday', hours: 'Closed', closed: true },
+]
 ---
 
 <Site
@@ -27,7 +37,7 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
           <div style="background:#fff; border:1px solid #DCCBA8; border-radius:8px; padding:24px; transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(42,22,8,0.10)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
             <div class="page-eyebrow" style="color:#C0341A;">Phone</div>
             <div style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608;">(07) 5370 7933</div>
-            <div style="margin-top:8px; color:#8B6A40; font-size:0.9rem;">Mon to Sat, 8am to 5pm AEST</div>
+            <div style="margin-top:8px; color:#8B6A40; font-size:0.9rem;">Online enquiries 7am - 4:30pm</div>
           </div>
         </a>
 
@@ -40,10 +50,31 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
         </a>
 
         <div style="background:#fff; border:1px solid #DCCBA8; border-radius:8px; padding:24px;">
-          <div class="page-eyebrow" style="color:#C0341A;">Location</div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:1.05rem; font-weight:600; color:#2A1608;">Sunshine Coast, QLD</div>
+          <div class="page-eyebrow" style="color:#C0341A;">Showroom</div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:1.05rem; font-weight:600; color:#2A1608; line-height:1.35;">
+            6 Bonanza Ct<br />Marcoola QLD 4564
+          </div>
           <div style="margin-top:8px; color:#8B6A40; font-size:0.9rem;">Visit by appointment recommended.</div>
         </div>
+      </div>
+
+      <!-- Showroom hours block -->
+      <div class="hours-block" style="margin-bottom:48px;">
+        <h3>Showroom & workshop hours</h3>
+        <table class="hours-table">
+          <tbody>
+            {showroomHours.map((row) => (
+              <tr>
+                <td>{row.day}</td>
+                <td class={row.closed ? 'is-closed' : ''}>{row.hours}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p style="margin-top:14px; font-size:0.82rem; color:var(--muted); line-height:1.5;">
+          Online enquiries are answered 7am - 4:30pm every day. Out of hours messages
+          get a reply first thing the next business day.
+        </p>
       </div>
 
       <!-- Two-column: form + map -->
@@ -105,7 +136,8 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
         <div>
           <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608; margin-bottom:16px;">Find us</h2>
           <p style="color:#8B6A40; margin-bottom:20px;">
-            We are based on the Sunshine Coast in Queensland. Visits by appointment so we can give you our full attention.
+            We are at <strong style="color:var(--ink);">6 Bonanza Ct, Marcoola</strong>, ten minutes north of Maroochydore on the Sunshine Coast.
+            Visits by appointment so we can give you our full attention.
           </p>
           <div class="map-embed">
             <iframe
@@ -117,7 +149,7 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
             ></iframe>
           </div>
           <p style="font-size:0.8rem; color:#8B6A40; margin-top:12px; text-align:center;">
-            Map shows the Sunshine Coast region. Exact street address shared on appointment confirmation.
+            Plenty of parking on site. Trailer space available on request.
           </p>
         </div>
       </div>

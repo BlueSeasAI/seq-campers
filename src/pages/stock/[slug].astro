@@ -111,6 +111,14 @@ const faqPageSchema = {
   })),
 }
 
+// Authorised Dealer mini-badge - only show for Kimberley or Stockman stock
+const brandLower = (caravan.brand ?? '').toLowerCase()
+const authorisedDealerLabel = brandLower.includes('kimberley')
+  ? 'Authorised Kimberley Kampers Dealer'
+  : brandLower.includes('stockman')
+    ? 'Authorised Stockman Dealer'
+    : null
+
 // Battery type pretty label
 const batteryTypeLabel = {
   lithium: 'Lithium (LiFePO4)',
@@ -248,6 +256,13 @@ const productSchema = {
         )}
         <div class="listing-price">${caravan.price?.toLocaleString('en-AU')}</div>
         {caravan.brand && <div class="listing-brand">{caravan.brand}</div>}
+
+        {authorisedDealerLabel && (
+          <div class="trust-badge-mini">
+            <span class="trust-tick" aria-hidden="true">✓</span>
+            {authorisedDealerLabel}
+          </div>
+        )}
 
         {caravan.specs && (
           <div class="specs-grid">
