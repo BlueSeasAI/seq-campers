@@ -178,33 +178,17 @@ const faqSchema = {
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
-  <!-- Hero - YouTube placeholder, will be replaced with hosted 4K file when Shane sends -->
-  <section class="hero hero-video">
+  <!-- Hero - silent looping video. No text overlay - the brand reads through
+       the header logo + the video itself. Quieter, more confident, skyerv-style. -->
+  <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
       <iframe
-        src="https://www.youtube.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=1"
+        src="https://www.youtube.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0"
         title="SEQ Campers - premium off-road caravans"
         frameborder="0"
         allow="autoplay; encrypted-media"
         allowfullscreen="false"
       ></iframe>
-    </div>
-    <div class="hero-overlay" aria-hidden="true"></div>
-
-    <div class="container">
-      <div class="hero-content">
-        <div class="page-eyebrow">SEQ Campers · Sunshine Coast, Queensland</div>
-        <h1>Off-road caravans built for the long way home.</h1>
-        <p>
-          Kimberley Kampers and Stockman caravans, hand-picked and inspected
-          by the SEQ team. Thirty years on the Sunshine Coast and
-          still going further than most.
-        </p>
-        <div class="hero-btns">
-          <a href="/stock" class="btn-primary">View current stock</a>
-          <a href="/brisbane-show-2026" class="btn-ghost">See us at the Brisbane Show</a>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -311,157 +295,10 @@ const faqSchema = {
     </div>
   </section>
 
-  <!-- Shane's Pick / Sale of the Week -->
-  {shanesPick && (
-    <section class="section">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <div class="page-eyebrow" style="color:var(--rust);">Sale of the week</div>
-            <h2 class="section-title">Shane's Pick</h2>
-          </div>
-          <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="section-link">View this listing →</a>
-        </div>
-
-        <div class="shanes-pick">
-          <div class="shanes-pick-photo">
-            {shanesPick.caravan.mainImage ? (
-              <img src={sanityImage(shanesPick.caravan.mainImage, { w: 800 })} alt={shanesPick.caravan.title} />
-            ) : (
-              <div class="caravan-card-noimg">No photo yet</div>
-            )}
-            <span class="shanes-pick-badge">Shane's Pick</span>
-          </div>
-          <div class="shanes-pick-body">
-            {shanesPick.caravan.condition && conditionLabel(shanesPick.caravan.condition) && (
-              <span class={`condition-badge condition-${shanesPick.caravan.condition}`}>{conditionLabel(shanesPick.caravan.condition)}</span>
-            )}
-            {shanesPick.caravan.brand && <div class="card-brand" style="margin-top:8px;">{shanesPick.caravan.brand}</div>}
-            <h3 class="shanes-pick-title">{shanesPick.caravan.title}</h3>
-            <div class="shanes-pick-prices">
-              {shanesPick.originalPrice && (
-                <span class="shanes-pick-original">${shanesPick.originalPrice.toLocaleString('en-AU')}</span>
-              )}
-              <span class="shanes-pick-price">${shanesPick.caravan.price?.toLocaleString('en-AU')}</span>
-            </div>
-            {shanesPick.quote && (
-              <blockquote class="shanes-pick-quote">
-                "{shanesPick.quote}"
-                <cite>- SEQ team</cite>
-              </blockquote>
-            )}
-            {shanesPick.caravan.specs && (
-              <div class="shanes-pick-specs">
-                {shanesPick.caravan.specs.sleeps && <div><span>Sleeps</span><strong>{shanesPick.caravan.specs.sleeps}</strong></div>}
-                {shanesPick.caravan.specs.length && <div><span>Length</span><strong>{shanesPick.caravan.specs.length}m</strong></div>}
-                {shanesPick.caravan.specs.tareWeight && <div><span>Tare</span><strong>{shanesPick.caravan.specs.tareWeight}kg</strong></div>}
-              </div>
-            )}
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
-              <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="btn-primary">View this listing</a>
-              <a href="/stock" class="btn-ghost" style="background:rgba(42,22,8,0.06); color:var(--ink); border-color:var(--tan-border);">See all stock</a>
-            </div>
-            {shanesPick.isPlaceholder && (
-              <p style="font-size:0.75rem; color:var(--muted); margin-top:14px; font-style:italic;">
-                Auto-picked from your featured stock. Set a specific Shane's Pick in Sanity Studio → Site Settings.
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  )}
-
-  <!-- Featured caravans -->
-  <section class="section" style="background:var(--sand-deep);">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">More featured stock</h2>
-        <a href="/stock" class="section-link">See all caravans →</a>
-      </div>
-
-      {featured.length === 0 ? (
-        <div class="empty-state">
-          <div class="empty-title">Featured listings coming soon</div>
-          <p>We are loading our caravan inventory into the new site. Check back shortly, or browse the full stock list.</p>
-          <p style="margin-top:16px;"><a href="/stock" class="section-link">Browse all stock →</a></p>
-        </div>
-      ) : (
-        <div class="stock-grid">
-          {featured.map((c) => <CaravanCard caravan={c} />)}
-        </div>
-      )}
-    </div>
-  </section>
-
-  <!-- What's Happening teaser -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <div class="page-eyebrow" style="color:var(--rust);">From the showroom floor</div>
-          <h2 class="section-title">What's happening</h2>
-        </div>
-        <a href="/whats-happening" class="section-link">All news →</a>
-      </div>
-      <div class="news-teaser-grid">
-        {upcomingNews.map((n) => n.href ? (
-          <a href={n.href} class="news-teaser-card news-teaser-card-link">
-            <div class="news-teaser-date">{n.date}</div>
-            <span class="news-type news-type-rust">{n.type}</span>
-            <h3>{n.title}</h3>
-            <p>{n.body}</p>
-            <span class="news-teaser-arrow" aria-hidden="true">Read more →</span>
-          </a>
-        ) : (
-          <div class="news-teaser-card">
-            <div class="news-teaser-date">{n.date}</div>
-            <span class="news-type news-type-rust">{n.type}</span>
-            <h3>{n.title}</h3>
-            <p>{n.body}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section class="section" style="background:var(--sand-deep);">
-    <div class="container">
-      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px;">
-        <div class="page-eyebrow" style="color:var(--rust);">In their own words</div>
-        <h2 class="section-title">Real owners, real trips, real stories</h2>
-      </div>
-      <div class="testimonial-grid">
-        {testimonials.map((t) => (
-          <figure class="testimonial-card">
-            <div class="testimonial-stars" aria-label={`${t.rating} out of 5 stars`}>
-              {Array.from({ length: t.rating }).map(() => <span aria-hidden="true">★</span>)}
-            </div>
-            <blockquote class="testimonial-quote">"{t.quote}"</blockquote>
-            <figcaption class="testimonial-meta">
-              <div class="testimonial-name">{t.name}</div>
-              <div class="testimonial-sub">{t.source}</div>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Service teaser -->
-  <section class="band-dark">
-    <div class="container" style="text-align:center; max-width:780px; margin:0 auto;">
-      <div class="page-eyebrow" style="color:var(--gold); margin-bottom:12px;">Workshop</div>
-      <h2 style="color:var(--sand); font-size:1.8rem; margin-bottom:16px;">
-        We don't just sell them. We service them.
-      </h2>
-      <p style="color:var(--gold); margin-bottom:28px; line-height:1.7;">
-        Our workshop handles everything from annual servicing to custom modifications.
-        You bought it here - we'll look after it for life.
-      </p>
-      <a href="/service" class="btn-primary">See workshop services</a>
-    </div>
-  </section>
-
+  <!-- Home page ends after Latest from YouTube per the design review.
+       Shane's Pick, Featured stock, What's Happening, Testimonials and the
+       Service teaser have all been moved off the home page. Stock lives at
+       /stock, news at /whats-happening, testimonials are surfaced contextually
+       on caravan detail pages, and the service callout is already covered by
+       the 3-pathway block above. -->
 </Site>

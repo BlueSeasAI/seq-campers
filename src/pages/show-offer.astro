@@ -1,0 +1,161 @@
+---
+import Site from '../layouts/Site.astro'
+import TrustStrip from '../components/TrustStrip.astro'
+
+// Grand Slam show offer page per Hormozi's pattern: stack inclusions with
+// dollar values, real scarcity, countdown timer, $500 refundable hold.
+//
+// IMPORTANT: numbers below are placeholders. Bart to confirm with Shane:
+//   - Total inclusion dollar value (currently $14,640 estimated)
+//   - Exact scarcity (currently 14 vans, must be true)
+//   - Refundable hold logistics ($500 default - Maud to confirm)
+//   - Show special expiry (currently Sun 7 Jun 2026 11pm AEST)
+
+const SHOW_EXPIRY_ISO = '2026-06-07T23:00:00+10:00'
+const VANS_REMAINING = 14
+const HOLD_AMOUNT = 500
+
+const inclusions = [
+  { label: 'Full annual service voucher', value: 1450, note: 'Bearings, brakes, gas, electrics - everything pre-trip ready.' },
+  { label: 'Premium hitch upgrade', value: 1290, note: 'Off-road coupling with full articulation.' },
+  { label: '12 months roadside cover', value: 580, note: 'Australia-wide breakdown assistance.' },
+  { label: 'Free 2000W inverter (Stockman Rover only)', value: 1900, note: 'Run lights, fridge, devices off-grid.' },
+  { label: '$3,000 accessory credit (Kimberley range)', value: 3000, note: 'Spend on solar, lithium, whatever upgrade matters most.' },
+  { label: 'Stone deflector + rock tamer kit', value: 880, note: 'Save your windows on the corrugations.' },
+  { label: 'Show floor handover pack', value: 540, note: 'Levellers, sand pegs, hose, mat. Ready to camp on collection.' },
+  { label: 'Locked-in 2026 pricing', value: 5000, note: 'Pre-July factory price rises do not apply to show buyers.' },
+]
+
+const totalValue = inclusions.reduce((sum, i) => sum + i.value, 0)
+---
+
+<Site
+  title="Brisbane Show 2026 Offer"
+  description={`SEQ Campers Brisbane Caravan Show special: ${totalValue.toLocaleString('en-AU')} dollars of inclusions free on any new caravan locked in by Sun 7 Jun 2026. Reserve with a refundable $${HOLD_AMOUNT} hold.`}
+>
+  <div class="page-header" style="background:linear-gradient(135deg, var(--ink) 0%, var(--ink-deep) 100%);">
+    <div class="container" style="text-align:center;">
+      <div class="page-eyebrow" style="color:var(--gold);">Brisbane Show 3 - 5 June 2026 · Stand 2693</div>
+      <h1 style="color:var(--sand);">${totalValue.toLocaleString('en-AU')} of inclusions. <span style="color:var(--gold);">Free.</span></h1>
+      <p style="color:var(--gold); max-width:640px; margin:8px auto 0;">
+        Lock in a new caravan at the show and we stack the value on top - no discount needed.
+        Offer expires Sunday 7 June at 11pm.
+      </p>
+    </div>
+  </div>
+
+  <TrustStrip />
+
+  <!-- Countdown + scarcity row -->
+  <section class="section" style="padding-top:32px; padding-bottom:24px;">
+    <div class="container" style="max-width:880px;">
+      <div class="show-offer-stats">
+        <div class="show-offer-stat show-offer-stat-countdown">
+          <div class="show-offer-stat-label">Offer expires in</div>
+          <div class="show-offer-stat-value" data-countdown={SHOW_EXPIRY_ISO}>--d --h --m --s</div>
+        </div>
+        <div class="show-offer-stat show-offer-stat-scarcity">
+          <div class="show-offer-stat-label">Vans available at show pricing</div>
+          <div class="show-offer-stat-value">{VANS_REMAINING} <span class="show-offer-stat-suffix">remaining</span></div>
+        </div>
+        <div class="show-offer-stat">
+          <div class="show-offer-stat-label">Reserve with</div>
+          <div class="show-offer-stat-value">${HOLD_AMOUNT} <span class="show-offer-stat-suffix">fully refundable</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The value stack -->
+  <section class="section" style="padding-top:24px;">
+    <div class="container" style="max-width:880px;">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:24px;">
+        <div class="page-eyebrow" style="color:var(--rust);">What's included</div>
+        <h2 class="section-title">Everything you get on top of the van.</h2>
+      </div>
+
+      <div class="value-stack">
+        {inclusions.map((item) => (
+          <div class="value-stack-row">
+            <div class="value-stack-tick" aria-hidden="true">✓</div>
+            <div class="value-stack-body">
+              <div class="value-stack-label">{item.label}</div>
+              <div class="value-stack-note">{item.note}</div>
+            </div>
+            <div class="value-stack-price">${item.value.toLocaleString('en-AU')}</div>
+          </div>
+        ))}
+        <div class="value-stack-row value-stack-total">
+          <div class="value-stack-tick value-stack-tick-total" aria-hidden="true">=</div>
+          <div class="value-stack-body">
+            <div class="value-stack-label">Total value stacked on top of every show-week purchase</div>
+            <div class="value-stack-note">All inclusions apply to new Kimberley Kampers and Stockman caravans purchased between 3 - 7 June 2026.</div>
+          </div>
+          <div class="value-stack-price value-stack-price-total">${totalValue.toLocaleString('en-AU')}</div>
+        </div>
+      </div>
+
+      <div style="background:var(--ink); color:var(--sand); border-radius:var(--radius); padding:28px 32px; border-left:6px solid var(--gold); margin-top:36px;">
+        <div class="page-eyebrow" style="color:var(--gold);">Reserve with a refundable hold</div>
+        <h3 style="color:var(--sand); font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; margin:8px 0 10px;">
+          ${HOLD_AMOUNT} hold. Locks in show pricing and inclusions. Fully refundable if you change your mind by Friday 14 June 2026.
+        </h3>
+        <p style="color:var(--gold); margin-bottom:18px; line-height:1.7;">
+          The hold gives you the show package locked in. If your partner says no on the drive home or you decide it is not the right time, you get the full $${HOLD_AMOUNT} back. No questions, no fine print.
+        </p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="/brisbane-show-2026" class="btn-primary">Build your spec + see show vans</a>
+          <a href="tel:0753707933" class="btn-ghost" style="background:rgba(244,237,224,0.10); color:var(--sand); border-color:rgba(244,237,224,0.35);">Call (07) 5370 7933</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reassurance row -->
+  <section class="section" style="background:var(--sand-deep); padding-top:40px; padding-bottom:40px;">
+    <div class="container" style="max-width:880px;">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:24px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Why it works</div>
+        <h2 class="section-title">Show buyers get the best deal of the year.</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px;">
+        <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px 24px;">
+          <h3 style="font-family:'Inter Tight', sans-serif; font-size:1.05rem; font-weight:700; color:var(--ink); margin-bottom:8px;">Locked-in 2026 pricing</h3>
+          <p style="color:var(--muted); font-size:0.92rem; line-height:1.6;">Factory price rises kick in 1 July. Show buyers do not pay them.</p>
+        </div>
+        <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px 24px;">
+          <h3 style="font-family:'Inter Tight', sans-serif; font-size:1.05rem; font-weight:700; color:var(--ink); margin-bottom:8px;">Refundable hold</h3>
+          <p style="color:var(--muted); font-size:0.92rem; line-height:1.6;">No commitment until you confirm. ${HOLD_AMOUNT} back if you change your mind by 14 June.</p>
+        </div>
+        <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px 24px;">
+          <h3 style="font-family:'Inter Tight', sans-serif; font-size:1.05rem; font-weight:700; color:var(--ink); margin-bottom:8px;">Hand-picked by Shane</h3>
+          <p style="color:var(--muted); font-size:0.92rem; line-height:1.6;">Every van on the show floor has been inspected and prepared by the SEQ team. 30 years on the lot.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Countdown JS - updates every second on client -->
+  <script is:inline define:vars={{ expiry: SHOW_EXPIRY_ISO }}>
+    (function () {
+      const el = document.querySelector('[data-countdown]')
+      if (!el) return
+      const target = new Date(expiry).getTime()
+
+      function tick() {
+        const diff = target - Date.now()
+        if (diff <= 0) {
+          el.textContent = 'Show offer closed'
+          return
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+        el.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`
+      }
+      tick()
+      setInterval(tick, 1000)
+    })()
+  </script>
+</Site>

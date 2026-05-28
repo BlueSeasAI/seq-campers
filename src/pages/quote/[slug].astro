@@ -47,7 +47,10 @@ const pageUrl = `${siteBase}/quote/${brand.slug}`
     </div>
   </section>
 
-  <!-- Quote enquiry form -->
+  <!-- Quote enquiry form (Netlify Forms - posts to sales@seqcampers.com.au)
+       Reliable across all devices including iOS without configured mail clients.
+       Single form-name "quote-enquiry" with hidden brand fields so we can
+       configure ONE email notification in Netlify and route everywhere. -->
   <section class="section" style="padding-top:24px;">
     <div class="container" style="max-width:760px;">
       <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:32px 36px; box-shadow:var(--shadow-sm);">
@@ -59,7 +62,24 @@ const pageUrl = `${siteBase}/quote/${brand.slug}`
           Reply within one business day. Direct from Shane or the team - no call centre.
         </p>
 
-        <form id={`quote-form-${brand.slug}`} class="quote-form" novalidate>
+        <form
+          class="quote-form enquiry-form"
+          name="quote-enquiry"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thanks/"
+        >
+          <!-- Required by Netlify Forms for static deploys -->
+          <input type="hidden" name="form-name" value="quote-enquiry" />
+          <p class="hp" style="display:none;">
+            <label>Don't fill this out: <input name="bot-field" /></label>
+          </p>
+
+          <!-- Brand context (for routing + reply) -->
+          <input type="hidden" name="brand_name" value={brand.name} />
+          <input type="hidden" name="brand_slug" value={brand.slug} />
+          <input type="hidden" name="page_url" value={pageUrl} />
 
           <div class="quote-fieldset">
             <div class="quote-fieldset-title">About you</div>
@@ -87,7 +107,7 @@ const pageUrl = `${siteBase}/quote/${brand.slug}`
               <fieldset class="quote-choice">
                 <legend>{q.label}</legend>
                 <div class="quote-choice-options">
-                  {q.options.map((opt, i) => (
+                  {q.options.map((opt) => (
                     <label class="quote-choice-option">
                       <input type="radio" name={`choice_${q.id}`} value={opt} />
                       <span>{opt}</span>
@@ -108,14 +128,7 @@ const pageUrl = `${siteBase}/quote/${brand.slug}`
           </button>
 
           <p style="font-size:0.78rem; color:var(--muted); margin-top:14px; text-align:center; line-height:1.5;">
-            Clicking Send opens your email app with everything filled in. Press send in your email app to deliver it.
-            You will keep a copy in your sent folder. We reply within one business day.
-          </p>
-
-          <p id={`quote-fallback-${brand.slug}`} class="quote-fallback" hidden>
-            If nothing happened when you clicked Send, your browser may have blocked the email.
-            <a href={`mailto:sales@seqcampers.com.au?subject=Quote%20enquiry%20-%20${encodeURIComponent(brand.name)}`}>Click here to email us directly</a>
-            or call <a href="tel:0753707933">(07) 5370 7933</a>.
+            Submissions go directly to the SEQ Campers team. We reply within one business day.
           </p>
         </form>
       </div>
@@ -126,76 +139,4 @@ const pageUrl = `${siteBase}/quote/${brand.slug}`
       </p>
     </div>
   </section>
-
-  <script is:inline define:vars={{ brandName: brand.name, brandSlug: brand.slug, pageUrl }}>
-    (function () {
-      const form = document.getElementById(`quote-form-${brandSlug}`)
-      const fallback = document.getElementById(`quote-fallback-${brandSlug}`)
-      if (!form) return
-
-      form.addEventListener('submit', function (ev) {
-        ev.preventDefault()
-        const data = new FormData(form)
-
-        const customer_name = (data.get('customer_name') || '').toString().trim()
-        const customer_phone = (data.get('customer_phone') || '').toString().trim()
-        const customer_email = (data.get('customer_email') || '').toString().trim()
-        const extra_notes = (data.get('extra_notes') || '').toString().trim()
-
-        if (!customer_name || !customer_phone || !customer_email) {
-          alert('Please fill in your name, phone and email so we can send you a quote.')
-          return
-        }
-
-        // Build list of choices
-        const choices = []
-        for (const [key, value] of data.entries()) {
-          if (key.startsWith('choice_')) {
-            const label = key.replace(/^choice_/, '').replace(/_/g, ' ')
-            choices.push({ label: label.charAt(0).toUpperCase() + label.slice(1), value: value.toString() })
-          }
-        }
-
-        // Build email body
-        const lines = [
-          'Hi SEQ Campers,',
-          '',
-          `I would like a quote for the ${brandName}.`,
-          `Build spec link: ${pageUrl}`,
-          '',
-          'My details:',
-          `  Name: ${customer_name}`,
-          `  Phone: ${customer_phone}`,
-          `  Email: ${customer_email}`,
-          '',
-        ]
-        if (choices.length) {
-          lines.push('What I want:')
-          choices.forEach((c) => lines.push(`  ${c.label}: ${c.value}`))
-          lines.push('')
-        }
-        if (extra_notes) {
-          lines.push('Additional notes:')
-          lines.push(extra_notes)
-          lines.push('')
-        }
-        lines.push('Please send me a written quote and let me know about delivery timing.')
-        lines.push('')
-        lines.push('Thanks,')
-        lines.push(customer_name)
-
-        const subject = `Quote enquiry - ${brandName}`
-        const body = lines.join('\n')
-        const mailto = `mailto:sales@seqcampers.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-
-        // Open the email client
-        window.location.href = mailto
-
-        // Show fallback link in case mailto handler didn't fire
-        setTimeout(function () {
-          if (fallback) fallback.hidden = false
-        }, 1500)
-      })
-    })()
-  </script>
 </Site>

@@ -130,18 +130,32 @@ a { color: inherit; }
 
 .logo img {
   display: block;
-  height: 64px;
+  height: 72px;
   width: auto;
   max-width: 100%;
   transition: height 0.2s;
 }
 
+/* On the home page hero (transparent header), the logo is much larger -
+   skyerv.com pattern. Scales back down when the header transitions to
+   solid after the user scrolls past the hero. */
+.site-header-overlay .logo img {
+  height: 140px;
+}
+.site-header-overlay.is-scrolled .logo img {
+  height: 72px;
+}
+
 @media (max-width: 860px) {
-  .logo img { height: 52px; }
+  .logo img { height: 56px; }
+  .site-header-overlay .logo img { height: 100px; }
+  .site-header-overlay.is-scrolled .logo img { height: 56px; }
 }
 
 @media (max-width: 520px) {
-  .logo img { height: 44px; }
+  .logo img { height: 46px; }
+  .site-header-overlay .logo img { height: 80px; }
+  .site-header-overlay.is-scrolled .logo img { height: 46px; }
 }
 
 nav { display: flex; gap: 24px; align-items: center; }
@@ -2215,61 +2229,68 @@ a:focus-visible, button:focus-visible {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 22px 40px;
+  gap: 18px 36px;
   text-align: left;
 }
 
 .trust-item {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   font-family: 'Inter Tight', sans-serif;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--ink);
   text-transform: none;
-  line-height: 1.25;
-  max-width: 290px;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .trust-item-label {
   display: inline-block;
 }
 
+/* AU badge is a standalone visual, sized larger to balance the text pills. */
 .trust-item-aus {
-  font-weight: 800;
+  padding: 0;
 }
 
 .trust-tick {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: var(--rust);
   color: #fff;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   flex-shrink: 0;
 }
 
 .trust-aus-icon {
-  width: 56px;
-  height: 56px;
+  width: 76px;
+  height: 76px;
   flex-shrink: 0;
   object-fit: contain;
   background: transparent;
   display: inline-block;
 }
 
-@media (max-width: 720px) {
-  .trust-strip { padding: 24px 0; }
-  .trust-strip-inner { gap: 16px 24px; }
-  .trust-item { font-size: 0.92rem; max-width: 100%; gap: 10px; }
-  .trust-tick { width: 26px; height: 26px; font-size: 0.85rem; }
-  .trust-aus-icon { width: 44px; height: 44px; }
+@media (max-width: 860px) {
+  .trust-strip-inner { gap: 14px 22px; }
+  .trust-item { font-size: 0.9rem; gap: 9px; white-space: normal; }
+  .trust-aus-icon { width: 64px; height: 64px; }
+}
+
+@media (max-width: 520px) {
+  .trust-strip { padding: 22px 0; }
+  .trust-strip-inner { gap: 12px 18px; }
+  .trust-item { font-size: 0.85rem; }
+  .trust-tick { width: 24px; height: 24px; font-size: 0.8rem; }
+  .trust-aus-icon { width: 54px; height: 54px; }
 }
 
 /* Mini Authorised Dealer badge (caravan detail sidebar) */
@@ -2610,6 +2631,131 @@ a:focus-visible, button:focus-visible {
   color: var(--muted);
   font-size: 0.86rem;
   line-height: 1.5;
+}
+
+/* ============================================================
+   Show offer page - countdown + scarcity + value stack
+   ============================================================ */
+.show-offer-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.show-offer-stat {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  text-align: left;
+}
+.show-offer-stat-countdown {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--sand);
+}
+.show-offer-stat-countdown .show-offer-stat-label { color: var(--gold); }
+.show-offer-stat-countdown .show-offer-stat-value { color: var(--sand); font-family: 'Inter Tight', sans-serif; font-variant-numeric: tabular-nums; }
+.show-offer-stat-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 8px;
+}
+.show-offer-stat-value {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.show-offer-stat-suffix {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0;
+  margin-left: 2px;
+}
+.show-offer-stat-countdown .show-offer-stat-suffix { color: var(--gold); }
+@media (max-width: 760px) {
+  .show-offer-stats { grid-template-columns: 1fr; gap: 12px; }
+  .show-offer-stat-value { font-size: 1.35rem; }
+}
+
+.value-stack {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 6px 0;
+  box-shadow: var(--shadow-sm);
+}
+.value-stack-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--tan-border);
+}
+.value-stack-row:last-child { border-bottom: none; }
+.value-stack-tick {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.value-stack-tick-total {
+  background: var(--ink);
+  width: 38px;
+  height: 38px;
+  font-size: 1.2rem;
+}
+.value-stack-body { min-width: 0; }
+.value-stack-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.value-stack-note {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+.value-stack-price {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--rust);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.value-stack-total {
+  background: var(--sand);
+  padding: 22px 24px;
+}
+.value-stack-total .value-stack-label { font-size: 1.05rem; }
+.value-stack-price-total {
+  font-size: 1.6rem;
+  color: var(--ink);
+}
+@media (max-width: 600px) {
+  .value-stack-row { grid-template-columns: 30px 1fr; gap: 12px; padding: 16px 18px; }
+  .value-stack-tick { width: 26px; height: 26px; font-size: 0.85rem; }
+  .value-stack-price { grid-column: 2; padding-top: 4px; }
 }
 
 /* ============================================================

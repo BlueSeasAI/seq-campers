@@ -5,7 +5,9 @@ const { variant = 'light' } = Astro.props
 <div class={`trust-strip trust-strip-${variant}`} role="region" aria-label="Dealer credentials">
   <div class="container">
     <div class="trust-strip-inner">
-      <span class="trust-item trust-item-aus">
+      <!-- AU badge - image is self-contained (already has "Australian Designed
+           & Built" text baked in), so no duplicate text label here. -->
+      <span class="trust-item trust-item-aus" title="Australian Designed and Built since 1996">
         <img
           class="trust-aus-icon"
           src="/au-built-badge.png"
@@ -14,11 +16,10 @@ const { variant = 'light' } = Astro.props
           height="200"
           loading="lazy"
         />
-        <span class="trust-item-label">Australian Designed & Built</span>
       </span>
       <span class="trust-item">
         <span class="trust-tick" aria-hidden="true">✓</span>
-        <span class="trust-item-label">Authorised Kimberley Kampers Dealer</span>
+        <span class="trust-item-label">Authorised Kimberley Dealer</span>
       </span>
       <span class="trust-item">
         <span class="trust-tick" aria-hidden="true">✓</span>
