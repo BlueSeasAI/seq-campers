@@ -32,9 +32,28 @@ if (!caravan) return Astro.redirect('/stock')
 const videos = caravan.videos ?? []
 const videoCount = Math.min(videos.length, 3)
 
-function youtubeEmbed(url) {
-  const match = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/)
-  return match ? `https://www.youtube.com/embed/${match[1]}` : null
+function youtubeId(url) {
+  const m = String(url ?? '').match(/(?:v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
+function youtubeEmbed(url, { autoplay = false } = {}) {
+  const id = youtubeId(url)
+  if (!id) return null
+  const params = new URLSearchParams({
+    modestbranding: '1',
+    rel: '0',
+    iv_load_policy: '3',
+    playsinline: '1',
+  })
+  if (autoplay) {
+    params.set('autoplay', '1')
+    params.set('mute', '1')
+    params.set('loop', '1')
+    params.set('playlist', id)
+    params.set('controls', '0')
+  }
+  return `https://www.youtube.com/embed/${id}?${params.toString()}`
 }
 
 // Build a meta description from structured data
@@ -207,6 +226,32 @@ const productSchema = {
           </div>
         )}
 
+        {/* Videos moved up here so they sit alongside photos as the primary visual story */}
+        {videoCount > 0 ? (
+          <div style="margin-top:24px;">
+            <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">Walkaround</div>
+            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:14px;">See it in motion</h2>
+            <div class={`video-grid videos-${videoCount}`}>
+              {videos.slice(0, 3).map((v, i) => {
+                const embedUrl = youtubeEmbed(v.url, { autoplay: i === 0 })
+                return embedUrl ? (
+                  <div class="video-embed">
+                    <iframe src={embedUrl} title={v.label ?? caravan.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen={i !== 0 ? true : undefined}></iframe>
+                  </div>
+                ) : null
+              })}
+            </div>
+          </div>
+        ) : (
+          <div style="margin-top:24px; background:var(--sand-deep); border:1px dashed var(--tan-border); border-radius:var(--radius); padding:20px 24px; text-align:center;">
+            <div class="page-eyebrow" style="color:var(--muted); margin-bottom:6px;">Walkaround video</div>
+            <p style="color:var(--muted); font-size:0.92rem; line-height:1.5;">
+              Shane is filming a B-roll walkthrough of this caravan - it will appear here as soon as it is ready.
+              Want to see it sooner? <a href="/contact" style="color:var(--rust); font-weight:600;">Book a private walkthrough</a>.
+            </p>
+          </div>
+        )}
+
         {descriptionHtml && (
           <div style="margin-top:32px;">
             <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">About this caravan</h2>
@@ -230,21 +275,6 @@ const productSchema = {
           </div>
         )}
 
-        {videoCount > 0 && (
-          <div style="margin-top:36px;">
-            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:16px;">Videos</h2>
-            <div class={`video-grid videos-${videoCount}`}>
-              {videos.slice(0, 3).map((v) => {
-                const embedUrl = youtubeEmbed(v.url)
-                return embedUrl ? (
-                  <div class="video-embed">
-                    <iframe src={embedUrl} title={v.label ?? caravan.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                  </div>
-                ) : null
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
       <!-- Right: price + specs + enquire -->

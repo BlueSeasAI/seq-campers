@@ -58,25 +58,6 @@ const showroomHours = [
         </div>
       </div>
 
-      <!-- Showroom hours block -->
-      <div class="hours-block" style="margin-bottom:48px;">
-        <h3>Showroom & workshop hours</h3>
-        <table class="hours-table">
-          <tbody>
-            {showroomHours.map((row) => (
-              <tr>
-                <td>{row.day}</td>
-                <td class={row.closed ? 'is-closed' : ''}>{row.hours}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p style="margin-top:14px; font-size:0.82rem; color:var(--muted); line-height:1.5;">
-          Online enquiries are answered 7am - 4:30pm every day. Out of hours messages
-          get a reply first thing the next business day.
-        </p>
-      </div>
-
       <!-- Two-column: form + map -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;" class="contact-grid">
         <div>
@@ -139,7 +120,7 @@ const showroomHours = [
             We are at <strong style="color:var(--ink);">6 Bonanza Ct, Marcoola</strong>, ten minutes north of Maroochydore on the Sunshine Coast.
             Visits by appointment so we can give you our full attention.
           </p>
-          <div class="map-embed">
+          <div class="map-embed map-embed-small">
             <iframe
               src={mapSrc}
               title="SEQ Campers location on Google Maps"
@@ -153,6 +134,34 @@ const showroomHours = [
           </p>
         </div>
       </div>
+
+      <!-- Hours - small + at bottom (the team prefers people to just ring) -->
+      <details class="hours-block-collapsed" style="margin-top:56px;">
+        <summary>
+          <span class="page-eyebrow" style="color:var(--muted); display:inline; margin:0;">Hours</span>
+          <span style="margin-left:8px; color:var(--muted); font-size:0.88rem;">
+            Mon-Wed 7:30am-3pm · Thu-Fri 8:30am-3pm · Sat 8:30am-12:30pm · Sun closed
+          </span>
+          <span style="margin-left:8px; color:var(--rust); font-size:0.78rem;">Show full week ▼</span>
+        </summary>
+        <div style="margin-top:14px;">
+          <table class="hours-table" style="max-width:380px;">
+            <tbody>
+              {showroomHours.map((row) => (
+                <tr>
+                  <td>{row.day}</td>
+                  <td class={row.closed ? 'is-closed' : ''}>{row.hours}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:0.78rem; color:var(--muted); line-height:1.5;">
+            Visits by appointment recommended - just give us a ring. Online enquiries
+            answered 7am-4:30pm every day; out-of-hours messages get a reply first
+            thing the next business day.
+          </p>
+        </div>
+      </details>
     </div>
   </section>
 

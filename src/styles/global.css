@@ -362,7 +362,54 @@ nav a.is-active {
   z-index: 1;
 }
 
+/* Hero with autoplay YouTube background video */
+.hero-video {
+  padding: 140px 0 120px;
+  min-height: 560px;
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 3px solid var(--gold);
+}
+
+.hero-video-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-video-bg iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Cover trick: scale iframe to always fill the hero, preserving 16:9 */
+  width: max(100vw, 177.78vh);
+  height: max(56.25vw, 100vh);
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: 0;
+}
+
+/* Dark overlay for text legibility */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    100deg,
+    rgba(26, 14, 6, 0.75) 0%,
+    rgba(26, 14, 6, 0.55) 35%,
+    rgba(26, 14, 6, 0.25) 70%,
+    rgba(26, 14, 6, 0.15) 100%
+  );
+}
+
 .hero-content { max-width: 560px; position: relative; z-index: 2; }
+.hero-video .hero-content { z-index: 3; }
 
 .hero h1 {
   font-size: 2.6rem;
@@ -763,6 +810,32 @@ a:focus-visible, button:focus-visible {
   width: 100%;
   height: 320px;
   border: 0;
+}
+
+.map-embed-small iframe {
+  height: 220px;
+}
+
+/* Collapsed hours block - small and unobtrusive */
+.hours-block-collapsed {
+  border-top: 1px solid var(--tan-border);
+  padding-top: 18px;
+}
+
+.hours-block-collapsed summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.hours-block-collapsed summary::-webkit-details-marker { display: none; }
+
+.hours-block-collapsed[open] summary > span:last-child {
+  color: var(--rust);
 }
 
 /* ============================================================
