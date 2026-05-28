@@ -349,8 +349,13 @@ const productSchema = {
           </div>
         )}
 
-        {(caravan.compliance?.vin || caravan.compliance?.registrationState) && (
+        {(caravan.compliance?.stockNumber || caravan.compliance?.vin || caravan.compliance?.registrationState) && (
           <div style="margin-top:14px; padding:12px 0; border-top:1px solid var(--tan-border); font-size:0.78rem; color:var(--muted);">
+            {caravan.compliance.stockNumber && (
+              <div style="margin-bottom:4px;">
+                <span style="font-weight:600;">Stock #:</span> {caravan.compliance.stockNumber}
+              </div>
+            )}
             {caravan.compliance.registrationState && (
               <div style="margin-bottom:4px;">
                 <span style="font-weight:600;">Reg state:</span> {caravan.compliance.registrationState}

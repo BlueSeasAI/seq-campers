@@ -24,9 +24,20 @@ export default {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
-      description: 'Used in the public web address. Click "Generate" to auto-fill.',
-      options: { source: 'title', maxLength: 96 },
-      validation: (Rule) => Rule.required(),
+      description: 'Auto-generated from the Caravan name when you save - or click "Generate" any time to refresh. Used in the public web address (e.g. seqcampers.com.au/stock/stockman-trekka-2026).',
+      options: {
+        source: 'title',
+        maxLength: 96,
+        slugify: (input) =>
+          String(input)
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9-\s]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .slice(0, 96),
+      },
+      validation: (Rule) => Rule.required().error('Slug is required - click the Generate button to auto-create it from the caravan name.'),
     },
 
     {
@@ -91,7 +102,7 @@ export default {
       title: 'Photos',
       type: 'array',
       description:
-        'Drag to reorder. First photo is the main image shown in the listing grid. Drop new files anywhere to add.',
+        'Tip: select multiple files in your file picker (Ctrl+click or Shift+click on Windows) to upload them in one go. Then click each thumbnail to add an Alt text. Drag to reorder - the first photo is the main image shown in the listing grid.',
       of: [
         {
           type: 'image',
@@ -205,16 +216,28 @@ export default {
 
     {
       name: 'compliance',
-      title: 'Compliance and identifiers',
+      title: 'Stock identifiers',
       type: 'object',
-      description: 'Helps buyers trust the listing - VIN enables PPSR/NEVDIS lookup.',
+      description: 'Only the SEQ stock number is required. VIN + registration state are optional - fill them in if you have them (helps buyers trust the listing and enables PPSR/NEVDIS lookups).',
       options: { columns: 2 },
       fields: [
         {
-          name: 'vin',
-          title: 'VIN (17 characters)',
+          name: 'stockNumber',
+          title: 'SEQ stock number',
           type: 'string',
-          description: 'Vehicle Identification Number, exactly 17 characters.',
+          description: 'The 4-digit SEQ Campers stock number (e.g. 1234). Shown on the listing for internal reference.',
+          validation: (Rule) =>
+            Rule.custom((v) => {
+              if (!v) return true
+              if (!/^[0-9]{3,5}$/.test(v)) return 'Use 3-5 digits only, e.g. 1234'
+              return true
+            }),
+        },
+        {
+          name: 'vin',
+          title: 'VIN (optional, 17 characters)',
+          type: 'string',
+          description: 'Vehicle Identification Number. Optional - skip for consignment / older stock where VIN is not available. If you do enter one, it must be exactly 17 characters.',
           validation: (Rule) =>
             Rule.custom((v) => {
               if (!v) return true
@@ -224,7 +247,7 @@ export default {
         },
         {
           name: 'registrationState',
-          title: 'Registration state',
+          title: 'Registration state (optional)',
           type: 'string',
           options: {
             list: [
@@ -406,9 +429,9 @@ export default {
 
     {
       name: 'configurator',
-      title: 'Available configurations',
+      title: 'Available configurations (new stock only)',
       type: 'array',
-      description: 'Optional. Add-on options the customer can pick.',
+      description: 'Leave blank for consignment / used stock. Only fill this in for NEW caravans where buyers can add upgrades (extra solar, lithium upgrade, etc.). The Brisbane Show "Build your spec" flow now lives on the dedicated /quote/{brand} pages, not on the listing itself.',
       of: [
         {
           type: 'object',
