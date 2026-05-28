@@ -34,18 +34,49 @@ const pageUrl = `${siteBase}/quote/${brand.slug}`
         {brand.intro}
       </p>
 
-      <div style="background:#fff; border:1px solid var(--tan-border); border-left:4px solid var(--gold); border-radius:var(--radius); padding:18px 22px; margin:24px 0 8px;">
-        <div class="page-eyebrow" style="color:var(--gold); margin-bottom:6px;">Show special</div>
-        <p style="color:var(--ink); font-weight:500; line-height:1.55; margin:0;">{brand.showSpecial}</p>
-      </div>
-
       <p style="color:var(--muted); font-size:0.92rem; margin-top:14px;">
-        Indicative pricing: <strong style="color:var(--ink);">{brand.indicativePrice}</strong>. Final quote includes
-        any additional configuration we agree on - we will send the written quote within one business day.
+        Indicative pricing: <strong style="color:var(--ink);">{brand.indicativePrice}</strong>.
       </p>
 
     </div>
   </section>
+
+  <!-- Show-week value stack: what you get on top of the van at no extra cost.
+       Per Hormozi/Laja: list inclusions with dollar values, total, make the
+       gap obvious. Stronger than just stating "show special - free X". -->
+  {brand.inclusions && brand.inclusions.length > 0 && (
+    <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
+      <div class="container" style="max-width:760px;">
+        <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
+          <div class="page-eyebrow" style="color:var(--rust);">Show-week value stack</div>
+          <h2 class="section-title">What you get on top of the {brand.name}</h2>
+          <p style="color:var(--muted); max-width:520px; margin:6px auto 0; line-height:1.6;">
+            Order during the show and these are stacked on top of the van at no extra cost.
+          </p>
+        </div>
+        <div class="value-stack">
+          {brand.inclusions.map((item) => (
+            <div class="value-stack-row">
+              <div class="value-stack-tick" aria-hidden="true">✓</div>
+              <div class="value-stack-body">
+                <div class="value-stack-label">{item.label}</div>
+                {item.note && <div class="value-stack-note">{item.note}</div>}
+              </div>
+              <div class="value-stack-price">{item.value > 0 ? `$${item.value.toLocaleString('en-AU')}` : 'Included'}</div>
+            </div>
+          ))}
+          <div class="value-stack-row value-stack-total">
+            <div class="value-stack-tick value-stack-tick-total" aria-hidden="true">=</div>
+            <div class="value-stack-body">
+              <div class="value-stack-label">Total value stacked on every show-week order</div>
+              <div class="value-stack-note">Apply to orders placed 3 - 7 June 2026. Refundable $500 hold locks the package in.</div>
+            </div>
+            <div class="value-stack-price value-stack-price-total">${brand.inclusions.reduce((s, i) => s + (i.value || 0), 0).toLocaleString('en-AU')}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- Quote enquiry form (Netlify Forms - posts to sales@seqcampers.com.au)
        Reliable across all devices including iOS without configured mail clients.

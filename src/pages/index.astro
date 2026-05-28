@@ -194,6 +194,19 @@ const faqSchema = {
 
   <TrustStrip />
 
+  <!-- Google reviews social proof - sits directly under the trust strip.
+       Per Luke's panel notes: visible 5-star count adds a fifth credibility
+       cue without crowding the pill row. -->
+  <div class="reviews-bar">
+    <div class="container">
+      <a href="https://www.google.com/search?q=SEQ+Campers+Sunshine+Coast+reviews" target="_blank" rel="noopener" class="reviews-bar-inner">
+        <span class="reviews-stars" aria-hidden="true">★★★★★</span>
+        <span class="reviews-text"><strong>35+ five-star reviews</strong> on Google</span>
+        <span class="reviews-link">Read them →</span>
+      </a>
+    </div>
+  </div>
+
   <!-- 3-pathway artery block: New / Used / Service. Below trust strip on
        desktop so the credibility cue lands first, then user picks a path. -->
   <section class="pathways-section" aria-label="Three pathways">
@@ -275,30 +288,61 @@ const faqSchema = {
     </div>
   </section>
 
-  <!-- Latest from YouTube -->
-  <section class="section" style="background:var(--sand-deep); padding-top:48px; padding-bottom:48px;">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <div class="page-eyebrow" style="color:var(--rust);">Watch before you visit</div>
-          <h2 class="section-title">Latest from our YouTube channel</h2>
+  <!-- Shane's Pick / Sale of the Week - replaces the YouTube grid per Bart.
+       Higher conversion than a 3-card browse grid: single focal point,
+       Shane's personal endorsement, urgency narrative, one clear CTA. -->
+  {shanesPick && (
+    <section class="section" style="background:var(--sand-deep); padding-top:48px; padding-bottom:48px;">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="page-eyebrow" style="color:var(--rust);">Sale of the week</div>
+            <h2 class="section-title">Shane's Pick</h2>
+          </div>
+          <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="section-link">View this listing →</a>
         </div>
-        <a href="/videos" class="section-link">All videos →</a>
-      </div>
-      <div class="video-grid">
-        {featuredVideos.map((v) => <VideoCard video={v} />)}
-      </div>
-      <p style="text-align:center; color:var(--muted); margin-top:24px; font-size:0.95rem;">
-        Join <strong style="color:var(--ink);">2,000+ off-road enthusiasts</strong> on our YouTube channel -
-        <a href="https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg" target="_blank" rel="noopener" style="color:var(--rust); font-weight:600;">subscribe here</a>
-      </p>
-    </div>
-  </section>
 
-  <!-- Home page ends after Latest from YouTube per the design review.
-       Shane's Pick, Featured stock, What's Happening, Testimonials and the
-       Service teaser have all been moved off the home page. Stock lives at
-       /stock, news at /whats-happening, testimonials are surfaced contextually
-       on caravan detail pages, and the service callout is already covered by
-       the 3-pathway block above. -->
+        <div class="shanes-pick">
+          <div class="shanes-pick-photo">
+            {shanesPick.caravan.mainImage ? (
+              <img src={sanityImage(shanesPick.caravan.mainImage, { w: 800 })} alt={shanesPick.caravan.title} />
+            ) : (
+              <div class="caravan-card-noimg">No photo yet</div>
+            )}
+            <span class="shanes-pick-badge">Shane's Pick</span>
+          </div>
+          <div class="shanes-pick-body">
+            {shanesPick.caravan.condition && conditionLabel(shanesPick.caravan.condition) && (
+              <span class={`condition-badge condition-${shanesPick.caravan.condition}`}>{conditionLabel(shanesPick.caravan.condition)}</span>
+            )}
+            {shanesPick.caravan.brand && <div class="card-brand" style="margin-top:8px;">{shanesPick.caravan.brand}</div>}
+            <h3 class="shanes-pick-title">{shanesPick.caravan.title}</h3>
+            <div class="shanes-pick-prices">
+              {shanesPick.originalPrice && (
+                <span class="shanes-pick-original">${shanesPick.originalPrice.toLocaleString('en-AU')}</span>
+              )}
+              <span class="shanes-pick-price">${shanesPick.caravan.price?.toLocaleString('en-AU')}</span>
+            </div>
+            {shanesPick.quote && (
+              <blockquote class="shanes-pick-quote">
+                "{shanesPick.quote}"
+                <cite>- SEQ team</cite>
+              </blockquote>
+            )}
+            {shanesPick.caravan.specs && (
+              <div class="shanes-pick-specs">
+                {shanesPick.caravan.specs.sleeps && <div><span>Sleeps</span><strong>{shanesPick.caravan.specs.sleeps}</strong></div>}
+                {shanesPick.caravan.specs.length && <div><span>Length</span><strong>{shanesPick.caravan.specs.length}m</strong></div>}
+                {shanesPick.caravan.specs.tareWeight && <div><span>Tare</span><strong>{shanesPick.caravan.specs.tareWeight}kg</strong></div>}
+              </div>
+            )}
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+              <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="btn-primary">View this listing</a>
+              <a href="/stock" class="btn-ghost" style="background:rgba(42,22,8,0.06); color:var(--ink); border-color:var(--tan-border);">See all stock</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
 </Site>

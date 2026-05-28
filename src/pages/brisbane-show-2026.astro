@@ -6,6 +6,24 @@ const showDates = '3 - 5 June 2026'
 const venue = 'Brisbane Showgrounds, Bowen Hills'
 const standNumber = '#2693'
 
+// Grand Slam show-offer value stack (Hormozi pattern, merged onto this page
+// per Bart - one URL, no separate /show-offer page).
+// TBC items - Shane to confirm via the checklist in the SEQ folder.
+const SHOW_EXPIRY_ISO = '2026-06-07T23:00:00+10:00'
+const VANS_REMAINING = 14
+const HOLD_AMOUNT = 500
+const inclusions = [
+  { label: 'Full annual service voucher', value: 1450, note: 'Bearings, brakes, gas, electrics. Pre-trip ready.' },
+  { label: 'Premium hitch upgrade', value: 1290, note: 'Off-road coupling, full articulation.' },
+  { label: '12 months roadside cover', value: 580, note: 'Australia-wide breakdown assistance.' },
+  { label: 'Free 2000W inverter (Stockman Rover)', value: 1900, note: 'Run lights, fridge, devices off-grid.' },
+  { label: '$3,000 accessory credit (Kimberley)', value: 3000, note: 'Solar, lithium, or whatever upgrade matters most.' },
+  { label: 'Stone deflector + rock tamer kit', value: 880, note: 'Save your windows on corrugations.' },
+  { label: 'Show floor handover pack', value: 540, note: 'Levellers, sand pegs, hose, mat. Ready to camp.' },
+  { label: 'Locked-in 2026 pricing', value: 5000, note: 'Pre-July factory price rises do not apply to show buyers.' },
+]
+const totalValue = inclusions.reduce((sum, i) => sum + i.value, 0)
+
 // Quote pages built and maintained by Maud on Netlify. These are the
 // canonical configurators - QR codes + "Build your spec" buttons all point
 // at these pages so visitors see the same quote tool Maud has been refining.
@@ -178,6 +196,61 @@ const eventSchema = {
     </div>
   </section>
 
+  <!-- Grand Slam show offer: value stack + countdown + scarcity + hold.
+       Lives between the "when/where" cards and the brand QR grid so it
+       lands before visitors start picking specific caravans. -->
+  <section class="section" style="padding-top:24px; padding-bottom:24px;">
+    <div class="container" style="max-width:980px;">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
+        <div class="page-eyebrow" style="color:var(--rust);">The show offer</div>
+        <h2 class="section-title">${totalValue.toLocaleString('en-AU')} of inclusions. <span style="color:var(--rust);">Free.</span></h2>
+        <p style="color:var(--muted); max-width:560px; margin:8px auto 0; line-height:1.6;">
+          Lock in a new caravan during the show and we stack the value on top - no discount needed. Offer closes Sunday 7 June at 11pm.
+        </p>
+      </div>
+
+      <div class="show-offer-stats" style="margin-bottom:22px;">
+        <div class="show-offer-stat show-offer-stat-countdown">
+          <div class="show-offer-stat-label">Offer closes in</div>
+          <div class="show-offer-stat-value" data-countdown={SHOW_EXPIRY_ISO}>--d --h --m --s</div>
+        </div>
+        <div class="show-offer-stat show-offer-stat-scarcity">
+          <div class="show-offer-stat-label">Show vans available</div>
+          <div class="show-offer-stat-value">{VANS_REMAINING} <span class="show-offer-stat-suffix">remaining</span></div>
+        </div>
+        <div class="show-offer-stat">
+          <div class="show-offer-stat-label">Reserve with</div>
+          <div class="show-offer-stat-value">${HOLD_AMOUNT} <span class="show-offer-stat-suffix">fully refundable</span></div>
+        </div>
+      </div>
+
+      <div class="value-stack">
+        {inclusions.map((item) => (
+          <div class="value-stack-row">
+            <div class="value-stack-tick" aria-hidden="true">✓</div>
+            <div class="value-stack-body">
+              <div class="value-stack-label">{item.label}</div>
+              <div class="value-stack-note">{item.note}</div>
+            </div>
+            <div class="value-stack-price">${item.value.toLocaleString('en-AU')}</div>
+          </div>
+        ))}
+        <div class="value-stack-row value-stack-total">
+          <div class="value-stack-tick value-stack-tick-total" aria-hidden="true">=</div>
+          <div class="value-stack-body">
+            <div class="value-stack-label">Total value stacked on every show-week purchase</div>
+            <div class="value-stack-note">All inclusions apply to new Kimberley Kampers and Stockman caravans purchased 3 - 7 June 2026.</div>
+          </div>
+          <div class="value-stack-price value-stack-price-total">${totalValue.toLocaleString('en-AU')}</div>
+        </div>
+      </div>
+
+      <p style="text-align:center; margin-top:14px; font-size:0.86rem; color:var(--muted);">
+        ${HOLD_AMOUNT} hold locks in show pricing and inclusions. Fully refundable if you change your mind by Friday 14 June 2026.
+      </p>
+    </div>
+  </section>
+
   <!-- Hero quote-builder section: the centrepiece for the show -->
   <section class="section" style="background:var(--sand-deep); padding-top:48px;">
     <div class="container">
@@ -280,4 +353,24 @@ const eventSchema = {
       </section>
     </div>
   </section>
+
+  <!-- Countdown ticker for the show offer (above) -->
+  <script is:inline define:vars={{ expiry: SHOW_EXPIRY_ISO }}>
+    (function () {
+      const el = document.querySelector('[data-countdown]')
+      if (!el) return
+      const target = new Date(expiry).getTime()
+      function tick() {
+        const diff = target - Date.now()
+        if (diff <= 0) { el.textContent = 'Show offer closed'; return }
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+        const s = Math.floor((diff % (1000 * 60)) / 1000)
+        el.textContent = d + 'd ' + h + 'h ' + m + 'm ' + s + 's'
+      }
+      tick()
+      setInterval(tick, 1000)
+    })()
+  </script>
 </Site>

@@ -121,6 +121,22 @@ a { color: inherit; }
   padding: 14px 24px;
 }
 
+/* On the overlay header (home hero), push logo + nav harder to the corners
+   like skyerv.com - max-width disabled, padding minimal. Returns to normal
+   container width once .is-scrolled flips the header solid. */
+.site-header-overlay .container {
+  max-width: none;
+  padding: 18px 38px;
+}
+.site-header-overlay.is-scrolled .container {
+  max-width: var(--container);
+  padding: 14px 24px;
+}
+
+@media (max-width: 720px) {
+  .site-header-overlay .container { padding: 14px 18px; }
+}
+
 .logo {
   display: inline-flex;
   align-items: center;
@@ -893,19 +909,30 @@ a:focus-visible, button:focus-visible {
 .photo-gallery {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 18px;
 }
 
 .photo-gallery img {
   width: 100%;
   aspect-ratio: 4/3;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photo-gallery img:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .photo-gallery img:first-child {
   grid-column: 1 / -1;
   aspect-ratio: 16/9;
+}
+
+@media (max-width: 600px) {
+  .photo-gallery { gap: 12px; }
 }
 
 .listing-sidebar {
@@ -935,14 +962,40 @@ a:focus-visible, button:focus-visible {
   margin-bottom: 20px;
 }
 
+.specs-toggle {
+  margin: 20px 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--tan-border);
+  border-bottom: 1px solid var(--tan-border);
+}
+.specs-toggle-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0 14px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.specs-toggle-summary::-webkit-details-marker { display: none; }
+.specs-toggle-icon {
+  color: var(--rust);
+  font-size: 1.4rem;
+  font-weight: 400;
+  transition: transform 0.2s;
+  line-height: 1;
+}
+.specs-toggle[open] .specs-toggle-icon { transform: rotate(45deg); }
 .specs-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin: 20px 0;
-  padding: 20px 0;
-  border-top: 1px solid var(--tan-border);
-  border-bottom: 1px solid var(--tan-border);
+  padding-bottom: 18px;
 }
 
 .spec-item { display: flex; flex-direction: column; gap: 2px; }
@@ -2448,6 +2501,43 @@ a:focus-visible, button:focus-visible {
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 12px;
+}
+
+/* ============================================================
+   Google reviews social-proof bar (under trust strip)
+   ============================================================ */
+.reviews-bar {
+  background: #fff;
+  border-bottom: 1px solid var(--tan-border);
+  padding: 12px 0;
+}
+.reviews-bar-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: center;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+  flex-wrap: wrap;
+}
+.reviews-stars {
+  color: #f59e0b;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+}
+.reviews-text { font-size: 0.95rem; color: var(--ink); }
+.reviews-text strong { color: var(--ink); font-weight: 700; }
+.reviews-link {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 600;
+  color: var(--rust);
+  font-size: 0.9rem;
+}
+.reviews-bar-inner:hover .reviews-link { text-decoration: underline; }
+@media (max-width: 520px) {
+  .reviews-text { font-size: 0.86rem; }
+  .reviews-stars { font-size: 1.02rem; }
 }
 
 /* ============================================================

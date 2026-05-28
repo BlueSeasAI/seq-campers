@@ -311,7 +311,12 @@ const productSchema = {
         )}
 
         {caravan.specs && (
-          <div class="specs-grid">
+        <details class="specs-toggle" open>
+          <summary class="specs-toggle-summary">
+            <span>Specs</span>
+            <span class="specs-toggle-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="specs-grid" style="margin-top:0;">
             {caravan.specs.sleeps && (
               <div class="spec-item">
                 <span class="spec-label">Sleeps</span>
@@ -361,6 +366,7 @@ const productSchema = {
               </div>
             )}
           </div>
+        </details>
         )}
 
         {(caravan.compliance?.stockNumber || caravan.compliance?.vin || caravan.compliance?.registrationState) && (
