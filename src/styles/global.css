@@ -147,34 +147,40 @@ a { color: inherit; }
   line-height: 0;
 }
 
+/* Logo at the SAME prominent size across every page. Per Bart: match the
+   home page size on inner pages too. The header itself gets taller as a
+   result - that's intentional. */
 .logo img {
   display: block;
-  height: 72px;
+  height: 140px;
   width: auto;
   max-width: 100%;
   transition: height 0.2s;
 }
 
-/* On the home page hero (transparent header), the logo is much larger -
-   skyerv.com pattern. ~2.5x the standard solid-header size. Scales back
-   down once .is-scrolled fires past the hero. */
+/* On the home page hero (transparent header), the logo is even larger -
+   skyerv.com pattern. Negative top margin lifts it so the TOP edge of
+   the logo aligns with the menu items on the right (logo is taller, so
+   without the lift the centres align but the top doesn't). */
 .site-header-overlay .logo img {
   height: 220px;
+  margin-top: -32px;
 }
 .site-header-overlay.is-scrolled .logo img {
-  height: 72px;
+  height: 140px;
+  margin-top: 0;
 }
 
 @media (max-width: 860px) {
-  .logo img { height: 56px; }
-  .site-header-overlay .logo img { height: 150px; }
-  .site-header-overlay.is-scrolled .logo img { height: 56px; }
+  .logo img { height: 96px; }
+  .site-header-overlay .logo img { height: 150px; margin-top: -20px; }
+  .site-header-overlay.is-scrolled .logo img { height: 96px; margin-top: 0; }
 }
 
 @media (max-width: 520px) {
-  .logo img { height: 46px; }
-  .site-header-overlay .logo img { height: 110px; }
-  .site-header-overlay.is-scrolled .logo img { height: 46px; }
+  .logo img { height: 72px; }
+  .site-header-overlay .logo img { height: 110px; margin-top: -14px; }
+  .site-header-overlay.is-scrolled .logo img { height: 72px; margin-top: 0; }
 }
 
 nav { display: flex; gap: 24px; align-items: center; }
@@ -977,40 +983,25 @@ a:focus-visible, button:focus-visible {
   margin-bottom: 20px;
 }
 
-.specs-toggle {
+.specs-block {
   margin: 20px 0;
-  padding: 14px 0 0;
+  padding: 16px 0;
   border-top: 1px solid var(--tan-border);
   border-bottom: 1px solid var(--tan-border);
 }
-.specs-toggle-summary {
-  list-style: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 0 14px;
+.specs-block-label {
   font-family: 'Inter Tight', sans-serif;
-  font-size: 1rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
 }
-.specs-toggle-summary::-webkit-details-marker { display: none; }
-.specs-toggle-icon {
-  color: var(--rust);
-  font-size: 1.4rem;
-  font-weight: 400;
-  transition: transform 0.2s;
-  line-height: 1;
-}
-.specs-toggle[open] .specs-toggle-icon { transform: rotate(45deg); }
 .specs-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  padding-bottom: 18px;
 }
 
 .spec-item { display: flex; flex-direction: column; gap: 2px; }
@@ -1101,10 +1092,9 @@ a:focus-visible, button:focus-visible {
   text-underline-offset: 2px;
 }
 .rich-text blockquote {
-  margin-left: 0;
-  padding: 12px 18px;
-  border-left: 3px solid var(--gold);
-  background: rgba(212, 148, 58, 0.06);
+  margin: 14px 0 14px 0;
+  padding: 0 0 0 22px;
+  border-left: 1px solid var(--tan-border);
   font-style: italic;
   color: var(--ink);
 }
@@ -1186,13 +1176,13 @@ a:focus-visible, button:focus-visible {
 }
 
 .configurator-placeholder-note {
-  background: #FFF3CD;
-  color: #856404;
-  border-left: 4px solid #D4943A;
-  border-radius: 4px;
-  padding: 12px 16px;
+  background: #FFF7EC;
+  color: #7A4F1A;
+  border: 1px solid #E8D5A8;
+  border-radius: var(--radius);
+  padding: 14px 18px;
   font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 24px;
 }
 
@@ -1394,9 +1384,8 @@ a:focus-visible, button:focus-visible {
    YouTube CTA bar (videos page)
    ============================================================ */
 .youtube-cta-bar {
-  background: linear-gradient(135deg, #fff 0%, var(--sand) 100%);
+  background: #fff;
   border: 1px solid var(--tan-border);
-  border-left: 6px solid var(--rust);
   border-radius: var(--radius);
   padding: 28px 32px;
   display: grid;
@@ -1722,14 +1711,12 @@ a:focus-visible, button:focus-visible {
 }
 
 .shanes-pick-quote {
-  border-left: 3px solid var(--gold);
-  background: var(--sand);
-  padding: 14px 18px;
+  padding: 4px 0 12px 22px;
+  border-left: 1px solid var(--tan-border);
   margin: 0 0 18px;
-  border-radius: 4px;
   color: var(--ink);
   font-style: italic;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   line-height: 1.6;
 }
 
@@ -1815,11 +1802,10 @@ a:focus-visible, button:focus-visible {
 }
 
 .featured-story {
-  background: linear-gradient(135deg, var(--ink), var(--ink-deep));
+  background: var(--ink);
   color: var(--sand);
   border-radius: var(--radius);
   padding: 36px 40px;
-  border-left: 6px solid var(--gold);
 }
 
 .featured-story h2 {
@@ -1995,7 +1981,7 @@ a:focus-visible, button:focus-visible {
 }
 
 .service-card-job {
-  border-left: 3px solid var(--rust);
+  /* No coloured left-stripe - rely on the card border and shadow alone. */
 }
 
 /* ============================================================
@@ -2148,10 +2134,10 @@ a:focus-visible, button:focus-visible {
 }
 
 .quote-fallback {
-  background: #FFF3CD;
-  color: #856404;
-  border-left: 4px solid #D4943A;
-  border-radius: 4px;
+  background: #FFF7EC;
+  color: #7A4F1A;
+  border: 1px solid #E8D5A8;
+  border-radius: var(--radius);
   padding: 12px 16px;
   font-size: 0.88rem;
   line-height: 1.5;
@@ -2222,10 +2208,9 @@ a:focus-visible, button:focus-visible {
 .qr-card-special {
   font-size: 0.86rem;
   color: var(--ink);
-  background: rgba(212, 148, 58, 0.10);
-  border-left: 3px solid var(--gold);
-  padding: 10px 14px;
-  border-radius: 4px;
+  background: var(--sand);
+  padding: 12px 14px;
+  border-radius: var(--radius);
   margin-bottom: 16px;
   line-height: 1.5;
 }
@@ -2655,20 +2640,17 @@ a:focus-visible, button:focus-visible {
   background: #fff;
   border: 1px solid var(--tan-border);
   border-radius: var(--radius);
-  border-top: 4px solid var(--rust);
-  padding: 22px 22px 24px;
+  padding: 24px 24px 26px;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 .story-step:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
+  border-color: var(--ink);
 }
-.story-step:nth-child(2) { border-top-color: var(--gold); }
-.story-step:nth-child(3) { border-top-color: #6B7A3A; }
-.story-step:nth-child(4) { border-top-color: var(--rust-dark); }
 .story-year {
   font-family: 'Inter Tight', sans-serif;
   font-size: 2.6rem;
@@ -2712,17 +2694,15 @@ a:focus-visible, button:focus-visible {
 .feature-card {
   background: #fff;
   border: 1px solid var(--tan-border);
-  border-left: 4px solid var(--rust);
   border-radius: var(--radius);
-  padding: 16px 18px;
+  padding: 18px 20px;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.18s, box-shadow 0.18s, border-left-color 0.2s;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
 }
-.feature-card:nth-child(2n) { border-left-color: var(--gold); }
-.feature-card:nth-child(3n) { border-left-color: #6B7A3A; }
 .feature-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  border-color: var(--ink);
 }
 .feature-card-label {
   font-family: 'Inter Tight', sans-serif;

@@ -251,7 +251,7 @@ const productSchema = {
         )}
 
         {caravan.tripHistory && (
-          <div style="margin-top:28px; background:#fff; border:1px solid var(--tan-border); border-left:4px solid var(--gold); border-radius:var(--radius); padding:20px 24px;">
+          <div style="margin-top:28px; background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px 26px;">
             <div class="page-eyebrow" style="color:var(--gold); margin-bottom:8px;">Where this van has been</div>
             <p style="color:var(--ink); line-height:1.75; font-style:italic;">{caravan.tripHistory}</p>
           </div>
@@ -299,12 +299,9 @@ const productSchema = {
         )}
 
         {caravan.specs && (
-        <details class="specs-toggle" open>
-          <summary class="specs-toggle-summary">
-            <span>Specs</span>
-            <span class="specs-toggle-icon" aria-hidden="true">+</span>
-          </summary>
-          <div class="specs-grid" style="margin-top:0;">
+        <div class="specs-block">
+          <div class="specs-block-label">Specs</div>
+          <div class="specs-grid">
             {caravan.specs.sleeps && (
               <div class="spec-item">
                 <span class="spec-label">Sleeps</span>
@@ -354,7 +351,7 @@ const productSchema = {
               </div>
             )}
           </div>
-        </details>
+        </div>
         )}
 
         {(caravan.compliance?.stockNumber || caravan.compliance?.vin || caravan.compliance?.registrationState) && (
