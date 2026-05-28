@@ -165,6 +165,31 @@ Test-Page -Name "Trust strip on home" -Path "/" -MustContain @(
     "30 years on the Sunshine Coast"
 )
 
+Test-Page -Name "AU badge image present (not SVG fallback)" -Path "/" -MustContain @(
+    '/au-built-badge.png'
+)
+
+Test-Page -Name "New SEQ logo present in header" -Path "/" -MustContain @(
+    '/seq-logo-new.png'
+    'Campers There'
+)
+
+# Verify static assets are reachable
+try {
+    $au = Invoke-WebRequest -Uri "$BaseUrl/au-built-badge.png" -UseBasicParsing -TimeoutSec 10 -Method Head
+    $logo = Invoke-WebRequest -Uri "$BaseUrl/seq-logo-new.png" -UseBasicParsing -TimeoutSec 10 -Method Head
+    $auOk = $au.StatusCode -eq 200
+    $logoOk = $logo.StatusCode -eq 200
+    $icon = if ($auOk -and $logoOk) { "OK  " } else { "FAIL" }
+    Write-Output ("  [{0}] au-built-badge.png reachable ({1} bytes)" -f $(if ($auOk) {"OK  "} else {"FAIL"}), $au.Headers.'Content-Length')
+    Write-Output ("  [{0}] seq-logo-new.png reachable ({1} bytes)" -f $(if ($logoOk) {"OK  "} else {"FAIL"}), $logo.Headers.'Content-Length')
+    if ($auOk) { $script:passCount++ } else { $script:failCount++ }
+    if ($logoOk) { $script:passCount++ } else { $script:failCount++ }
+} catch {
+    Write-Output ("  [FAIL] Could not HEAD static assets: " + $_.Exception.Message)
+    $script:failCount += 2
+}
+
 Test-Page -Name "Trust strip on stock listing" -Path "/stock" -MustContain @(
     "trust-strip"
 )
