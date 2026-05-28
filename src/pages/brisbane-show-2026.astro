@@ -1,11 +1,10 @@
 ---
 import Site from '../layouts/Site.astro'
-import TrustStrip from '../components/TrustStrip.astro'
 
 // Brisbane Caravan, Camping & Touring Supershow 2026
 const showDates = '3 - 5 June 2026'
 const venue = 'Brisbane Showgrounds, Bowen Hills'
-const standNumber = '2693'
+const standNumber = '#2693'
 
 // Quote pages built and maintained by Maud on Netlify. These are the
 // canonical configurators - QR codes + "Build your spec" buttons all point
@@ -156,8 +155,6 @@ const eventSchema = {
     </div>
   </div>
 
-  <TrustStrip />
-
   <!-- When / Where / Stand -->
   <section class="section" style="padding-bottom:24px;">
     <div class="container" style="max-width:980px;">
@@ -174,8 +171,8 @@ const eventSchema = {
         </div>
         <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
           <div class="page-eyebrow" style="color:var(--rust);">Stand</div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{standNumber}</div>
-          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Updated closer to the show</div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:1.6rem; font-weight:800; color:var(--ink); letter-spacing:-0.01em;">{standNumber}</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Look for the SEQ Campers banner.</div>
         </div>
       </div>
     </div>
