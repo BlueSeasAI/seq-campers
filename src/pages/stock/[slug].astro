@@ -1,23 +1,12 @@
 ---
 import Site from '../../layouts/Site.astro'
 import { getAllCaravanPaths, getCaravan, sanityImage, sanitySrcset, conditionLabel, portableTextToHtml } from '../../lib/sanity.js'
-import Configurator from '../../components/Configurator.jsx'
 
-// PLACEHOLDER configurator options. Used only when a caravan does not yet
-// have its own configurator data loaded in Sanity. Remove the fallback once
-// Q-07 (Maud's real per-caravan add-on list) lands and is in the CMS.
-const PLACEHOLDER_CONFIGURATOR_OPTIONS = [
-  { name: 'Solar package upgrade (300W roof + 200W portable)', priceAdd: 3200 },
-  { name: 'Lithium battery upgrade (200Ah LiFePO4)', priceAdd: 4800 },
-  { name: 'Diesel heater (Webasto)', priceAdd: 1900 },
-  { name: 'Air conditioner (rooftop reverse cycle)', priceAdd: 2400 },
-  { name: 'External shower kit + hot water', priceAdd: 650 },
-  { name: 'Bike rack (3-bike rear-mount)', priceAdd: 600 },
-  { name: 'Roll-out awning (Dometic 4m)', priceAdd: 1850 },
-  { name: 'Stone deflector + rock tamer', priceAdd: 880 },
-  { name: 'Off-road jockey wheel + sand pegs kit', priceAdd: 420 },
-  { name: 'Premium mattress upgrade (memory foam)', priceAdd: 1100 },
-]
+// Phase 1 (Brisbane Show 2026): in-page React configurator removed. The
+// "Build your spec" CTA now routes to /quote/{brand} - dedicated brand-aware
+// quote enquiry pages that email sales@seqcampers.com.au. The React
+// Configurator.jsx component is kept in the codebase for Phase 2 when we
+// rebuild a Tesla-style cascading configurator inside the listing page.
 
 export async function getStaticPaths() {
   const caravans = await getAllCaravanPaths()
@@ -73,11 +62,6 @@ const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.repla
 
 // Description is Portable Text (rich text blocks). Render to clean HTML.
 const descriptionHtml = portableTextToHtml(caravan.description)
-
-const configuratorOptions = caravan.configurator?.length
-  ? caravan.configurator
-  : PLACEHOLDER_CONFIGURATOR_OPTIONS
-const configuratorIsPlaceholder = !caravan.configurator?.length
 
 // FAQs - use per-caravan custom FAQs from Sanity if present, otherwise
 // generate a smart default set from the caravan's structured data.
@@ -137,6 +121,24 @@ const authorisedDealerLabel = brandLower.includes('kimberley')
   : brandLower.includes('stockman')
     ? 'Authorised Stockman Dealer'
     : null
+
+// Map caravan title/brand to /quote/{slug} for the "Build your spec" CTA.
+// Falls back to /contact for vans we don't have a dedicated quote page for
+// (consignment/used stock from other manufacturers).
+function resolveQuoteSlug(title, brandStr) {
+  const haystack = `${title ?? ''} ${brandStr ?? ''}`.toLowerCase()
+  // Most specific first - Kruiser S/T need to be matched before generic "kruiser"
+  if (haystack.includes('kruiser s') || haystack.includes('s class')) return 'kruiser-s'
+  if (haystack.includes('kruiser t') || haystack.includes('t class')) return 'kruiser-t'
+  if (haystack.includes('kruiswagen')) return 'kruiswagen'
+  if (haystack.includes('karavan')) return 'karavan'
+  if (haystack.includes('kube')) return 'kube'
+  if (haystack.includes('trekka')) return 'trekka'
+  if (haystack.includes('rover')) return 'rover'
+  return null
+}
+const quoteSlug = resolveQuoteSlug(caravan.title, caravan.brand)
+const quoteHref = quoteSlug ? `/quote/${quoteSlug}` : '/contact'
 
 // Battery type pretty label
 const batteryTypeLabel = {
@@ -362,27 +364,13 @@ const productSchema = {
           </div>
         )}
 
-        <a href="#configurator" class="btn-enquire">Build your spec + get a quote</a>
+        <a href={quoteHref} class="btn-enquire">Build your spec + get a quote</a>
 
         <p style="margin-top:16px; font-size:0.78rem; color:var(--text-muted); text-align:center;">
           Or call us on <a href="tel:0753707933" style="color:var(--rust);">(07) 5370 7933</a>
         </p>
       </div>
 
-    </div>
-
-    <!-- Configurator (React component, client-side hydrated for live total) -->
-    <div id="configurator">
-      <Configurator
-        client:load
-        basePrice={caravan.price}
-        options={configuratorOptions}
-        caravanTitle={caravan.title}
-        caravanSlug={slug}
-        contactEmail="office@seqcampers.com.au"
-        siteBase={siteBase}
-        isPlaceholder={configuratorIsPlaceholder}
-      />
     </div>
 
     <!-- FAQ section (FAQPage schema is in <head>) -->

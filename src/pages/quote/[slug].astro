@@ -1,0 +1,201 @@
+---
+import Site from '../../layouts/Site.astro'
+import { quoteBrands, getQuoteBrand } from '../../data/quote-brands.js'
+
+export async function getStaticPaths() {
+  return quoteBrands.map((b) => ({ params: { slug: b.slug } }))
+}
+
+const { slug } = Astro.params
+const brand = getQuoteBrand(slug)
+
+if (!brand) return Astro.redirect('/stock')
+
+const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
+const pageUrl = `${siteBase}/quote/${brand.slug}`
+---
+
+<Site
+  title={`Build your ${brand.name} spec`}
+  description={`Tell SEQ Campers what you want in your ${brand.name}. ${brand.showSpecial} Quick 60-second enquiry form - we will reply with a written quote within one business day.`}
+>
+  <div class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">{brand.brandFamily} · Build your spec</div>
+      <h1>{brand.name}</h1>
+      <p>{brand.headline}</p>
+    </div>
+  </div>
+
+  <section class="section" style="padding-top:48px; padding-bottom:24px;">
+    <div class="container" style="max-width:760px;">
+
+      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75; margin-bottom:18px;">
+        {brand.intro}
+      </p>
+
+      <div style="background:#fff; border:1px solid var(--tan-border); border-left:4px solid var(--gold); border-radius:var(--radius); padding:18px 22px; margin:24px 0 8px;">
+        <div class="page-eyebrow" style="color:var(--gold); margin-bottom:6px;">Show special</div>
+        <p style="color:var(--ink); font-weight:500; line-height:1.55; margin:0;">{brand.showSpecial}</p>
+      </div>
+
+      <p style="color:var(--muted); font-size:0.92rem; margin-top:14px;">
+        Indicative pricing: <strong style="color:var(--ink);">{brand.indicativePrice}</strong>. Final quote includes
+        any additional configuration we agree on - we will send the written quote within one business day.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- Quote enquiry form -->
+  <section class="section" style="padding-top:24px;">
+    <div class="container" style="max-width:760px;">
+      <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:32px 36px; box-shadow:var(--shadow-sm);">
+        <div class="page-eyebrow" style="color:var(--rust);">Send us your spec</div>
+        <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:var(--ink); margin:6px 0 8px;">
+          Tell us what you want
+        </h2>
+        <p style="color:var(--muted); font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
+          60 seconds. Shane and the team will read it, write you a proper quote, and call you back within one business day.
+        </p>
+
+        <form id={`quote-form-${brand.slug}`} class="quote-form" novalidate>
+
+          <div class="quote-fieldset">
+            <div class="quote-fieldset-title">About you</div>
+
+            <div class="quote-row">
+              <label class="quote-field">
+                <span>Your name</span>
+                <input type="text" name="customer_name" required autocomplete="name" />
+              </label>
+              <label class="quote-field">
+                <span>Phone</span>
+                <input type="tel" name="customer_phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
+              </label>
+            </div>
+            <label class="quote-field">
+              <span>Email</span>
+              <input type="email" name="customer_email" required autocomplete="email" />
+            </label>
+          </div>
+
+          <div class="quote-fieldset">
+            <div class="quote-fieldset-title">Your build preferences (tick the closest)</div>
+
+            {brand.keyChoices.map((q) => (
+              <fieldset class="quote-choice">
+                <legend>{q.label}</legend>
+                <div class="quote-choice-options">
+                  {q.options.map((opt, i) => (
+                    <label class="quote-choice-option">
+                      <input type="radio" name={`choice_${q.id}`} value={opt} />
+                      <span>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
+
+            <label class="quote-field" style="margin-top:18px;">
+              <span>Anything else we should know? (optional)</span>
+              <textarea name="extra_notes" rows="3" placeholder="Tow vehicle details, timing, special requirements, trade-in van, anything we should factor in..."></textarea>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary quote-submit">
+            Send my spec to SEQ Campers
+          </button>
+
+          <p style="font-size:0.78rem; color:var(--muted); margin-top:14px; text-align:center; line-height:1.5;">
+            Clicking Send opens your email app with everything filled in. Press send in your email app to deliver it.
+            You will keep a copy in your sent folder. We reply within one business day.
+          </p>
+
+          <p id={`quote-fallback-${brand.slug}`} class="quote-fallback" hidden>
+            If nothing happened when you clicked Send, your browser may have blocked the email.
+            <a href={`mailto:sales@seqcampers.com.au?subject=Quote%20enquiry%20-%20${encodeURIComponent(brand.name)}`}>Click here to email us directly</a>
+            or call <a href="tel:0753707933">(07) 5370 7933</a>.
+          </p>
+        </form>
+      </div>
+
+      <p style="text-align:center; margin-top:28px; color:var(--muted); font-size:0.92rem;">
+        Prefer to chat? <a href="tel:0753707933" style="color:var(--rust); font-weight:600;">Call (07) 5370 7933</a> or
+        <a href="/contact" style="color:var(--rust); font-weight:600;">book a Sunshine Coast visit</a>.
+      </p>
+    </div>
+  </section>
+
+  <script is:inline define:vars={{ brandName: brand.name, brandSlug: brand.slug, pageUrl }}>
+    (function () {
+      const form = document.getElementById(`quote-form-${brandSlug}`)
+      const fallback = document.getElementById(`quote-fallback-${brandSlug}`)
+      if (!form) return
+
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault()
+        const data = new FormData(form)
+
+        const customer_name = (data.get('customer_name') || '').toString().trim()
+        const customer_phone = (data.get('customer_phone') || '').toString().trim()
+        const customer_email = (data.get('customer_email') || '').toString().trim()
+        const extra_notes = (data.get('extra_notes') || '').toString().trim()
+
+        if (!customer_name || !customer_phone || !customer_email) {
+          alert('Please fill in your name, phone and email so we can send you a quote.')
+          return
+        }
+
+        // Build list of choices
+        const choices = []
+        for (const [key, value] of data.entries()) {
+          if (key.startsWith('choice_')) {
+            const label = key.replace(/^choice_/, '').replace(/_/g, ' ')
+            choices.push({ label: label.charAt(0).toUpperCase() + label.slice(1), value: value.toString() })
+          }
+        }
+
+        // Build email body
+        const lines = [
+          'Hi SEQ Campers,',
+          '',
+          `I would like a quote for the ${brandName}.`,
+          `Build spec link: ${pageUrl}`,
+          '',
+          'My details:',
+          `  Name: ${customer_name}`,
+          `  Phone: ${customer_phone}`,
+          `  Email: ${customer_email}`,
+          '',
+        ]
+        if (choices.length) {
+          lines.push('What I want:')
+          choices.forEach((c) => lines.push(`  ${c.label}: ${c.value}`))
+          lines.push('')
+        }
+        if (extra_notes) {
+          lines.push('Additional notes:')
+          lines.push(extra_notes)
+          lines.push('')
+        }
+        lines.push('Please send me a written quote and let me know about delivery timing.')
+        lines.push('')
+        lines.push('Thanks,')
+        lines.push(customer_name)
+
+        const subject = `Quote enquiry - ${brandName}`
+        const body = lines.join('\n')
+        const mailto = `mailto:sales@seqcampers.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+
+        // Open the email client
+        window.location.href = mailto
+
+        // Show fallback link in case mailto handler didn't fire
+        setTimeout(function () {
+          if (fallback) fallback.hidden = false
+        }, 1500)
+      })
+    })()
+  </script>
+</Site>

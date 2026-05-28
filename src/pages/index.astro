@@ -66,26 +66,24 @@ const shanesPick = settings?.shanesPick?.caravan
 // Placeholder testimonials - Maud to replace with real customer quotes.
 // Format intentionally specific (full name + suburb + caravan + star rating)
 // because the audit found Kimberley + Stockman both lack this trust signal.
+// Real Google reviews - verbatim, names + attribution preserved.
 const testimonials = [
   {
-    quote: "Shane spent over an hour walking us through three different vans before we settled on the Trekka. No pressure, no rush, just answered every question we threw at him. Picked the van up two weeks ago - already done one trip out west and couldn't be happier.",
-    name: "Mark & Janelle Whitfield",
-    suburb: "Caloundra, QLD",
-    caravan: "Stockman Trekka",
+    quote: "A huge shout out to SEQ Campers. While traveling we found one of our guide rollers kept coming off the track, after inspecting them discovered the others were in bad shape. A phone call to SEQ campers and a conversation with Shane had us diverting to their workshop, where Grant took control and sorted our van out - he and the crew gave it a thorough check over. The service was something we didn't expect at such short notice, but was very much appreciated as it saved us the hassle of doing that fiddly job while on the road. Thanks fellas!",
+    name: "Willie & Cathy",
+    source: "Catherine Fabris · Google review",
     rating: 5,
   },
   {
-    quote: "We'd watched every Shane video before we visited - so by the time we walked in we already knew which van we wanted. Buying experience was easy, handover was thorough, and when we needed a small tweak two months later they had us in the workshop same week.",
-    name: "Peter Hollis",
-    suburb: "Buderim, QLD",
-    caravan: "Kimberley Kamper",
+    quote: "Great customer service. We brought a karavan under consignment from Shane and Maud, which was a great experience. After using the van, we noticed some issues with it and contacted the SEQ campers team. They were very helpful and carried out the repairs required under warranty. Upon picking the van up, workshop manager Grant was very kind and spent the time to explain the repairs they had carried out. This was appreciated, and I wouldn't hesitate to recommend any of my friends or family to this business.",
+    name: "David Poole",
+    source: "Google review",
     rating: 5,
   },
   {
-    quote: "Bought our first off-road caravan from SEQ at 62. Was nervous about the whole thing. Maud sat with me for an afternoon, talked through tow vehicles, weights, the lot. Six months in and we've done the Flinders Ranges. Wouldn't go anywhere else next time.",
-    name: "Lorraine Pretorius",
-    suburb: "Maleny, QLD",
-    caravan: "Kimberley Karavan",
+    quote: "We purchased a second hand KK to do WA while waiting for a new build. The knowledge and after-sales support was fantastic. The handover and after-sale support was great - it shortened the learning curve significantly. When we sold the van 6 months later they had potential buyers before I could deliver the van. We received the new van and there were some issues but Maud and the team handled everything necessary to rectify everything. Recently they added a bbq table custom made for my Weber - it is fantastic, one less table to carry on the road. I can only say positive things about the relationship I have with the team at SEQ Campers.",
+    name: "T Ireland",
+    source: "Google Local Guide review",
     rating: 5,
   },
 ]
@@ -407,7 +405,7 @@ const faqSchema = {
             <blockquote class="testimonial-quote">"{t.quote}"</blockquote>
             <figcaption class="testimonial-meta">
               <div class="testimonial-name">{t.name}</div>
-              <div class="testimonial-sub">{t.suburb} · {t.caravan}</div>
+              <div class="testimonial-sub">{t.source}</div>
             </figcaption>
           </figure>
         ))}
