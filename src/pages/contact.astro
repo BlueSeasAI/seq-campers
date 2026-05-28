@@ -3,16 +3,6 @@ import Site from '../layouts/Site.astro'
 
 const mapQuery = encodeURIComponent('SEQ Campers, 6 Bonanza Ct, Marcoola QLD 4564, Australia')
 const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
-
-const showroomHours = [
-  { day: 'Monday', hours: '7:30am - 3pm' },
-  { day: 'Tuesday', hours: '7:30am - 3pm' },
-  { day: 'Wednesday', hours: '7:30am - 3pm' },
-  { day: 'Thursday', hours: '8:30am - 3pm' },
-  { day: 'Friday', hours: '8:30am - 3pm' },
-  { day: 'Saturday', hours: '8:30am - 12:30pm' },
-  { day: 'Sunday', hours: 'Closed', closed: true },
-]
 ---
 
 <Site
@@ -27,39 +17,34 @@ const showroomHours = [
     </div>
   </div>
 
-  <section class="section">
+  <section class="section" style="padding-bottom:32px;">
     <div class="container" style="max-width:980px;">
 
-      <!-- Three quick-contact cards -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px; margin-bottom:48px;">
-
-        <a href="tel:0753707933" style="text-decoration:none; color:inherit;">
-          <div style="background:#fff; border:1px solid #DCCBA8; border-radius:8px; padding:24px; transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(42,22,8,0.10)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
-            <div class="page-eyebrow" style="color:#C0341A;">Phone</div>
-            <div style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608;">(07) 5370 7933</div>
-            <div style="margin-top:8px; color:#8B6A40; font-size:0.9rem;">Online enquiries 7am - 4:30pm</div>
-          </div>
+      <!-- Three quick-contact cards (same height so they line up cleanly) -->
+      <div class="contact-cards">
+        <a href="tel:0753707933" class="contact-card">
+          <div class="page-eyebrow" style="color:#C0341A;">Phone</div>
+          <div class="contact-card-value">(07) 5370 7933</div>
+          <div class="contact-card-foot">Online enquiries 7am - 4:30pm</div>
         </a>
 
-        <a href="mailto:office@seqcampers.com.au" style="text-decoration:none; color:inherit;">
-          <div style="background:#fff; border:1px solid #DCCBA8; border-radius:8px; padding:24px; transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(42,22,8,0.10)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
-            <div class="page-eyebrow" style="color:#C0341A;">Email</div>
-            <div style="font-family:'Inter Tight', sans-serif; font-size:1.05rem; font-weight:600; color:#2A1608; word-break:break-word;">office@seqcampers.com.au</div>
-            <div style="margin-top:8px; color:#8B6A40; font-size:0.9rem;">We reply within one business day.</div>
-          </div>
+        <a href="mailto:office@seqcampers.com.au" class="contact-card">
+          <div class="page-eyebrow" style="color:#C0341A;">Email</div>
+          <div class="contact-card-value" style="font-size:1.05rem; word-break:break-word;">office@seqcampers.com.au</div>
+          <div class="contact-card-foot">We reply within one business day.</div>
         </a>
 
-        <div style="background:#fff; border:1px solid #DCCBA8; border-radius:8px; padding:24px;">
+        <div class="contact-card contact-card-static">
           <div class="page-eyebrow" style="color:#C0341A;">Showroom</div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:1.05rem; font-weight:600; color:#2A1608; line-height:1.35;">
+          <div class="contact-card-value" style="font-size:1.05rem; line-height:1.35;">
             6 Bonanza Ct<br />Marcoola QLD 4564
           </div>
-          <div style="margin-top:8px; color:#8B6A40; font-size:0.9rem;">Visit by appointment recommended.</div>
+          <div class="contact-card-foot">Visit by appointment.</div>
         </div>
       </div>
 
       <!-- Two-column: form + map -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;" class="contact-grid">
+      <div class="contact-grid">
         <div>
           <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608; margin-bottom:16px;">Send us a message</h2>
           <p style="color:#8B6A40; margin-bottom:20px;">
@@ -107,18 +92,13 @@ const showroomHours = [
             </label>
 
             <button type="submit">Send enquiry</button>
-
-            <p style="font-size:0.78rem; color:#8B6A40; margin-top:4px; text-align:center;">
-              We will only use your details to reply to your enquiry. No marketing lists.
-            </p>
           </form>
         </div>
 
         <div>
           <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608; margin-bottom:16px;">Find us</h2>
           <p style="color:#8B6A40; margin-bottom:20px;">
-            We are at <strong style="color:var(--ink);">6 Bonanza Ct, Marcoola</strong>, ten minutes north of Maroochydore on the Sunshine Coast.
-            Visits by appointment so we can give you our full attention.
+            We are at <strong style="color:var(--ink);">6 Bonanza Ct, Marcoola</strong>, ten minutes north of Maroochydore.
           </p>
           <div class="map-embed map-embed-small">
             <iframe
@@ -134,40 +114,57 @@ const showroomHours = [
           </p>
         </div>
       </div>
-
-      <!-- Hours - small + at bottom (the team prefers people to just ring) -->
-      <details class="hours-block-collapsed" style="margin-top:56px;">
-        <summary>
-          <span class="page-eyebrow" style="color:var(--muted); display:inline; margin:0;">Hours</span>
-          <span style="margin-left:8px; color:var(--muted); font-size:0.88rem;">
-            Mon-Wed 7:30am-3pm · Thu-Fri 8:30am-3pm · Sat 8:30am-12:30pm · Sun closed
-          </span>
-          <span style="margin-left:8px; color:var(--rust); font-size:0.78rem;">Show full week ▼</span>
-        </summary>
-        <div style="margin-top:14px;">
-          <table class="hours-table" style="max-width:380px;">
-            <tbody>
-              {showroomHours.map((row) => (
-                <tr>
-                  <td>{row.day}</td>
-                  <td class={row.closed ? 'is-closed' : ''}>{row.hours}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p style="margin-top:10px; font-size:0.78rem; color:var(--muted); line-height:1.5;">
-            Visits by appointment recommended - just give us a ring. Online enquiries
-            answered 7am-4:30pm every day; out-of-hours messages get a reply first
-            thing the next business day.
-          </p>
-        </div>
-      </details>
     </div>
   </section>
 
   <style>
+    .contact-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 40px;
+    }
+    .contact-card {
+      background: #fff;
+      border: 1px solid #DCCBA8;
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 150px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .contact-card:hover:not(.contact-card-static) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(42,22,8,0.10);
+    }
+    .contact-card-value {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #2A1608;
+      flex: 1;
+    }
+    .contact-card-foot {
+      color: #8B6A40;
+      font-size: 0.9rem;
+      margin-top: 12px;
+    }
+    @media (max-width: 760px) {
+      .contact-cards { grid-template-columns: 1fr; gap: 12px; }
+      .contact-card { min-height: 0; }
+    }
     @media (max-width: 768px) {
       .contact-grid { grid-template-columns: 1fr !important; }
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
     }
   </style>
 </Site>

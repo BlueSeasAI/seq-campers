@@ -43,13 +43,32 @@ const recentJobs = [
 >
   <div class="page-header">
     <div class="container">
-      <div class="page-eyebrow">Workshop</div>
-      <h1>We don't just sell them. We service them for life.</h1>
+      <div class="page-eyebrow">Workshop & owners group</div>
+      <h1>Buy here. Service here. Stay part of the family.</h1>
       <p>Sunshine Coast workshop - {workshopHours}</p>
     </div>
   </div>
 
-  <section class="section">
+  <!-- Meet the team video placeholder (real video coming from Anna's footage) -->
+  <section class="section" style="padding-bottom:24px;">
+    <div class="container" style="max-width:980px;">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Meet the team</div>
+        <h2 class="section-title">The people looking after your van</h2>
+      </div>
+      <div class="meet-the-team-video">
+        <div class="meet-the-team-placeholder" aria-label="Meet the team video coming soon">
+          <div class="meet-the-team-icon" aria-hidden="true">▶</div>
+          <div class="meet-the-team-text">
+            <strong>Meet the team video</strong>
+            <span>Grant, Mike and the SEQ workshop crew. Video lands here once Anna's footage is uploaded.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:32px;">
     <div class="container">
       <div class="services-grid">
         {services.map((s) => (

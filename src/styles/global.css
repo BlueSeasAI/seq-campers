@@ -68,6 +68,50 @@ a { color: inherit; }
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background 0.25s, border-color 0.25s, padding 0.2s;
+}
+
+/* Home page only: header overlays the hero video, transparent at top of
+   page, becomes solid when user scrolls past the hero (JS adds .is-scrolled). */
+.site-header-overlay {
+  position: absolute;
+  background: transparent;
+  border-bottom-color: transparent;
+  width: 100%;
+}
+.site-header-overlay nav a {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+.site-header-overlay nav a:hover { color: #fff; }
+.site-header-overlay nav a.is-active { border-bottom-color: var(--gold); color: #fff; }
+.site-header-overlay .nav-cta {
+  background: var(--rust);
+  color: #fff;
+}
+.site-header-overlay .nav-toggle-bar {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* When user scrolls down past the hero, JS adds .is-scrolled to restore
+   the solid header for legibility on the lower (light) sections. */
+.site-header-overlay.is-scrolled {
+  position: fixed;
+  top: 0;
+  background: var(--sand);
+  border-bottom: 1px solid var(--tan-border);
+  box-shadow: 0 4px 14px rgba(42, 22, 8, 0.08);
+}
+.site-header-overlay.is-scrolled nav a {
+  color: var(--muted);
+  text-shadow: none;
+}
+.site-header-overlay.is-scrolled nav a:hover { color: var(--ink); }
+.site-header-overlay.is-scrolled nav a.is-active { color: var(--ink); border-bottom-color: var(--rust); }
+.site-header-overlay.is-scrolled .nav-toggle-bar {
+  background: var(--ink);
+  box-shadow: none;
 }
 
 .site-header .container {
@@ -86,17 +130,18 @@ a { color: inherit; }
 
 .logo img {
   display: block;
-  height: 44px;
+  height: 64px;
   width: auto;
   max-width: 100%;
+  transition: height 0.2s;
 }
 
 @media (max-width: 860px) {
-  .logo img { height: 36px; }
+  .logo img { height: 52px; }
 }
 
 @media (max-width: 520px) {
-  .logo img { height: 30px; }
+  .logo img { height: 44px; }
 }
 
 nav { display: flex; gap: 24px; align-items: center; }
@@ -814,28 +859,6 @@ a:focus-visible, button:focus-visible {
 
 .map-embed-small iframe {
   height: 220px;
-}
-
-/* Collapsed hours block - small and unobtrusive */
-.hours-block-collapsed {
-  border-top: 1px solid var(--tan-border);
-  padding-top: 18px;
-}
-
-.hours-block-collapsed summary {
-  list-style: none;
-  cursor: pointer;
-  padding: 4px 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.hours-block-collapsed summary::-webkit-details-marker { display: none; }
-
-.hours-block-collapsed[open] summary > span:last-child {
-  color: var(--rust);
 }
 
 /* ============================================================
@@ -2178,7 +2201,9 @@ a:focus-visible, button:focus-visible {
   background: var(--sand);
   border-top: 1px solid var(--tan-border);
   border-bottom: 1px solid var(--tan-border);
-  padding: 18px 0;
+  /* Generous vertical space - per design panel: prominence comes from
+     isolation/breathing room, not just bigger pills. */
+  padding: 36px 0;
 }
 
 .trust-strip-deep {
@@ -2190,64 +2215,61 @@ a:focus-visible, button:focus-visible {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 14px 22px;
-  text-align: center;
+  gap: 22px 40px;
+  text-align: left;
 }
 
 .trust-item {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
   font-family: 'Inter Tight', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: var(--ink);
   text-transform: none;
+  line-height: 1.25;
+  max-width: 290px;
+}
+
+.trust-item-label {
+  display: inline-block;
+}
+
+.trust-item-aus {
+  font-weight: 800;
 }
 
 .trust-tick {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--rust);
   color: #fff;
-  font-size: 0.7rem;
+  font-size: 1rem;
   font-weight: 700;
   flex-shrink: 0;
-}
-
-.trust-divider {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--tan-border);
-  display: inline-block;
 }
 
 .trust-aus-icon {
-  width: 32px;
-  height: 32px;
+  width: 56px;
+  height: 56px;
   flex-shrink: 0;
   object-fit: contain;
+  background: transparent;
   display: inline-block;
 }
 
-.trust-item-aus {
-  /* Subtle accent so the Aussie credibility cue draws the eye - 20-30% of
-     buyers care about this per the audit, so it earns the extra weight. */
-  color: var(--ink);
-  font-weight: 700;
-}
-
 @media (max-width: 720px) {
-  .trust-strip { padding: 14px 0; }
-  .trust-strip-inner { gap: 10px 16px; }
-  .trust-item { font-size: 0.76rem; }
-  .trust-divider { display: none; }
+  .trust-strip { padding: 24px 0; }
+  .trust-strip-inner { gap: 16px 24px; }
+  .trust-item { font-size: 0.92rem; max-width: 100%; gap: 10px; }
+  .trust-tick { width: 26px; height: 26px; font-size: 0.85rem; }
+  .trust-aus-icon { width: 44px; height: 44px; }
 }
 
 /* Mini Authorised Dealer badge (caravan detail sidebar) */
@@ -2408,6 +2430,240 @@ a:focus-visible, button:focus-visible {
 }
 
 /* ============================================================
+   3-pathway artery block (New / Used / Service) - home page
+   ============================================================ */
+.pathways-section {
+  padding: 56px 0 32px;
+  background: var(--sand);
+}
+.pathway-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.pathway-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.2s;
+}
+.pathway-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--rust);
+}
+.pathway-image {
+  aspect-ratio: 16/10;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--sand-deep);
+  position: relative;
+}
+.pathway-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(42,22,8,0) 40%, rgba(42,22,8,0.5) 100%);
+}
+.pathway-body {
+  padding: 22px 26px 26px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.pathway-eyebrow {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 8px;
+}
+.pathway-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+.pathway-desc {
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  flex: 1;
+}
+.pathway-cta {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--rust);
+  letter-spacing: 0.01em;
+}
+@media (max-width: 860px) {
+  .pathway-grid { grid-template-columns: 1fr; gap: 16px; }
+  .pathways-section { padding: 32px 0 16px; }
+  .pathway-title { font-size: 1.35rem; }
+}
+
+/* ============================================================
+   Horizontal story timeline (About page)
+   ============================================================ */
+.story-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.story-step {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  border-top: 4px solid var(--rust);
+  padding: 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.story-step:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.story-step:nth-child(2) { border-top-color: var(--gold); }
+.story-step:nth-child(3) { border-top-color: #6B7A3A; }
+.story-step:nth-child(4) { border-top-color: var(--rust-dark); }
+.story-year {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+.story-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.25;
+}
+.story-body {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  flex: 1;
+}
+@media (max-width: 860px) {
+  .story-timeline { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .story-year { font-size: 2rem; }
+}
+@media (max-width: 520px) {
+  .story-timeline { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Top Features visual cards (caravan detail)
+   ============================================================ */
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.feature-card {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-left: 4px solid var(--rust);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s, box-shadow 0.18s, border-left-color 0.2s;
+}
+.feature-card:nth-child(2n) { border-left-color: var(--gold); }
+.feature-card:nth-child(3n) { border-left-color: #6B7A3A; }
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.feature-card-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+.feature-card-detail {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   Meet the team video placeholder (service page)
+   ============================================================ */
+.meet-the-team-video {
+  aspect-ratio: 16/8;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink-deep) 100%);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+}
+.meet-the-team-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: var(--sand);
+  text-align: center;
+  padding: 24px;
+}
+.meet-the-team-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--rust);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(192, 52, 26, 0.4);
+}
+.meet-the-team-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 480px;
+}
+.meet-the-team-text strong {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.2rem;
+  color: var(--sand);
+}
+.meet-the-team-text span {
+  color: var(--gold);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* ============================================================
    Footer
    ============================================================ */
 .site-footer {
@@ -2430,11 +2686,19 @@ a:focus-visible, button:focus-visible {
 }
 
 @media (max-width: 860px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
 }
 
 @media (max-width: 520px) {
-  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  /* On mobile show only the essentials - brand+address and hours.
+     The "About SEQ" links are still reachable from the top nav + the
+     thin footer-bottom row. */
+  .footer-grid { grid-template-columns: 1fr; gap: 18px; padding-bottom: 18px; }
+  .footer-grid .footer-col:nth-child(3),
+  .footer-grid .footer-col:nth-child(4) { display: none; }
+  .footer-brand { font-size: 0.86rem; }
+  .footer-address, .footer-hours-compact { font-size: 0.82rem; }
+  .site-footer { padding: 28px 0 18px; margin-top: 48px; }
 }
 
 .footer-col h4 {

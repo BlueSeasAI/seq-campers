@@ -210,6 +210,42 @@ const faqSchema = {
 
   <TrustStrip />
 
+  <!-- 3-pathway artery block: New / Used / Service. Below trust strip on
+       desktop so the credibility cue lands first, then user picks a path. -->
+  <section class="pathways-section" aria-label="Three pathways">
+    <div class="container">
+      <div class="pathway-grid">
+        <a href="/stock?status=for-sale&condition=new" class="pathway-card pathway-new">
+          <div class="pathway-image" style="background-image:url('/pathway-new.png');"></div>
+          <div class="pathway-body">
+            <div class="pathway-eyebrow">New caravans</div>
+            <h3 class="pathway-title">Buy new</h3>
+            <p class="pathway-desc">Kimberley Kampers and Stockman straight from the factory. Built for the long way home.</p>
+            <span class="pathway-cta">Explore new stock →</span>
+          </div>
+        </a>
+        <a href="/stock?status=for-sale" class="pathway-card pathway-used">
+          <div class="pathway-image" style="background-image:url('/pathway-used.png');"></div>
+          <div class="pathway-body">
+            <div class="pathway-eyebrow">Used caravans</div>
+            <h3 class="pathway-title">Buy used</h3>
+            <p class="pathway-desc">Hand-picked consignment stock. Inspected, prepared, and ready for the road.</p>
+            <span class="pathway-cta">Browse used stock →</span>
+          </div>
+        </a>
+        <a href="/service" class="pathway-card pathway-service">
+          <div class="pathway-image" style="background-image:url('/pathway-service.png');"></div>
+          <div class="pathway-body">
+            <div class="pathway-eyebrow">Workshop</div>
+            <h3 class="pathway-title">Service & support</h3>
+            <p class="pathway-desc">Annual service, warranty work, modifications. The team who knows your van.</p>
+            <span class="pathway-cta">See workshop services →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Why SEQ + intro pitch -->
   <section class="section" style="padding-bottom:32px;">
     <div class="container" style="max-width:840px; text-align:center;">
@@ -311,7 +347,7 @@ const faqSchema = {
             {shanesPick.quote && (
               <blockquote class="shanes-pick-quote">
                 "{shanesPick.quote}"
-                <cite>— SEQ team</cite>
+                <cite>- SEQ team</cite>
               </blockquote>
             )}
             {shanesPick.caravan.specs && (

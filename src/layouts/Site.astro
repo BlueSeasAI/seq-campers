@@ -14,6 +14,9 @@ const isActive = (path) => {
   if (path === '/') return pathname === '/'
   return pathname === path || pathname.startsWith(path + '/')
 }
+// Home page gets a transparent header that overlays the hero video, like
+// skyerv.com. All other pages get the standard solid sticky header.
+const isHome = pathname === '/'
 
 // Build canonical + absolute OG image URLs from site base
 const siteBase = Astro.site ?? new URL('https://seqcampers.com.au')
@@ -64,8 +67,8 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
 
   <slot name="head" />
 </head>
-<body>
-  <header class="site-header">
+<body data-home={isHome ? 'true' : 'false'}>
+  <header class={`site-header ${isHome ? 'site-header-overlay' : ''}`}>
     <div class="container">
       <a href="/" class="logo" aria-label="SEQ Campers home">
         <img src="/seq-logo-new.png" alt="SEQ Campers - Campers There & Back" width="600" height="338" />
@@ -112,6 +115,18 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           document.body.style.overflow = ''
         })
       })
+
+      // Home page only: toggle .is-scrolled on the header once past the hero
+      const header = document.querySelector('.site-header-overlay')
+      if (header) {
+        const threshold = 80
+        const onScroll = () => {
+          if (window.scrollY > threshold) header.classList.add('is-scrolled')
+          else header.classList.remove('is-scrolled')
+        }
+        onScroll()
+        window.addEventListener('scroll', onScroll, { passive: true })
+      }
     })()
   </script>
 

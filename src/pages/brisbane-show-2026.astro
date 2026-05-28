@@ -5,11 +5,12 @@ import TrustStrip from '../components/TrustStrip.astro'
 // Brisbane Caravan, Camping & Touring Supershow 2026
 const showDates = '3 - 5 June 2026'
 const venue = 'Brisbane Showgrounds, Bowen Hills'
-const standNumber = 'TBC - confirmed closer to the show'
+const standNumber = '2693'
 
-// Site base used for generating QR code URLs - always point at the canonical
-// domain so codes scanned at the show stay valid even if Netlify URL changes.
-const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
+// Quote pages built and maintained by Maud on Netlify. These are the
+// canonical configurators - QR codes + "Build your spec" buttons all point
+// at these pages so visitors see the same quote tool Maud has been refining.
+const MAUD_QUOTE_BASE = 'https://rainbow-babka-6e2adc.netlify.app'
 
 // 7 brands to feature with QR codes + quote builders at the show.
 // QR codes are displayed on desktop only (no point scanning a QR on your own
@@ -195,7 +196,7 @@ const eventSchema = {
 
       <div class="qr-grid">
         {brandQuotes.map((b) => {
-          const quoteUrl = `${siteBase}/quote/${b.slug}`
+          const quoteUrl = `${MAUD_QUOTE_BASE}/${b.slug}`
           return (
             <div class="qr-card">
               <div class="qr-card-meta">
@@ -206,7 +207,7 @@ const eventSchema = {
                   <span class="page-eyebrow" style="color:var(--gold); margin:0; display:block; margin-bottom:4px;">Show special</span>
                   {b.showSpecial}
                 </div>
-                <a href={`/quote/${b.slug}`} class="btn-primary qr-card-cta">Build your {b.brand} spec</a>
+                <a href={quoteUrl} target="_blank" rel="noopener" class="btn-primary qr-card-cta">Build your {b.brand} spec</a>
               </div>
               <div class="qr-card-qr" aria-hidden="false">
                 <img
