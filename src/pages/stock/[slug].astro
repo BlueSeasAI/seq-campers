@@ -122,24 +122,12 @@ const authorisedDealerLabel = brandLower.includes('kimberley')
     ? 'Authorised Stockman Dealer'
     : null
 
-// Map caravan title/brand to Maud's existing quote builder pages on Netlify.
-// These are the canonical configurators Maud has built and tested. New/used
-// stock without a dedicated builder falls back to /contact for a manual quote.
-const MAUD_QUOTE_BASE = 'https://rainbow-babka-6e2adc.netlify.app'
-function resolveQuoteSlug(title, brandStr) {
-  const haystack = `${title ?? ''} ${brandStr ?? ''}`.toLowerCase()
-  if (haystack.includes('kruiser s') || haystack.includes('s class')) return 'kruiser-s'
-  if (haystack.includes('kruiser t') || haystack.includes('t class')) return 'kruiser-t'
-  if (haystack.includes('kruiswagen')) return 'kruiswagen'
-  if (haystack.includes('karavan')) return 'karavan'
-  if (haystack.includes('kube')) return 'kube'
-  if (haystack.includes('trekka')) return 'trekka'
-  if (haystack.includes('rover')) return 'rover'
-  return null
-}
-const quoteSlug = resolveQuoteSlug(caravan.title, caravan.brand)
-const quoteHref = quoteSlug ? `${MAUD_QUOTE_BASE}/${quoteSlug}` : '/contact'
-const quoteIsExternal = !!quoteSlug
+// Per-listing enquiry form data. Each listing posts to Netlify Forms via the
+// shared "listing-enquiry" form name with the caravan's Sanity-loaded
+// details prefilled as hidden fields. NO routing to Maud's brand pages -
+// those are for new-build spec configuration; this is for THIS specific
+// caravan with its specs already known from Sanity.
+const listingPageUrl = `${siteBase}/stock/${slug}`
 
 // Battery type pretty label
 const batteryTypeLabel = {
@@ -389,7 +377,7 @@ const productSchema = {
           </div>
         )}
 
-        <a href={quoteHref} class="btn-enquire" {...(quoteIsExternal ? { target: '_blank', rel: 'noopener' } : {})}>Build your spec + get a quote</a>
+        <a href="#listing-enquiry" class="btn-enquire">Enquire about this caravan</a>
 
         <p style="margin-top:16px; font-size:0.78rem; color:var(--text-muted); text-align:center;">
           Or call us on <a href="tel:0753707933" style="color:var(--rust);">(07) 5370 7933</a>
@@ -397,6 +385,63 @@ const productSchema = {
       </div>
 
     </div>
+
+    <!-- Per-listing enquiry form. Posts via Netlify Forms to office@. The
+         caravan's Sanity-loaded title, brand, stock #, price + URL are
+         all submitted as hidden fields so the team has full context on
+         reply without the customer having to retype anything. -->
+    <section id="listing-enquiry" class="listing-enquiry">
+      <div class="listing-enquiry-inner">
+        <div class="page-eyebrow" style="color:var(--rust);">Enquire about this caravan</div>
+        <h2 class="listing-enquiry-title">Send us your details. We will reply within one business day.</h2>
+        <p class="listing-enquiry-sub">
+          We have all the specs for <strong>{caravan.title}</strong>{caravan.compliance?.stockNumber ? ` (stock #${caravan.compliance.stockNumber})` : ''} on file - tell us what you need to know or where you would like to take it.
+        </p>
+
+        <form
+          class="enquiry-form"
+          name="listing-enquiry"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thanks/"
+        >
+          <input type="hidden" name="form-name" value="listing-enquiry" />
+          <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+          <!-- Caravan context (Sanity-sourced, hidden from the customer) -->
+          <input type="hidden" name="caravan_title" value={caravan.title} />
+          <input type="hidden" name="caravan_brand" value={caravan.brand || ''} />
+          <input type="hidden" name="caravan_price" value={caravan.price || ''} />
+          <input type="hidden" name="caravan_stock_number" value={caravan.compliance?.stockNumber || ''} />
+          <input type="hidden" name="caravan_status" value={caravan.status || ''} />
+          <input type="hidden" name="caravan_url" value={listingPageUrl} />
+
+          <div class="form-row">
+            <label>
+              Your name
+              <input type="text" name="customer_name" required autocomplete="name" />
+            </label>
+            <label>
+              Phone
+              <input type="tel" name="customer_phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
+            </label>
+          </div>
+
+          <label>
+            Email
+            <input type="email" name="customer_email" required autocomplete="email" />
+          </label>
+
+          <label>
+            What would you like to know?
+            <textarea name="message" placeholder="Trade-in van details, finance questions, want to book a viewing, anything we should factor in..."></textarea>
+          </label>
+
+          <button type="submit">Send enquiry</button>
+        </form>
+      </div>
+    </section>
 
     <!-- FAQ section (FAQPage schema is in <head>) -->
     <section class="faq-section" aria-label="Frequently asked questions">

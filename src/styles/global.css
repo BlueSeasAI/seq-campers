@@ -122,19 +122,22 @@ a { color: inherit; }
 }
 
 /* On the overlay header (home hero), push logo + nav harder to the corners
-   like skyerv.com - max-width disabled, padding minimal. Returns to normal
-   container width once .is-scrolled flips the header solid. */
+   like skyerv.com - max-width disabled, padding minimal vertical so the
+   elements sit close to the top edge. Returns to normal container width
+   once .is-scrolled flips the header solid. */
 .site-header-overlay .container {
   max-width: none;
-  padding: 18px 38px;
+  padding: 8px 38px;
+  align-items: flex-start;
 }
 .site-header-overlay.is-scrolled .container {
   max-width: var(--container);
   padding: 14px 24px;
+  align-items: center;
 }
 
 @media (max-width: 720px) {
-  .site-header-overlay .container { padding: 14px 18px; }
+  .site-header-overlay .container { padding: 6px 18px; }
 }
 
 .logo {
@@ -153,10 +156,10 @@ a { color: inherit; }
 }
 
 /* On the home page hero (transparent header), the logo is much larger -
-   skyerv.com pattern. Scales back down when the header transitions to
-   solid after the user scrolls past the hero. */
+   skyerv.com pattern. ~2.5x the standard solid-header size. Scales back
+   down once .is-scrolled fires past the hero. */
 .site-header-overlay .logo img {
-  height: 140px;
+  height: 220px;
 }
 .site-header-overlay.is-scrolled .logo img {
   height: 72px;
@@ -164,13 +167,13 @@ a { color: inherit; }
 
 @media (max-width: 860px) {
   .logo img { height: 56px; }
-  .site-header-overlay .logo img { height: 100px; }
+  .site-header-overlay .logo img { height: 150px; }
   .site-header-overlay.is-scrolled .logo img { height: 56px; }
 }
 
 @media (max-width: 520px) {
   .logo img { height: 46px; }
-  .site-header-overlay .logo img { height: 80px; }
+  .site-header-overlay .logo img { height: 110px; }
   .site-header-overlay.is-scrolled .logo img { height: 46px; }
 }
 
@@ -467,6 +470,18 @@ nav a.is-active {
   transform: translate(-50%, -50%);
   pointer-events: none;
   border: 0;
+}
+
+/* Click/pointer blocker - sits over the iframe so YouTube chrome cannot
+   appear on mouseover. Header + below remain interactive (they sit on a
+   higher z-index OR outside the hero). */
+.hero-video-block {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+  pointer-events: auto;
+  cursor: default;
 }
 
 /* Dark overlay for text legibility */
@@ -2721,6 +2736,36 @@ a:focus-visible, button:focus-visible {
   color: var(--muted);
   font-size: 0.86rem;
   line-height: 1.5;
+}
+
+/* ============================================================
+   Per-listing enquiry form (caravan detail page)
+   ============================================================ */
+.listing-enquiry {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  margin: 32px 0 48px;
+  box-shadow: var(--shadow-sm);
+  scroll-margin-top: 100px;
+}
+.listing-enquiry-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 6px 0 8px;
+  letter-spacing: -0.01em;
+}
+.listing-enquiry-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+@media (max-width: 640px) {
+  .listing-enquiry { padding: 24px 22px; margin: 24px 0 36px; }
 }
 
 /* ============================================================
