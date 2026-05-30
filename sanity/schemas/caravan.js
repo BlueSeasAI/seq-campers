@@ -24,20 +24,37 @@ export default {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
-      description: 'Auto-generated from the Caravan name when you save - or click "Generate" any time to refresh. Used in the public web address (e.g. seqcampers.com.au/stock/stockman-trekka-2026).',
+      description: 'The web address ending for this caravan. Click the blue Generate button to auto-fill it from the Caravan name - that is the easiest way to get it right. If you type your own, use only lowercase letters, numbers and hyphens.',
       options: {
         source: 'title',
         maxLength: 96,
         slugify: (input) =>
           String(input)
             .toLowerCase()
+            .normalize('NFKD')
+            .replace(/[^a-z0-9\s-]/g, '')
             .trim()
-            .replace(/[^a-z0-9-\s]/g, '')
             .replace(/\s+/g, '-')
             .replace(/-+/g, '-')
             .slice(0, 96),
       },
-      validation: (Rule) => Rule.required().error('Slug is required - click the Generate button to auto-create it from the caravan name.'),
+      validation: (Rule) =>
+        Rule.required()
+          .error('Slug is required - click the blue Generate button to auto-create it from the caravan name.')
+          .custom((value) => {
+            if (!value?.current) return true
+            const slug = value.current
+            if (!/^[a-z0-9-]+$/.test(slug)) {
+              return 'Slug can only contain lowercase letters, numbers and hyphens. Click the blue Generate button next to this field to auto-fix it.'
+            }
+            if (slug.startsWith('-') || slug.endsWith('-')) {
+              return 'Slug cannot start or end with a hyphen. Click Generate to auto-fix.'
+            }
+            if (slug.includes('--')) {
+              return 'Slug cannot contain double-hyphens. Click Generate to auto-fix.'
+            }
+            return true
+          }),
     },
 
     {

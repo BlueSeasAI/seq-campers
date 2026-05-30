@@ -202,14 +202,17 @@ const faqSchema = {
   <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
       <iframe
-        src="https://www.youtube.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&showinfo=0"
-        title="SEQ Campers - premium off-road caravans"
+        src="https://www.youtube-nocookie.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&showinfo=0&enablejsapi=0"
+        title="SEQ Campers"
         frameborder="0"
         allow="autoplay; encrypted-media"
         allowfullscreen="false"
+        tabindex="-1"
       ></iframe>
-      <!-- Transparent layer that swallows pointer events so YouTube never
-           shows its overlay UI on hover/tap. Video keeps playing underneath. -->
+      <!-- Bulletproof click-blocker: covers the whole iframe at high z-index,
+           swallows ALL pointer events + touch + selection so YouTube can
+           never show its hover/tap controls overlay. Video keeps playing
+           underneath because the iframe receives no user input at all. -->
       <div class="hero-video-block" aria-hidden="true"></div>
     </div>
   </section>
