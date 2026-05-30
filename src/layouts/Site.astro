@@ -134,12 +134,21 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
 
   <script is:inline>
     /* Inline form submission for every Netlify form on the site. Stops the
-       browser navigating away to the ugly default thanks page. POSTs via
-       fetch + shows an in-place success message.
-       MUST wait for DOM ready because the forms live AFTER this script in
-       the document (this script is in <header>, forms render in <main>). */
+       browser navigating away to the ugly default Netlify thanks page.
+       POSTs via fetch + shows an in-place success message.
+
+       CRITICAL: target forms by their hidden form-name input, NOT by the
+       data-netlify attribute. Netlify's HTML post-processor STRIPS the
+       data-netlify and netlify-honeypot attributes from deployed HTML
+       after detecting forms at build time. Selecting on data-netlify
+       works in `npm run dev` but matches NOTHING in production. */
     function bindNetlifyAjaxForms() {
-      const forms = document.querySelectorAll('form[data-netlify="true"]')
+      const formNameInputs = document.querySelectorAll('input[name="form-name"]')
+      const forms = []
+      formNameInputs.forEach(function (input) {
+        const f = input.closest('form')
+        if (f && forms.indexOf(f) === -1) forms.push(f)
+      })
       forms.forEach(function (form) {
         if (form.dataset.ajaxBound) return
         form.dataset.ajaxBound = '1'
