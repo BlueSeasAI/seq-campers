@@ -141,7 +141,7 @@ Test-Page -Name "Brisbane Show promoted to top nav" -Path "/" -MustContain @(
 Group-Section "Hero video"
 
 Test-Page -Name "Hero YouTube iframe present" -Path "/" -MustContain @(
-    'youtube.com/embed/tozC7prVbOg'
+    'youtube-nocookie.com/embed/tozC7prVbOg'
     'autoplay=1'
     'mute=1'
     'loop=1'
@@ -159,7 +159,7 @@ Group-Section "Trust strip + Australian Made"
 
 Test-Page -Name "Trust strip on home" -Path "/" -MustContain @(
     "trust-strip"
-    "Authorised Kimberley Kampers Dealer"
+    "Authorised Kimberley Dealer"
     "Authorised Stockman Dealer"
     "Australian Designed"
     "30 years on the Sunshine Coast"
@@ -253,12 +253,14 @@ Test-Page -Name "Placeholder bios removed" -Path "/about" -MustNotContain @(
 Group-Section "Contact page reflow"
 
 Test-Page -Name "Contact page loads" -Path "/contact" -MustContain @(
-    "6 Bonanza Ct"
+    "3B/6 Bonanza Court"
     "Marcoola QLD 4564"
 )
 
-Test-Page -Name "Hours block now collapsed at bottom" -Path "/contact" -MustContain @(
+# Hours dropdown was removed per Bart - footer hours are enough.
+Test-Page -Name "Hours dropdown removed (footer hours only now)" -Path "/contact" -MustNotContain @(
     "hours-block-collapsed"
+    "Show full week"
 )
 
 Test-Page -Name "Map embed marked as small" -Path "/contact" -MustContain @(
@@ -323,15 +325,15 @@ foreach ($b in $quoteBrands) {
         $b.family
         $b.price
         "Build your spec"
-        "Show special"
-        "Tell us what you want"
+        "Show-week value stack"
+        "Your spec, your way"
         "Your name"
         "Phone"
         "Email"
         'name="customer_name"'
         'name="customer_phone"'
         'name="customer_email"'
-        "sales@seqcampers.com.au"
+        'name="quote-enquiry"'
     )
 }
 
@@ -343,9 +345,10 @@ Test-Page -Name "Quote page has 5 radio key-choice groups (Rover)" -Path "/quote
     'name="choice_tow"'
 )
 
-Test-Page -Name "Quote submit JS builds correct mailto" -Path "/quote/rover" -MustContain @(
-    'mailto:sales@seqcampers.com.au'
-    'Quote enquiry -'
+Test-Page -Name "Quote form uses Netlify Forms (not mailto)" -Path "/quote/rover" -MustContain @(
+    'name="quote-enquiry"'
+    'data-netlify="true"'
+    'action="/thanks/"'
 )
 
 Test-Page -Name "Stockman Rover show special (free inverter)" -Path "/quote/rover" -MustContain @(
@@ -373,10 +376,13 @@ try {
     }
     else {
         foreach ($slug in $caravanSlugs) {
-            # Check the detail page has either /quote/ link or /contact link
-            Test-Page -Name "Caravan /stock/$slug detail page loads with CTA" -Path "/stock/$slug" -MustContain @(
+            # Per-listing inline Netlify Forms enquiry block (replaced the
+            # old "Build your spec" link to Maud's brand pages).
+            Test-Page -Name "Caravan /stock/$slug has enquiry CTA + form" -Path "/stock/$slug" -MustContain @(
                 "btn-enquire"
-                "Build your spec + get a quote"
+                "Enquire about this caravan"
+                'name="listing-enquiry"'
+                'name="caravan_title"'
             )
         }
     }
@@ -442,7 +448,7 @@ if ($caravanSlugs -and $caravanSlugs.Count -gt 0) {
 Group-Section "Footer with real address + hours"
 
 Test-Page -Name "Footer shows real address" -Path "/" -MustContain @(
-    "6 Bonanza Ct"
+    "3B/6 Bonanza Court"
     "Marcoola QLD 4564"
 )
 
