@@ -117,14 +117,17 @@ a { color: inherit; }
 .site-header .container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 14px 24px;
+  /* Logo + nav items both ANCHORED TO THE TOP so the inner-page menu
+     items sit at the same Y position as the home overlay menu items.
+     Inner pages used to use align-items:center which pushed menu items
+     way down the (now-much-taller) 220px-logo header. */
+  align-items: flex-start;
+  padding: 8px 38px;
+  max-width: none;
 }
 
-/* On the overlay header (home hero), push logo + nav harder to the corners
-   like skyerv.com - max-width disabled, padding minimal vertical so the
-   elements sit close to the top edge. Returns to normal container width
-   once .is-scrolled flips the header solid. */
+/* Home hero overlay - same padding + anchoring as inner pages so the
+   logo + menu sit at identical Y positions across the whole site. */
 .site-header-overlay .container {
   max-width: none;
   padding: 8px 38px;
@@ -136,7 +139,18 @@ a { color: inherit; }
   align-items: center;
 }
 
+/* Nudge the nav items down a touch (matches home: menu items sit ~10px
+   below the very top edge, in line with the visual centre of the small
+   nav-cta button). */
+.site-header nav {
+  padding-top: 10px;
+}
+.site-header-overlay.is-scrolled nav {
+  padding-top: 0;
+}
+
 @media (max-width: 720px) {
+  .site-header .container { padding: 6px 18px; }
   .site-header-overlay .container { padding: 6px 18px; }
 }
 
