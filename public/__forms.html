@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+  <title>Netlify Forms decoy</title>
+  <meta name="robots" content="noindex" />
+</head>
+<body>
+  <!--
+    This file exists so Netlify's static form parser can detect every form
+    name we use across the site, even forms that only exist on dynamically
+    generated pages (e.g. /quote/[slug], /stock/[slug]). Without this file
+    a form submission can land on /thanks/ as a raw POST that Netlify never
+    intercepts -> 404.
+
+    Each form here mirrors the live form's `name` + `data-netlify` setup
+    with a single required field. Netlify never serves this page to users
+    (robots noindex + no internal links) - it only reads it at build time.
+  -->
+
+  <form name="enquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="caravan_interest" />
+    <textarea name="message"></textarea>
+    <input name="bot-field" />
+  </form>
+
+  <form name="listing-enquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="state" />
+    <input type="text" name="caravan_title" />
+    <input type="text" name="caravan_url" />
+    <input type="text" name="tow_vehicle" />
+    <input type="text" name="experience" />
+    <textarea name="message"></textarea>
+    <input name="bot-field" />
+  </form>
+
+  <form name="workshop-booking" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="caravan" />
+    <textarea name="message"></textarea>
+    <input name="bot-field" />
+  </form>
+
+  <form name="quote-builder" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="brand" />
+    <input type="text" name="model" />
+    <input type="text" name="variant" />
+    <input type="text" name="options" />
+    <input type="text" name="estimated_price" />
+    <textarea name="message"></textarea>
+    <input name="bot-field" />
+  </form>
+
+  <form name="quote-enquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="brand" />
+    <textarea name="message"></textarea>
+    <input name="bot-field" />
+  </form>
+</body>
+</html>

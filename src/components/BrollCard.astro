@@ -1,0 +1,126 @@
+---
+/**
+ * B-roll video tile for the USED stock listings page.
+ *
+ * Per Shane: model + year + last 4 of stock# only. No price, no sound, no text overlay.
+ * Tile clicks through to /stock/[slug] spec page.
+ *
+ * Fallback: if no brollVideoUrl is set on the caravan, falls back to the
+ * mainImage so the tile still renders.
+ */
+import { sanityImage, youtubeId } from '../lib/sanity.js'
+
+const { caravan: c } = Astro.props
+const slugStr = typeof c.slug === 'string' ? c.slug : c.slug?.current
+const href = slugStr ? `/stock/${slugStr}` : '#'
+
+const vid = youtubeId(c.brollVideoUrl)
+const stockNo = c.compliance?.stockNumber || ''
+const stockTail = stockNo.slice(-4)
+const year = c.specs?.year
+const modelLine = [c.brand, year].filter(Boolean).join(' ')
+---
+
+<a href={href} class="broll-card" data-brand={c.brand || ''}>
+  <div class="broll-media">
+    {vid ? (
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+        title={c.title}
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen="false"
+        tabindex="-1"
+        inert
+        loading="lazy"
+      ></iframe>
+    ) : c.mainImage ? (
+      <img
+        src={sanityImage(c.mainImage, { w: 640 })}
+        alt={c.title}
+        loading="lazy"
+      />
+    ) : (
+      <div class="broll-noimg">No video yet</div>
+    )}
+    <div class="broll-block" aria-hidden="true"></div>
+  </div>
+  <div class="broll-meta">
+    <div class="broll-title">{c.title}</div>
+    {(modelLine || stockTail) && (
+      <div class="broll-sub">
+        {modelLine}
+        {modelLine && stockTail && <span class="broll-dot">·</span>}
+        {stockTail && <span>Stock #{stockTail}</span>}
+      </div>
+    )}
+  </div>
+</a>
+
+<style>
+  .broll-card {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--tan-border, #DCCBA8);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .broll-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--rust, #C0341A);
+    box-shadow: 0 10px 28px rgba(42,22,8,0.14);
+  }
+  .broll-media {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #1a1a1c;
+    overflow: hidden;
+  }
+  .broll-media iframe,
+  .broll-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+  }
+  .broll-block {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: transparent;
+    pointer-events: auto;
+  }
+  .broll-noimg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+  }
+  .broll-meta {
+    padding: 14px 16px 16px;
+  }
+  .broll-title {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 700;
+    color: var(--ink, #2A1608);
+    font-size: 1.05rem;
+    line-height: 1.25;
+  }
+  .broll-sub {
+    margin-top: 4px;
+    color: var(--muted, #8B6A40);
+    font-size: 0.85rem;
+  }
+  .broll-dot {
+    margin: 0 6px;
+    opacity: 0.5;
+  }
+</style>

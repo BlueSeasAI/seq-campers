@@ -88,14 +88,18 @@ export function conditionLabel(value) {
 // Queries
 // ---------------------------------------------------------------------------
 
-export async function getForSaleCaravans() {
+export async function getForSaleCaravans(stockType = null) {
+  const filter = stockType
+    ? `*[_type == "caravan" && status == "for-sale" && stockType == "${stockType}"]`
+    : `*[_type == "caravan" && status == "for-sale"]`
   const raw = await client.fetch(`
-    *[_type == "caravan" && status == "for-sale"]
+    ${filter}
     | order(featured desc, price asc) {
-      _id, title, slug, price, status, condition, featured,
+      _id, title, slug, price, status, condition, stockType, brollVideoUrl, featured,
       "brand": brand->name,
       "mainImage": photos[0].asset->url,
-      specs { sleeps, length, tareWeight }
+      specs { sleeps, length, tareWeight, year },
+      compliance { stockNumber }
     }
   `)
   // Normalise slug to the same safe form getAllCaravanPaths produces so
@@ -104,6 +108,14 @@ export async function getForSaleCaravans() {
     ...c,
     slug: { current: safeSlug(c.slug?.current) || safeSlug(c.title) },
   }))
+}
+
+export async function getUsedCaravans() {
+  return getForSaleCaravans('used')
+}
+
+export async function getNewCaravans() {
+  return getForSaleCaravans('new')
 }
 
 export async function getCaravan(slug) {

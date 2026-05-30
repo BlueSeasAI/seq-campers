@@ -28,10 +28,16 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
           <div class="contact-card-foot">Online enquiries 7am - 4:30pm</div>
         </a>
 
+        <a href="sms:0422624920" class="contact-card">
+          <div class="page-eyebrow" style="color:#C0341A;">Text us</div>
+          <div class="contact-card-value">0422 624 920</div>
+          <div class="contact-card-foot">After-hours text replies welcome.</div>
+        </a>
+
         <a href="mailto:office@seqcampers.com.au" class="contact-card">
           <div class="page-eyebrow" style="color:#C0341A;">Email</div>
           <div class="contact-card-value" style="font-size:1.05rem; word-break:break-word;">office@seqcampers.com.au</div>
-          <div class="contact-card-foot">We reply within one business day.</div>
+          <div class="contact-card-foot">Please get in touch if you haven't heard back.</div>
         </a>
 
         <div class="contact-card contact-card-static">
@@ -39,8 +45,13 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
           <div class="contact-card-value" style="font-size:1.05rem; line-height:1.35;">
             3B/6 Bonanza Court<br />Marcoola QLD 4564
           </div>
-          <div class="contact-card-foot">Visit by appointment.</div>
+          <div class="contact-card-foot">Appointments preferred - after-hours always welcome.</div>
         </div>
+      </div>
+
+      <div style="background:var(--sand-deep, #F4EDE0); border:1px solid var(--tan-border, #DCCBA8); border-left:4px solid #C0341A; border-radius:8px; padding:16px 20px; margin-bottom:36px; color:#2A1608; line-height:1.6; font-size:0.95rem;">
+        <strong style="display:block; margin-bottom:6px;">We love showing the caravans off in person.</strong>
+        If you can drop in, we'll set up the awnings, walk through the systems, and answer the awkward questions face-to-face. Work-life family and camping balance is real - if office hours don't suit, get in touch and we'll find a time that does.
       </div>
 
       <!-- Two-column: form + map -->
@@ -120,9 +131,12 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
   <style>
     .contact-cards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      .contact-cards { grid-template-columns: repeat(2, 1fr); }
     }
     .contact-card {
       background: #fff;

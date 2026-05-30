@@ -1,0 +1,159 @@
+---
+import Site from '../../layouts/Site.astro'
+import CaravanCard from '../../components/CaravanCard.astro'
+import TrustStrip from '../../components/TrustStrip.astro'
+import { getNewCaravans, getDistinctBrands } from '../../lib/sanity.js'
+import { quoteBrands } from '../../data/quote-brands.js'
+
+let caravans = []
+try {
+  caravans = await getNewCaravans()
+} catch (err) {
+  console.warn('Sanity unreachable for /new:', err.message)
+}
+
+const brands = [...new Set(caravans.map((c) => c.brand).filter(Boolean))].sort()
+
+const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ Campers in Queensland. Build your spec, lock in show pricing, and order direct from the factory.`
+---
+
+<Site title="New Caravans" description={description}>
+  <div class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">New</div>
+      <h1>New caravans, built to your spec.</h1>
+      <p>Pick a brand, build your spec, and we'll match it to a factory order or current build slot.</p>
+    </div>
+  </div>
+
+  <TrustStrip />
+
+  <!-- Configurator entry tiles - the 7 brands -->
+  <section class="section" style="padding-top:32px; padding-bottom:32px;">
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Build your spec</div>
+        <h2 class="section-title">Configure a new caravan in your time.</h2>
+      </div>
+      <div class="new-config-grid">
+        {quoteBrands.map((b) => (
+          <a href={`/quote/${b.slug}`} class="new-config-card">
+            <div class="new-config-brand">{b.brandFamily}</div>
+            <div class="new-config-name">{b.name.replace(b.brandFamily + ' ', '')}</div>
+            <div class="new-config-headline">{b.headline}</div>
+            <div class="new-config-price">{b.indicativePrice}</div>
+            <span class="new-config-cta">Build your spec →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {caravans.length > 0 && (
+    <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
+      <div class="container">
+        <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
+          <div class="page-eyebrow" style="color:var(--rust);">In stock</div>
+          <h2 class="section-title">New caravans available now.</h2>
+          <p style="color:var(--muted); margin-top:6px;">{caravans.length} new caravan{caravans.length !== 1 ? 's' : ''} ready or about to land.</p>
+        </div>
+
+        {brands.length > 1 && (
+          <form class="filter-bar" id="new-filters" aria-label="Filter new stock">
+            <div class="filter-field">
+              <label class="filter-label" for="filter-brand-new">Brand</label>
+              <select id="filter-brand-new" name="brand">
+                <option value="">All brands</option>
+                {brands.map((b) => <option value={b}>{b}</option>)}
+              </select>
+            </div>
+            <div class="filter-field">
+              <label class="filter-label">&nbsp;</label>
+              <button type="reset" class="filter-reset">Reset</button>
+            </div>
+          </form>
+        )}
+
+        <div class="stock-grid" id="new-grid">
+          {caravans.map((c) => <CaravanCard caravan={c} showSpecs />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <script is:inline>
+    (function () {
+      const form = document.getElementById('new-filters')
+      if (!form) return
+      const cards = Array.from(document.querySelectorAll('#new-grid .caravan-card'))
+      function applyFilters() {
+        const brand = (form.brand?.value || '').trim()
+        cards.forEach(function (c) {
+          const cBrand = c.dataset.brand || ''
+          c.style.display = !brand || cBrand === brand ? '' : 'none'
+        })
+      }
+      form.addEventListener('input', applyFilters)
+      form.addEventListener('reset', () => setTimeout(applyFilters, 0))
+    })()
+  </script>
+
+  <style>
+    .new-config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .new-config-card {
+      background: #fff;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 10px;
+      padding: 22px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .new-config-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--rust, #C0341A);
+      box-shadow: 0 8px 22px rgba(42,22,8,0.10);
+    }
+    .new-config-brand {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--rust, #C0341A);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .new-config-name {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink, #2A1608);
+      line-height: 1.15;
+    }
+    .new-config-headline {
+      color: var(--muted, #8B6A40);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+    .new-config-price {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      color: var(--ink, #2A1608);
+      margin-top: auto;
+      padding-top: 14px;
+    }
+    .new-config-cta {
+      color: var(--rust, #C0341A);
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin-top: 6px;
+    }
+  </style>
+</Site>

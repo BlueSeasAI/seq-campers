@@ -87,11 +87,11 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       </button>
 
       <nav id="primary-nav">
+        <a href="/new" class={isActive('/new') ? 'is-active' : ''}>New</a>
         <a href="/stock" class={isActive('/stock') ? 'is-active' : ''}>Stock</a>
         <a href="/videos" class={isActive('/videos') ? 'is-active' : ''}>Videos</a>
         <a href="/service" class={isActive('/service') ? 'is-active' : ''}>Service</a>
         <a href="/brisbane-show-2026" class={isActive('/brisbane-show-2026') ? 'is-active' : ''}>Brisbane Show</a>
-        <a href="/about" class={isActive('/about') ? 'is-active' : ''}>About</a>
         <a href="/brisbane-show-2026" class="nav-cta">Reserve a show slot</a>
       </nav>
     </div>

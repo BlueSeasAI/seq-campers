@@ -1,73 +1,61 @@
 ---
 import Site from '../../layouts/Site.astro'
-import CaravanCard from '../../components/CaravanCard.astro'
+import BrollCard from '../../components/BrollCard.astro'
 import TrustStrip from '../../components/TrustStrip.astro'
-import { getForSaleCaravans, getDistinctBrands } from '../../lib/sanity.js'
+import { getUsedCaravans } from '../../lib/sanity.js'
 
-const caravans = await getForSaleCaravans()
-const brands = await getDistinctBrands()
-const description = `Browse ${caravans.length} premium off-road caravan${caravans.length === 1 ? '' : 's'} for sale at SEQ Campers in Queensland. Kimberley Kampers, Stockman, and hand-picked stock - inspected, ready to tow.`
+let caravans = []
+try {
+  caravans = await getUsedCaravans()
+} catch (err) {
+  console.warn('Sanity unreachable for /stock:', err.message)
+}
+
+const brands = [...new Set(caravans.map((c) => c.brand).filter(Boolean))].sort()
+const description = `Browse ${caravans.length} hand-picked used off-road caravan${caravans.length === 1 ? '' : 's'} for sale at SEQ Campers in Queensland. Walk-around video for every van.`
 ---
 
-<Site title="Caravans for Sale" description={description}>
+<Site title="Used Stock" description={description}>
   <div class="page-header">
     <div class="container">
       <div class="page-eyebrow">Stock</div>
-      <h1>Caravans for sale</h1>
-      <p id="result-count">{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} available</p>
+      <h1>Used caravans, every one on video.</h1>
+      <p id="result-count">{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} ready to tow away.</p>
     </div>
   </div>
 
   <TrustStrip />
 
-  <div class="container">
+  <div class="container" style="padding-top:24px; padding-bottom:48px;">
     {caravans.length === 0 ? (
       <div class="empty-state">
-        <div class="empty-title">Stock listings coming soon</div>
-        <p>We are currently loading our caravan inventory. Check back shortly.</p>
+        <div class="empty-title">Used stock listings loading</div>
+        <p>We're rebuilding the used stock library right now. Check back shortly, or call (07) 5370 7933 to ask what's about to land.</p>
       </div>
     ) : (
       <>
-        <form class="filter-bar" id="stock-filters" aria-label="Filter stock">
-          <div class="filter-field">
-            <label class="filter-label" for="filter-brand">Brand</label>
-            <select id="filter-brand" name="brand">
-              <option value="">All brands</option>
-              {brands.map((b) => <option value={b}>{b}</option>)}
-            </select>
-          </div>
-
-          <div class="filter-field">
-            <label class="filter-label" for="filter-status">Status</label>
-            <select id="filter-status" name="status">
-              <option value="">All</option>
-              <option value="for-sale">For Sale</option>
-              <option value="on-hold">On Hold</option>
-              <option value="coming-soon">Coming Soon</option>
-            </select>
-          </div>
-
-          <div class="filter-field">
-            <label class="filter-label" for="filter-price-min">Price (AUD)</label>
-            <div class="filter-price-range">
-              <input id="filter-price-min" name="priceMin" type="number" placeholder="Min" min="0" step="1000" />
-              <span>to</span>
-              <input id="filter-price-max" name="priceMax" type="number" placeholder="Max" min="0" step="1000" />
+        {brands.length > 1 && (
+          <form class="filter-bar" id="stock-filters" aria-label="Filter stock">
+            <div class="filter-field">
+              <label class="filter-label" for="filter-brand">Brand</label>
+              <select id="filter-brand" name="brand">
+                <option value="">All brands</option>
+                {brands.map((b) => <option value={b}>{b}</option>)}
+              </select>
             </div>
-          </div>
+            <div class="filter-field">
+              <label class="filter-label">&nbsp;</label>
+              <button type="reset" class="filter-reset">Reset filters</button>
+            </div>
+          </form>
+        )}
 
-          <div class="filter-field">
-            <label class="filter-label">&nbsp;</label>
-            <button type="reset" class="filter-reset">Reset filters</button>
-          </div>
-        </form>
-
-        <div class="stock-grid" id="stock-grid">
-          {caravans.map((c) => <CaravanCard caravan={c} showSpecs />)}
+        <div class="broll-grid" id="stock-grid">
+          {caravans.map((c) => <BrollCard caravan={c} />)}
         </div>
 
         <div class="filter-empty" id="filter-empty-state" style="display:none;">
-          <p>No caravans match these filters. Try widening the price range or clearing a filter.</p>
+          <p>No caravans match these filters. Try clearing a filter.</p>
         </div>
       </>
     )}
@@ -77,72 +65,45 @@ const description = `Browse ${caravans.length} premium off-road caravan${caravan
     (function () {
       const form = document.getElementById('stock-filters')
       if (!form) return
-      const cards = Array.from(document.querySelectorAll('#stock-grid .caravan-card'))
+      const cards = Array.from(document.querySelectorAll('#stock-grid .broll-card'))
       const countEl = document.getElementById('result-count')
       const emptyState = document.getElementById('filter-empty-state')
       const grid = document.getElementById('stock-grid')
       const total = cards.length
 
-      function readFilters() {
-        const data = new FormData(form)
-        return {
-          brand: (data.get('brand') || '').toString().trim(),
-          status: (data.get('status') || '').toString().trim(),
-          priceMin: parseFloat(data.get('priceMin')) || 0,
-          priceMax: parseFloat(data.get('priceMax')) || Infinity,
-        }
-      }
-
       function applyFilters() {
-        const f = readFilters()
+        const brand = (form.brand?.value || '').trim()
         let visible = 0
         cards.forEach(function (c) {
-          const brand = c.dataset.brand || ''
-          const status = c.dataset.status || ''
-          const price = parseFloat(c.dataset.price) || 0
-          const match =
-            (!f.brand || brand === f.brand) &&
-            (!f.status || status === f.status) &&
-            price >= f.priceMin &&
-            price <= f.priceMax
+          const cBrand = c.dataset.brand || ''
+          const match = !brand || cBrand === brand
           c.style.display = match ? '' : 'none'
           if (match) visible++
         })
         if (countEl) {
           countEl.textContent =
             visible === total
-              ? total + ' caravan' + (total !== 1 ? 's' : '') + ' available'
+              ? total + ' caravan' + (total !== 1 ? 's' : '') + ' ready to tow away.'
               : visible + ' of ' + total + ' caravan' + (total !== 1 ? 's' : '')
         }
         if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none'
         if (grid) grid.style.display = visible === 0 ? 'none' : ''
-        syncUrl(f)
       }
 
-      function syncUrl(f) {
-        const params = new URLSearchParams()
-        if (f.brand) params.set('brand', f.brand)
-        if (f.status) params.set('status', f.status)
-        if (f.priceMin) params.set('priceMin', String(f.priceMin))
-        if (f.priceMax && Number.isFinite(f.priceMax)) params.set('priceMax', String(f.priceMax))
-        const qs = params.toString()
-        history.replaceState(null, '', qs ? '?' + qs : window.location.pathname)
-      }
-
-      function applyUrlToForm() {
-        const params = new URLSearchParams(window.location.search)
-        if (params.has('brand')) form.brand.value = params.get('brand')
-        if (params.has('status')) form.status.value = params.get('status')
-        if (params.has('priceMin')) form.priceMin.value = params.get('priceMin')
-        if (params.has('priceMax')) form.priceMax.value = params.get('priceMax')
-      }
-
-      applyUrlToForm()
       applyFilters()
       form.addEventListener('input', applyFilters)
-      form.addEventListener('reset', function () {
-        setTimeout(applyFilters, 0)
-      })
+      form.addEventListener('reset', () => setTimeout(applyFilters, 0))
     })()
   </script>
+
+  <style>
+    .broll-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+    @media (max-width: 640px) {
+      .broll-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+  </style>
 </Site>

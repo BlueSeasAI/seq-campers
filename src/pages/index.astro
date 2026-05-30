@@ -3,6 +3,7 @@ import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
+import MountainIcon from '../components/MountainIcon.astro'
 import { getFeaturedCaravans, getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
 
 let featured = []
@@ -117,7 +118,7 @@ const localBusiness = {
   '@type': 'AutoDealer',
   '@id': 'https://seqcampers.com.au/#business',
   name: 'SEQ Campers',
-  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman stock. Thirty years in the industry.",
+  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman stock. Off-road camping experts since 2013.",
   url: 'https://seqcampers.com.au',
   telephone: '+61-7-5370-7933',
   email: 'office@seqcampers.com.au',
@@ -174,7 +175,7 @@ const faqSchema = {
       name: 'How long has SEQ Campers been operating?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: "SEQ Campers has been on the Sunshine Coast for over thirty years. We also run a YouTube channel with more than 2,000 subscribers where Shane walks through every caravan in detail.",
+        text: "SEQ Campers has been the Sunshine Coast home of premium off-road caravans since 2013, building on Kimberley Kampers' 30-year Australian heritage. We also run a YouTube channel with more than 2,000 subscribers where Shane walks through every caravan in detail.",
       },
     },
     {
@@ -191,7 +192,7 @@ const faqSchema = {
 
 <Site
   title="Premium Off-Road Caravans"
-  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Kampers and Stockman stock, hand-inspected by Shane. Thirty years on the Sunshine Coast."
+  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Kampers and Stockman stock, hand-inspected by Shane. Off-road camping on the Sunshine Coast since 2013."
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
@@ -219,6 +220,85 @@ const faqSchema = {
     </div>
   </section>
 
+  <!-- Three Mountain Banners (Watch / Visit / Adventure) - Shane's preferred
+       home page architecture. Each banner is a full-viewport section with a
+       mountain icon in one of the SEQ logo colours. Clicking jumps to the
+       relevant page where the "tree" lives (videos, used stock, service). -->
+  <section class="mountain-banner mountain-watch" id="watch">
+    <a href="/videos" class="mountain-banner-link">
+      <div class="mountain-banner-bg">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0"
+          title="Watch our video library"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen="false"
+          tabindex="-1"
+          inert
+        ></iframe>
+        <div class="mountain-banner-block" aria-hidden="true"></div>
+        <div class="mountain-banner-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="mountain-banner-inner">
+        <MountainIcon color="#F5B544" accent="#D89425" size={88} />
+        <div class="mountain-banner-eyebrow">1. Watch</div>
+        <h2 class="mountain-banner-title">Browse our video library.</h2>
+        <p class="mountain-banner-desc">See every model inside and out - Kimberley and Stockman. Get a feel for what suits your travel style before you visit.</p>
+        <span class="mountain-banner-cta">See all models →</span>
+      </div>
+    </a>
+  </section>
+
+  <section class="mountain-banner mountain-visit" id="visit">
+    <a href="/stock" class="mountain-banner-link">
+      <div class="mountain-banner-bg">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/xYf81xUZtNE?autoplay=1&mute=1&loop=1&playlist=xYf81xUZtNE&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0"
+          title="Visit our stock"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen="false"
+          tabindex="-1"
+          inert
+        ></iframe>
+        <div class="mountain-banner-block" aria-hidden="true"></div>
+        <div class="mountain-banner-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="mountain-banner-inner">
+        <MountainIcon color="#E97B3C" accent="#C0341A" size={88} />
+        <div class="mountain-banner-eyebrow">2. Visit</div>
+        <h2 class="mountain-banner-title">Available now for sale.</h2>
+        <p class="mountain-banner-desc">Every used caravan on the lot, with a walk-around video. Book a showroom visit or call us to lock one in.</p>
+        <span class="mountain-banner-cta">See in-stock caravans →</span>
+      </div>
+    </a>
+  </section>
+
+  <section class="mountain-banner mountain-adventure" id="adventure">
+    <a href="/service" class="mountain-banner-link">
+      <div class="mountain-banner-bg">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/WwgapQt3xO4?autoplay=1&mute=1&loop=1&playlist=WwgapQt3xO4&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0"
+          title="Adventure - handover and service"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen="false"
+          tabindex="-1"
+          inert
+        ></iframe>
+        <div class="mountain-banner-block" aria-hidden="true"></div>
+        <div class="mountain-banner-overlay" aria-hidden="true"></div>
+      </div>
+      <div class="mountain-banner-inner">
+        <MountainIcon color="#4cea89" accent="#2BA85F" size={88} />
+        <div class="mountain-banner-eyebrow">3. Adventure</div>
+        <h2 class="mountain-banner-title">From our driveway to yours.</h2>
+        <p class="mountain-banner-desc">Handover, upgrades, annual service, repairs - whatever the road throws at it, we're here.</p>
+        <span class="mountain-banner-cta">Camping support →</span>
+      </div>
+    </a>
+  </section>
+
   <TrustStrip />
 
   <!-- Google reviews social proof - display only, no exit link. Per Bart:
@@ -233,87 +313,6 @@ const faqSchema = {
       </a>
     </div>
   </div>
-
-  <!-- 3-pathway artery block: New / Used / Service. Below trust strip on
-       desktop so the credibility cue lands first, then user picks a path. -->
-  <section class="pathways-section" aria-label="Three pathways">
-    <div class="container">
-      <div class="pathway-grid">
-        <a href="/stock?status=for-sale&condition=new" class="pathway-card pathway-new">
-          <div class="pathway-image" style="background-image:url('/pathway-new.png');"></div>
-          <div class="pathway-body">
-            <div class="pathway-eyebrow">New caravans</div>
-            <h3 class="pathway-title">Buy new</h3>
-            <p class="pathway-desc">Kimberley Kampers and Stockman straight from the factory. Built for the long way home.</p>
-            <span class="pathway-cta">Explore new stock →</span>
-          </div>
-        </a>
-        <a href="/stock?status=for-sale" class="pathway-card pathway-used">
-          <div class="pathway-image" style="background-image:url('/pathway-used.png');"></div>
-          <div class="pathway-body">
-            <div class="pathway-eyebrow">Used caravans</div>
-            <h3 class="pathway-title">Buy used</h3>
-            <p class="pathway-desc">Hand-picked consignment stock. Inspected, prepared, and ready for the road.</p>
-            <span class="pathway-cta">Browse used stock →</span>
-          </div>
-        </a>
-        <a href="/service" class="pathway-card pathway-service">
-          <div class="pathway-image" style="background-image:url('/pathway-service.png');"></div>
-          <div class="pathway-body">
-            <div class="pathway-eyebrow">Workshop</div>
-            <h3 class="pathway-title">Service & support</h3>
-            <p class="pathway-desc">Annual service, warranty work, modifications. The team who knows your van.</p>
-            <span class="pathway-cta">See workshop services →</span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why SEQ + intro pitch -->
-  <section class="section" style="padding-bottom:32px;">
-    <div class="container" style="max-width:840px; text-align:center;">
-      <div class="page-eyebrow" style="color:var(--rust); margin-bottom:12px;">Why SEQ Campers</div>
-      <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.8rem; font-weight:600; color:var(--ink); letter-spacing:-0.01em; margin-bottom:18px;">
-        Buying a caravan is a big decision.
-      </h2>
-      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75; margin-bottom:18px;">
-        You're looking at spending $50,000 to $200,000+ on something your family will use for the next 20 years.
-        You want to see it, touch it, hear from someone who's actually used it - not just read specs on a page.
-      </p>
-      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75;">
-        That's why we put everything on video. Every model, every feature, setup and pack-down. So by the time you walk into our showroom,
-        you already know what you're looking at - and you can spend your time asking the questions that actually matter to you.
-      </p>
-    </div>
-  </section>
-
-  <!-- 3 steps -->
-  <section class="section" style="padding-top:24px;">
-    <div class="container">
-      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px;">
-        <div class="page-eyebrow" style="color:var(--rust);">How it works</div>
-        <h2 class="section-title">Three steps to your next adventure</h2>
-      </div>
-      <div class="three-steps">
-        <div class="step-card">
-          <div class="step-num">1</div>
-          <h3>Watch</h3>
-          <p>Browse our video library. See every model inside and out. Get a feel for what suits your travel style before you visit.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">2</div>
-          <h3>Visit</h3>
-          <p>Book a walkthrough at our Sunshine Coast showroom. No pressure, no rush. Shane and Maud will match you to the right caravan.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">3</div>
-          <h3>Adventure</h3>
-          <p>Hit the road knowing you've made the right call. And when it's time for a service, we're right here on the Sunshine Coast.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Shane's Pick / Sale of the Week - replaces the YouTube grid per Bart.
        Higher conversion than a 3-card browse grid: single focal point,
@@ -372,6 +371,119 @@ const faqSchema = {
       </div>
     </section>
   )}
+
+  <style>
+    /* Three Mountain Banners - SkyRV-style full viewport sections.
+       Per Shane's brief: seamless, video-led, each banner is a full
+       screen height with a mountain icon and minimal text overlay. */
+    .mountain-banner {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 560px;
+      overflow: hidden;
+      background: #1a1a1c;
+    }
+    .mountain-banner-link {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      color: inherit;
+    }
+    .mountain-banner-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .mountain-banner-bg iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 177.78vh;
+      height: 100vh;
+      min-width: 100%;
+      min-height: 56.25vw;
+      transform: translate(-50%, -50%);
+      border: 0;
+      pointer-events: none;
+    }
+    .mountain-banner-block {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: auto;
+    }
+    .mountain-banner-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.65) 100%);
+      pointer-events: none;
+    }
+    .mountain-banner-inner {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      padding: 40px 24px;
+      color: #fff;
+      pointer-events: none;
+    }
+    .mountain-banner-inner > * { pointer-events: auto; }
+    .mountain-banner-eyebrow {
+      margin-top: 18px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+    }
+    .mountain-banner-title {
+      margin: 10px 0 14px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.35);
+      max-width: 820px;
+    }
+    .mountain-banner-desc {
+      max-width: 640px;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.9);
+      margin: 0 0 22px;
+      text-shadow: 0 1px 12px rgba(0,0,0,0.35);
+    }
+    .mountain-banner-cta {
+      display: inline-block;
+      padding: 14px 28px;
+      background: #fff;
+      color: var(--ink, #2A1608);
+      border-radius: 999px;
+      font-weight: 700;
+      font-family: 'Inter Tight', sans-serif;
+      letter-spacing: 0.02em;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .mountain-banner-link:hover .mountain-banner-cta {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+    }
+    @media (max-width: 768px) {
+      .mountain-banner { height: 80vh; min-height: 480px; }
+      .mountain-banner-desc { font-size: 0.95rem; }
+    }
+  </style>
 
   <!-- Testimonials - lives below Shane's Pick. Reviews bar above scrolls
        here. Real Google reviews. No external link out - keeps visitors
