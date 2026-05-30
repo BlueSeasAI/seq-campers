@@ -134,26 +134,33 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
 
   <script is:inline>
     /* Inline form submission for every Netlify form on the site. Stops the
-       browser navigating away to the ugly default thanks page (or our own
-       /thanks/ page). POSTs via fetch + shows an in-place success message.
-       Falls back to native form POST if JS / fetch fails. */
-    (function () {
+       browser navigating away to the ugly default thanks page. POSTs via
+       fetch + shows an in-place success message.
+       MUST wait for DOM ready because the forms live AFTER this script in
+       the document (this script is in <header>, forms render in <main>). */
+    function bindNetlifyAjaxForms() {
       const forms = document.querySelectorAll('form[data-netlify="true"]')
       forms.forEach(function (form) {
+        if (form.dataset.ajaxBound) return
+        form.dataset.ajaxBound = '1'
         form.addEventListener('submit', async function (e) {
           e.preventDefault()
           const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]')
-          if (submitBtn) { submitBtn.disabled = true; submitBtn.dataset.originalText = submitBtn.textContent; submitBtn.textContent = 'Sending...' }
+          if (submitBtn) {
+            submitBtn.disabled = true
+            submitBtn.dataset.originalText = submitBtn.textContent
+            submitBtn.textContent = 'Sending...'
+          }
           try {
             const data = new FormData(form)
             const body = new URLSearchParams()
-            for (const [k, v] of data.entries()) body.append(k, v)
+            for (const [k, v] of data.entries()) body.append(k, String(v))
             const res = await fetch('/', {
               method: 'POST',
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
               body: body.toString(),
             })
-            if (!res.ok) throw new Error('Submit failed ' + res.status)
+            if (!res.ok && res.status !== 0) throw new Error('Submit failed ' + res.status)
             const thanks = document.createElement('div')
             thanks.className = 'inline-form-thanks'
             thanks.setAttribute('role', 'status')
@@ -162,18 +169,27 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
             form.style.display = 'none'
             thanks.scrollIntoView({ behavior: 'smooth', block: 'center' })
           } catch (err) {
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitBtn.dataset.originalText || 'Send' }
-            const errBox = form.querySelector('.inline-form-error') || (function() {
-              const e = document.createElement('div')
-              e.className = 'inline-form-error'
-              form.insertBefore(e, form.firstChild)
-              return e
+            console.error('Form submission error:', err)
+            if (submitBtn) {
+              submitBtn.disabled = false
+              submitBtn.textContent = submitBtn.dataset.originalText || 'Send'
+            }
+            const errBox = form.querySelector('.inline-form-error') || (function () {
+              const el = document.createElement('div')
+              el.className = 'inline-form-error'
+              form.insertBefore(el, form.firstChild)
+              return el
             })()
             errBox.textContent = 'Something went wrong - please try again, or call (07) 5370 7933.'
           }
         })
       })
-    })()
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bindNetlifyAjaxForms)
+    } else {
+      bindNetlifyAjaxForms()
+    }
 
     (function () {
       const btn = document.querySelector('.nav-toggle')
