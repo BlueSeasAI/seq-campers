@@ -332,10 +332,7 @@ export async function getSiteSettings() {
           "mainImage": photos[0].asset->url,
           specs { sleeps, length, tareWeight }
         }
-      },
-      workshopHours,
-      showroomHours,
-      streetAddress
+      }
     }
   `)
   if (raw?.shanesPick?.caravan) {
