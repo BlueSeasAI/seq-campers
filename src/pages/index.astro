@@ -108,7 +108,7 @@ const testimonials = [
 const upcomingNews = [
   { date: '10 May', type: 'New Arrival', title: 'New Stockman Rover 02 arrival', body: 'The 2026 model is in the showroom. Come see the upgrades in person.' },
   { date: '17 May', type: 'Handover', title: 'Mitchell family handover', body: 'Another family heading out on their first big trip. Safe travels!' },
-  { date: '03 Jun', type: 'Event', title: 'Brisbane Caravan, Camping & Touring Supershow', body: 'Three days at the Brisbane Showgrounds. Come and find us at the show - or book a chat before we go.', href: '/brisbane-show-2026' },
+  { date: '03 Jun', type: 'Event', title: 'Brisbane Caravan, Camping & Touring Supershow', body: 'Five days at the Brisbane Showgrounds, stand 2693 in the Main Oval. Come and find us at the show - or book a chat before we go.', href: '/brisbane-show-2026' },
 ]
 
 // LocalBusiness schema - tells Google/AI "we are an Australian caravan dealer"
@@ -117,7 +117,7 @@ const localBusiness = {
   '@type': 'AutoDealer',
   '@id': 'https://seqcampers.com.au/#business',
   name: 'SEQ Campers',
-  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman stock. Thirty years in the industry.",
+  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman stock. Off-road camping experts since 2013.",
   url: 'https://seqcampers.com.au',
   telephone: '+61-7-5370-7933',
   email: 'office@seqcampers.com.au',
@@ -131,8 +131,7 @@ const localBusiness = {
     addressCountry: 'AU',
   },
   openingHoursSpecification: [
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday'], opens: '07:30', closes: '15:00' },
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Thursday', 'Friday'], opens: '08:30', closes: '15:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:30', closes: '15:00' },
     { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '08:30', closes: '12:30' },
   ],
   priceRange: '$$$',
@@ -174,7 +173,7 @@ const faqSchema = {
       name: 'How long has SEQ Campers been operating?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: "SEQ Campers has been on the Sunshine Coast for over thirty years. We also run a YouTube channel with more than 2,000 subscribers where Shane walks through every caravan in detail.",
+        text: "SEQ Campers has been the Sunshine Coast home of premium off-road caravans since 2013, building on Kimberley Kampers' 30-year Australian heritage. We also run a YouTube channel with more than 2,000 subscribers where Shane walks through every caravan in detail.",
       },
     },
     {
@@ -191,7 +190,7 @@ const faqSchema = {
 
 <Site
   title="Premium Off-Road Caravans"
-  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Kampers and Stockman stock, hand-inspected by Shane. Thirty years on the Sunshine Coast."
+  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Kampers and Stockman stock, hand-inspected by Shane. Off-road camping on the Sunshine Coast since 2013."
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
@@ -201,23 +200,119 @@ const faqSchema = {
        (the controls that occasionally flicker in). -->
   <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&showinfo=0&enablejsapi=0"
-        title="SEQ Campers"
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen="false"
+      <video
+        class="hero-video-mp4"
+        src="/hero-video.mp4"
+        poster="/hero-poster.jpg"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        disablepictureinpicture
+        controlslist="nodownload nofullscreen noremoteplayback"
         tabindex="-1"
-        inert
-      ></iframe>
-      <!-- Bulletproof click-blocker: covers the whole iframe at high z-index,
-           swallows ALL pointer events + touch + selection so YouTube can
-           never show its hover/tap controls overlay. Video keeps playing
-           underneath because the iframe is also `inert` so it receives no
-           focus / pointer / keyboard input at all. -->
+      ></video>
       <div class="hero-video-block" aria-hidden="true"></div>
     </div>
   </section>
+
+  <!-- Three pathway video tiles (Kimberley-style 4-box pattern but with 3 +
+       video-backgrounds). Shane's preferred home page architecture: compact
+       side-by-side boxes with looping muted B-roll inside, mountain icon and
+       label overlaid. Click goes down the relevant "tree". -->
+  <section class="section pathway-tiles-section" aria-label="Three steps to your next adventure">
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
+        <div class="page-eyebrow" style="color:var(--rust);">How it works</div>
+        <h2 class="section-title">Three steps to your next adventure.</h2>
+      </div>
+
+      <div class="pathway-tile-grid">
+        <a href="/videos" class="pathway-tile pathway-tile-watch" data-video-id="tozC7prVbOg">
+          <div class="pathway-tile-media">
+            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/tozC7prVbOg/hqdefault.jpg" alt="" loading="lazy" />
+            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
+            <div class="pathway-tile-block" aria-hidden="true"></div>
+            <div class="pathway-tile-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="pathway-tile-inner">
+            <div class="pathway-tile-label">1. Watch</div>
+            <div class="pathway-tile-sub">Our video library - every model, Kimberley and Stockman.</div>
+          </div>
+        </a>
+
+        <a href="/stock" class="pathway-tile pathway-tile-visit" data-video-id="xYf81xUZtNE">
+          <div class="pathway-tile-media">
+            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/xYf81xUZtNE/hqdefault.jpg" alt="" loading="lazy" />
+            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
+            <div class="pathway-tile-block" aria-hidden="true"></div>
+            <div class="pathway-tile-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="pathway-tile-inner">
+            <div class="pathway-tile-label">2. Visit</div>
+            <div class="pathway-tile-sub">Pre-loved and new display vans available now.</div>
+          </div>
+        </a>
+
+        <a href="/service" class="pathway-tile pathway-tile-adventure" data-video-id="WwgapQt3xO4">
+          <div class="pathway-tile-media">
+            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/WwgapQt3xO4/hqdefault.jpg" alt="" loading="lazy" />
+            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
+            <div class="pathway-tile-block" aria-hidden="true"></div>
+            <div class="pathway-tile-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="pathway-tile-inner">
+            <div class="pathway-tile-label">3. Adventure</div>
+            <div class="pathway-tile-sub">From our driveway to your driveway. Camping support.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    /* Pathway tiles: hover (or touch) swaps the poster for an autoplay iframe.
+       Mouse-leave / tap-out clears the iframe so other tiles never trigger
+       multiple videos at once. */
+    (function () {
+      const tiles = document.querySelectorAll('.pathway-tile')
+      tiles.forEach(function (tile) {
+        const videoId = tile.getAttribute('data-video-id')
+        if (!videoId) return
+        const wrap = tile.querySelector('.pathway-tile-iframe-wrap')
+        let iframe = null
+
+        function play() {
+          if (iframe) return
+          iframe = document.createElement('iframe')
+          iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId +
+            '?autoplay=1&mute=1&loop=1&playlist=' + videoId +
+            '&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0'
+          iframe.setAttribute('frameborder', '0')
+          iframe.setAttribute('allow', 'autoplay; encrypted-media')
+          iframe.setAttribute('tabindex', '-1')
+          iframe.setAttribute('inert', '')
+          wrap.appendChild(iframe)
+          tile.classList.add('is-playing')
+        }
+        function stop() {
+          if (!iframe) return
+          iframe.remove()
+          iframe = null
+          tile.classList.remove('is-playing')
+        }
+        tile.addEventListener('mouseenter', play)
+        tile.addEventListener('mouseleave', stop)
+        tile.addEventListener('focusin', play)
+        tile.addEventListener('focusout', stop)
+        /* Touch devices: tap once = preview, tap twice / link follow = navigate */
+        tile.addEventListener('touchstart', function (e) {
+          if (!iframe) { e.preventDefault(); play() }
+        }, { passive: false })
+      })
+    })()
+  </script>
 
   <TrustStrip />
 
@@ -233,87 +328,6 @@ const faqSchema = {
       </a>
     </div>
   </div>
-
-  <!-- 3-pathway artery block: New / Used / Service. Below trust strip on
-       desktop so the credibility cue lands first, then user picks a path. -->
-  <section class="pathways-section" aria-label="Three pathways">
-    <div class="container">
-      <div class="pathway-grid">
-        <a href="/stock?status=for-sale&condition=new" class="pathway-card pathway-new">
-          <div class="pathway-image" style="background-image:url('/pathway-new.png');"></div>
-          <div class="pathway-body">
-            <div class="pathway-eyebrow">New caravans</div>
-            <h3 class="pathway-title">Buy new</h3>
-            <p class="pathway-desc">Kimberley Kampers and Stockman straight from the factory. Built for the long way home.</p>
-            <span class="pathway-cta">Explore new stock →</span>
-          </div>
-        </a>
-        <a href="/stock?status=for-sale" class="pathway-card pathway-used">
-          <div class="pathway-image" style="background-image:url('/pathway-used.png');"></div>
-          <div class="pathway-body">
-            <div class="pathway-eyebrow">Used caravans</div>
-            <h3 class="pathway-title">Buy used</h3>
-            <p class="pathway-desc">Hand-picked consignment stock. Inspected, prepared, and ready for the road.</p>
-            <span class="pathway-cta">Browse used stock →</span>
-          </div>
-        </a>
-        <a href="/service" class="pathway-card pathway-service">
-          <div class="pathway-image" style="background-image:url('/pathway-service.png');"></div>
-          <div class="pathway-body">
-            <div class="pathway-eyebrow">Workshop</div>
-            <h3 class="pathway-title">Service & support</h3>
-            <p class="pathway-desc">Annual service, warranty work, modifications. The team who knows your van.</p>
-            <span class="pathway-cta">See workshop services →</span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why SEQ + intro pitch -->
-  <section class="section" style="padding-bottom:32px;">
-    <div class="container" style="max-width:840px; text-align:center;">
-      <div class="page-eyebrow" style="color:var(--rust); margin-bottom:12px;">Why SEQ Campers</div>
-      <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.8rem; font-weight:600; color:var(--ink); letter-spacing:-0.01em; margin-bottom:18px;">
-        Buying a caravan is a big decision.
-      </h2>
-      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75; margin-bottom:18px;">
-        You're looking at spending $50,000 to $200,000+ on something your family will use for the next 20 years.
-        You want to see it, touch it, hear from someone who's actually used it - not just read specs on a page.
-      </p>
-      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75;">
-        That's why we put everything on video. Every model, every feature, setup and pack-down. So by the time you walk into our showroom,
-        you already know what you're looking at - and you can spend your time asking the questions that actually matter to you.
-      </p>
-    </div>
-  </section>
-
-  <!-- 3 steps -->
-  <section class="section" style="padding-top:24px;">
-    <div class="container">
-      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px;">
-        <div class="page-eyebrow" style="color:var(--rust);">How it works</div>
-        <h2 class="section-title">Three steps to your next adventure</h2>
-      </div>
-      <div class="three-steps">
-        <div class="step-card">
-          <div class="step-num">1</div>
-          <h3>Watch</h3>
-          <p>Browse our video library. See every model inside and out. Get a feel for what suits your travel style before you visit.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">2</div>
-          <h3>Visit</h3>
-          <p>Book a walkthrough at our Sunshine Coast showroom. No pressure, no rush. Shane and Maud will match you to the right caravan.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">3</div>
-          <h3>Adventure</h3>
-          <p>Hit the road knowing you've made the right call. And when it's time for a service, we're right here on the Sunshine Coast.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Shane's Pick / Sale of the Week - replaces the YouTube grid per Bart.
        Higher conversion than a 3-card browse grid: single focal point,
@@ -372,6 +386,138 @@ const faqSchema = {
       </div>
     </section>
   )}
+
+  <style>
+    /* Three Pathway Tiles - Kimberley-style side-by-side video boxes.
+       Default state: still YouTube thumbnail. Hover/touch: iframe swaps in
+       and auto-plays muted. Mouse-leave clears the iframe so multiple tiles
+       never play at once. */
+    .pathway-tiles-section {
+      padding-top: 32px;
+      padding-bottom: 32px;
+    }
+    .pathway-tile-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 880px) {
+      .pathway-tile-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+    .pathway-tile {
+      position: relative;
+      display: block;
+      aspect-ratio: 4 / 5;
+      border-radius: 14px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      background: #1a1a1c;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .pathway-tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 38px rgba(42, 22, 8, 0.22);
+    }
+    .pathway-tile-media {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .pathway-tile-poster {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s;
+    }
+    .pathway-tile.is-playing .pathway-tile-poster {
+      opacity: 0;
+    }
+    .pathway-tile-iframe-wrap {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .pathway-tile-iframe-wrap iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 177.78%;
+      height: 100%;
+      min-width: 100%;
+      min-height: 56.25vw;
+      transform: translate(-50%, -50%);
+      border: 0;
+    }
+    .pathway-tile-block {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .pathway-tile-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.78) 100%);
+      pointer-events: none;
+    }
+    .pathway-tile-inner {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: center;
+      padding: 24px 22px 26px;
+      color: #fff;
+      pointer-events: none;
+    }
+    .pathway-tile-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.5);
+    }
+    .pathway-tile-sub {
+      margin-top: 6px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.92);
+      max-width: 280px;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.45);
+    }
+
+    /* Hero video section: full viewport height. Self-hosted MP4 fills the
+       hero in both dimensions via object-fit cover. */
+    :global(.hero-video.hero-video-clean) {
+      padding: 0 !important;
+      min-height: 100vh !important;
+      height: 100vh;
+    }
+    :global(.hero-video-mp4) {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border: 0;
+      pointer-events: none;
+    }
+    @media (max-width: 768px) {
+      :global(.hero-video.hero-video-clean) {
+        min-height: 85vh !important;
+        height: 85vh;
+      }
+    }
+  </style>
 
   <!-- Testimonials - lives below Shane's Pick. Reviews bar above scrolls
        here. Real Google reviews. No external link out - keeps visitors

@@ -6,8 +6,10 @@
 // Currently controls:
 //   - Hero video URL (the YouTube background loop on the home page)
 //   - Shane's Pick reference (the featured used caravan on the home page)
-//   - Sale of the week messaging
-//   - Workshop opening hours
+//
+// Hours and street address are NOT here - they're hardcoded in src/layouts/Site.astro
+// footer + src/pages/contact.astro because they almost never change and we don't
+// want Maud accidentally publishing a typo'd address.
 
 export default {
   name: 'siteSettings',
@@ -69,33 +71,11 @@ export default {
       ],
     },
 
-    {
-      name: 'workshopHours',
-      title: 'Workshop opening hours',
-      type: 'string',
-      description: 'Shown on the /service page and footer. e.g. "Mon-Fri, 8am-4:30pm AEST"',
-      initialValue: 'Mon to Fri, 8am to 4:30pm AEST',
-    },
-
-    {
-      name: 'showroomHours',
-      title: 'Showroom opening hours',
-      type: 'string',
-      description: 'Shown on /about and /contact. e.g. "Mon-Fri 8am-5pm, Sat 8am-12pm"',
-      initialValue: 'Mon to Sat, 8am to 5pm AEST',
-    },
-
-    {
-      name: 'streetAddress',
-      title: 'Street address',
-      type: 'string',
-      description: 'Full street address for the contact page map and footer. e.g. "6 Bonanza Ct, Marcoola QLD 4564"',
-    },
   ],
 
   preview: {
     prepare() {
-      return { title: 'Site Settings', subtitle: 'Hero video, Shane\'s Pick, hours, address' }
+      return { title: 'Site Settings', subtitle: 'Hero video and Shane\'s Pick' }
     },
   },
 }

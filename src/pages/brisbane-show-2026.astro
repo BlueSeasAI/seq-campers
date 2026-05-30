@@ -2,9 +2,22 @@
 import Site from '../layouts/Site.astro'
 
 // Brisbane Caravan, Camping & Touring Supershow 2026
-const showDates = '3 - 5 June 2026'
+const showDates = '3 - 7 June 2026'
+const showDays = 'Wed - Sun, 5 days'
 const venue = 'Brisbane Showgrounds, Bowen Hills'
 const standNumber = '#2693'
+const standArea = 'Main Oval'
+const podiumNumber = '0422 624 920'
+
+// Caravans we're bringing to the show floor (Shane confirmed)
+const showStock = [
+  { name: 'Kimberley Kruiswagen', detail: 'Mercedes 4x4 motorhome' },
+  { name: 'Kimberley Karavan Eco Suite', detail: 'with media release' },
+  { name: 'Kimberley Kruiser T Class', detail: 'luxury off-road tourer' },
+  { name: 'Kimberley Kruiser S Class', detail: 'flagship apartment-grade' },
+  { name: 'Stockman Trekka', detail: 'serious off-road camper trailer' },
+  { name: 'Stockman Rover', detail: 'all-rounder family off-grid' },
+]
 
 // Grand Slam show-offer value stack (Hormozi pattern, merged onto this page
 // per Bart - one URL, no separate /show-offer page).
@@ -22,7 +35,7 @@ const inclusions = [
   { label: 'Show floor handover pack', value: 540, note: 'Levellers, sand pegs, hose, mat. Ready to camp.' },
   { label: 'Locked-in 2026 pricing', value: 5000, note: 'Pre-July factory price rises do not apply to show buyers.' },
 ]
-const totalValue = inclusions.reduce((sum, i) => sum + i.value, 0)
+// Per Shane: show each special individually, no summed total line.
 
 // Quote builder pages now live on our own domain at /quote/{brand}.
 // (Mirrored from Maud's rainbow-babka.netlify.app pages with Netlify Forms
@@ -96,7 +109,7 @@ function qrUrl(targetUrl) {
 const faqs = [
   {
     q: 'Where will SEQ Campers be at the Brisbane Show?',
-    a: `${venue}. Stand number: ${standNumber}. We will post the exact location on this page and our YouTube channel a week before doors open.`,
+    a: `${venue}, Main Oval, stand ${standNumber}. Doors open Wednesday 3 June and we're on the floor through to Sunday 7 June. Free trains for ticket holders straight to the showgrounds.`,
   },
   {
     q: 'Can I scan a QR code on this page to start building my quote before the show?',
@@ -104,7 +117,7 @@ const faqs = [
   },
   {
     q: 'Which caravans are you bringing to the show?',
-    a: 'A curated mix of Kimberley Kampers and Stockman stock - including options set up for serious off-grid touring. Final list confirmed closer to the show.',
+    a: 'Kimberley Kruiswagen (Mercedes 4x4 motorhome), Kimberley Karavan Eco Suite (with media release), Kimberley Kruiser T Class and S Class, plus Stockman Trekka and Stockman Rover. A full lineup across the Kimberley and Stockman ranges.',
   },
   {
     q: 'Can I book a private chat at the show?',
@@ -135,7 +148,7 @@ const eventSchema = {
   '@type': 'Event',
   name: 'SEQ Campers at the Brisbane Caravan, Camping & Touring Supershow 2026',
   startDate: '2026-06-03',
-  endDate: '2026-06-05',
+  endDate: '2026-06-07',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   eventStatus: 'https://schema.org/EventScheduled',
   location: {
@@ -160,7 +173,7 @@ const eventSchema = {
 
 <Site
   title="Brisbane Caravan Show 2026"
-  description="SEQ Campers at the Brisbane Caravan, Camping & Touring Supershow, 3-5 June 2026. Build your spec for Kimberley Kampers and Stockman caravans, scan the QR codes, and lock in show-only pricing."
+  description="SEQ Campers at the Brisbane Caravan, Camping & Touring Supershow, 3-7 June 2026. Stand #2693 in the Main Oval. Build your spec for Kimberley Kampers and Stockman caravans, scan the QR codes, and lock in show-only pricing."
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(eventSchema)} />
@@ -180,18 +193,38 @@ const eventSchema = {
         <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
           <div class="page-eyebrow" style="color:var(--rust);">When</div>
           <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{showDates}</div>
-          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Wed - Fri, doors open 9am</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">{showDays}</div>
         </div>
         <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
           <div class="page-eyebrow" style="color:var(--rust);">Where</div>
           <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{venue}</div>
-          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">600 Gregory Tce, Bowen Hills</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">600 Gregory Tce, Bowen Hills · free trains for ticket holders</div>
         </div>
         <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
-          <div class="page-eyebrow" style="color:var(--rust);">Stand</div>
+          <div class="page-eyebrow" style="color:var(--rust);">Find us</div>
           <div style="font-family:'Inter Tight', sans-serif; font-size:1.6rem; font-weight:800; color:var(--ink); letter-spacing:-0.01em;">{standNumber}</div>
-          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Look for the SEQ Campers banner.</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">{standArea} · look for the SEQ Campers banner</div>
         </div>
+      </div>
+
+      <div style="margin-top:18px; background:#FFF5EC; border:1px solid #F0CDA8; border-left:4px solid var(--rust); border-radius:8px; padding:14px 18px; color:#5A3818; font-size:0.92rem; line-height:1.55;">
+        <strong>Showroom closed Saturday 6 June:</strong> the whole SEQ team is at the show floor. Drop in to the stand to see us, or call <a href={`tel:${podiumNumber.replace(/\s/g, '')}`} style="color:var(--rust); font-weight:600; text-decoration:none;">{podiumNumber}</a> for a text reply during show hours.
+      </div>
+    </div>
+  </section>
+
+  <!-- What we're bringing to the show -->
+  <section class="section" style="padding-top:8px; padding-bottom:24px;">
+    <div class="container" style="max-width:980px;">
+      <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">On the stand</div>
+      <h2 class="section-title" style="margin-bottom:18px;">Caravans we're bringing to Brisbane.</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px;">
+        {showStock.map((c) => (
+          <div style="background:#fff; border:1px solid var(--tan-border); border-radius:8px; padding:14px 16px;">
+            <div style="font-family:'Inter Tight', sans-serif; font-weight:600; color:var(--ink); font-size:1.02rem;">{c.name}</div>
+            <div style="color:var(--muted); font-size:0.85rem; margin-top:2px;">{c.detail}</div>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -202,10 +235,10 @@ const eventSchema = {
   <section class="section" style="padding-top:24px; padding-bottom:24px;">
     <div class="container" style="max-width:980px;">
       <div style="margin-bottom:18px;">
-        <div class="page-eyebrow" style="color:var(--rust);">The show offer</div>
-        <h2 class="section-title" style="margin-top:6px;">${totalValue.toLocaleString('en-AU')} of inclusions. <span style="color:var(--rust);">Free.</span></h2>
+        <div class="page-eyebrow" style="color:var(--rust);">Show inclusions</div>
+        <h2 class="section-title" style="margin-top:6px;">What you get if you buy at the show.</h2>
         <p style="color:var(--muted); margin-top:10px; line-height:1.6;">
-          Lock in a new caravan during the show and we stack the value on top - no discount needed. Offer closes Sunday 7 June at 11pm.
+          Each item below is yours when you order a new caravan during the show. Offer also honoured for one week after the show closes (Sunday 14 June at 11pm) if you can't make it to Brisbane but can get to our Sunshine Coast showroom.
         </p>
       </div>
 
@@ -235,14 +268,6 @@ const eventSchema = {
             <div class="value-stack-price">${item.value.toLocaleString('en-AU')}</div>
           </div>
         ))}
-        <div class="value-stack-row value-stack-total">
-          <div class="value-stack-tick value-stack-tick-total" aria-hidden="true">=</div>
-          <div class="value-stack-body">
-            <div class="value-stack-label">Total value stacked on every show-week purchase</div>
-            <div class="value-stack-note">All inclusions apply to new Kimberley Kampers and Stockman caravans purchased 3 - 7 June 2026.</div>
-          </div>
-          <div class="value-stack-price value-stack-price-total">${totalValue.toLocaleString('en-AU')}</div>
-        </div>
       </div>
 
       <p style="text-align:center; margin-top:14px; font-size:0.86rem; color:var(--muted);">
@@ -307,7 +332,7 @@ const eventSchema = {
         along the joinery, and asking the awkward questions face-to-face. The Brisbane Show is the easiest way to do all of that in one place.
       </p>
       <p style="color:var(--muted); line-height:1.75; margin-bottom:32px;">
-        Shane and the SEQ team will be on the stand for all three days, with a curated lineup of Kimberley Kampers and Stockman stock - including
+        Shane and the SEQ team will be on the stand for all five days, with a curated lineup of Kimberley Kampers and Stockman stock - including
         options set up for serious off-grid touring.
       </p>
 
@@ -318,6 +343,7 @@ const eventSchema = {
         </h3>
         <p style="color:var(--gold); margin-bottom:18px; line-height:1.6;">
           Show floors get busy. Lock in focused time with Shane to walk through a specific caravan and we will confirm a slot during the show.
+          <strong style="display:block; margin-top:8px; color:#FFD699;">Heads-up: we won't be checking email at the show floor - send your slot request before Wednesday morning, or text {podiumNumber} during show hours.</strong>
         </p>
         <a href="/contact" class="btn-primary">Reserve a show slot</a>
       </div>

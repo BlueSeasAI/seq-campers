@@ -88,14 +88,26 @@ export function conditionLabel(value) {
 // Queries
 // ---------------------------------------------------------------------------
 
-export async function getForSaleCaravans() {
+export async function getForSaleCaravans(stockType = null) {
+  // For 'used' we include caravans with stockType undefined too - existing
+  // Sanity records pre-date the field and default to used (the common case).
+  // For 'new' we require explicit stockType=="new".
+  let filter
+  if (stockType === 'used') {
+    filter = `*[_type == "caravan" && status == "for-sale" && (stockType == "used" || !defined(stockType))]`
+  } else if (stockType === 'new') {
+    filter = `*[_type == "caravan" && status == "for-sale" && stockType == "new"]`
+  } else {
+    filter = `*[_type == "caravan" && status == "for-sale"]`
+  }
   const raw = await client.fetch(`
-    *[_type == "caravan" && status == "for-sale"]
+    ${filter}
     | order(featured desc, price asc) {
-      _id, title, slug, price, status, condition, featured,
+      _id, title, slug, price, status, condition, stockType, brollVideoUrl, featured,
       "brand": brand->name,
       "mainImage": photos[0].asset->url,
-      specs { sleeps, length, tareWeight }
+      specs { sleeps, length, tareWeight, year },
+      compliance { stockNumber }
     }
   `)
   // Normalise slug to the same safe form getAllCaravanPaths produces so
@@ -104,6 +116,14 @@ export async function getForSaleCaravans() {
     ...c,
     slug: { current: safeSlug(c.slug?.current) || safeSlug(c.title) },
   }))
+}
+
+export async function getUsedCaravans() {
+  return getForSaleCaravans('used')
+}
+
+export async function getNewCaravans() {
+  return getForSaleCaravans('new')
 }
 
 export async function getCaravan(slug) {
@@ -254,10 +274,21 @@ export function youtubeEmbedUrl(url, opts = {}) {
 export async function getAllVideos() {
   return client.fetch(`
     *[_type == "video"]
-    | order(category asc, order asc, _createdAt desc) {
-      _id, title, youtubeUrl, description, category, featured, order
+    | order(brandFamily asc, category asc, order asc, _createdAt desc) {
+      _id, title, youtubeUrl, description, category, brandFamily, featured, order
     }
   `)
+}
+
+export async function getVideosByBrandFamily() {
+  const all = await getAllVideos()
+  const groups = { kimberley: [], stockman: [], general: [] }
+  all.forEach((v) => {
+    const key = v.brandFamily || 'general'
+    if (!groups[key]) groups[key] = []
+    groups[key].push(v)
+  })
+  return groups
 }
 
 export async function getFeaturedVideos(limit = 3) {
@@ -301,10 +332,7 @@ export async function getSiteSettings() {
           "mainImage": photos[0].asset->url,
           specs { sleeps, length, tareWeight }
         }
-      },
-      workshopHours,
-      showroomHours,
-      streetAddress
+      }
     }
   `)
   if (raw?.shanesPick?.caravan) {

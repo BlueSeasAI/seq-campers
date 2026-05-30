@@ -4,24 +4,44 @@ import Site from '../layouts/Site.astro'
 
 <Site
   title="About SEQ Campers"
-  description="SEQ Campers - Shane and Maud's Sunshine Coast off-road camper business. Three decades on the lot. Authorised Kimberley Kampers and Stockman dealer."
+  description="SEQ Campers - Shane and Maud's Sunshine Coast off-road camper business. The story so far: from Shane walking through the door in 2013 to the new Marcoola showroom in 2025. Authorised Kimberley Kampers and Stockman dealer."
 >
   <div class="page-header">
     <div class="container">
-      <div class="page-eyebrow">About</div>
-      <h1>Off-road experts. Sunshine Coast.</h1>
-      <p>Thirty years selling, servicing, and testing off-road campers.</p>
+      <div class="page-eyebrow">About SEQ Campers</div>
+      <h1>The Sunshine Coast's home for off-road caravans.</h1>
+      <p>Over a decade matching adventurers to the right rig - from first-timers to seasoned grey nomads.</p>
     </div>
   </div>
 
-  <!-- Meet the team -->
+  <!-- Intro narrative -->
   <section class="section">
+    <div class="container" style="max-width:780px;">
+      <div style="color:var(--ink); line-height:1.8; font-size:1.05rem;">
+        <p style="margin-bottom:18px;">
+          Born from a genuine love of the open road and the great Australian outdoors, SEQ Campers has been the Sunshine Coast's go-to destination for off-road caravans and campers for over a decade. Founded by a passionate traveller who knows firsthand what it takes to explore this incredible country, we've built our reputation on honest advice, deep product knowledge and the kind of personalised service that keeps our customers coming back - and sending their mates our way.
+        </p>
+        <p style="margin-bottom:18px;">
+          We're proud authorised specialists in <strong>Kimberley Kampers</strong> and <strong>Stockman</strong> products, and we carry a carefully curated range of new and used off-road caravans and campers to suit every adventure style and budget.
+        </p>
+        <p style="margin-bottom:18px;">
+          Whether you're a first-timer trying to figure out where to start, or a seasoned grey nomad chasing your next upgrade, you'll find a team here that genuinely loves this stuff as much as you do.
+        </p>
+        <p>
+          Come in, have a chat, and let's get you out there - the Sunshine Coast is a great place to start dreaming, and we're here to help make it happen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meet the team -->
+  <section class="section" style="background:var(--sand-deep); padding-top:48px; padding-bottom:48px;">
     <div class="container" style="max-width:980px;">
       <div style="text-align:center; max-width:640px; margin:0 auto 32px;">
         <div class="page-eyebrow" style="color:var(--rust);">Meet the team</div>
         <h2 class="section-title" style="margin-top:6px;">Shane and Maud</h2>
         <p style="color:var(--muted); margin-top:8px;">
-          The husband-and-wife team behind SEQ Campers since 1996.
+          The team behind SEQ Campers since 2019.
         </p>
       </div>
       <div class="team-grid">
@@ -37,9 +57,7 @@ import Site from '../layouts/Site.astro'
             <div class="team-name">Shane</div>
             <div class="team-role">Owner · SEQ Campers since 2013</div>
             <p class="team-bio">
-              Shane has called SEQ Campers home since 2013 and has been the proud owner since 2019.
-              Deep love of the outdoors, hands-on mechanical background. He connects with customers
-              as a fellow adventurer who knows exactly what you need out on the road.
+              Shane has called SEQ Campers home since 2013 and has been the proud owner since 2019. Deep love of the outdoors, hands-on mechanical background. He connects with customers as a fellow adventurer who knows exactly what you need out on the road.
             </p>
           </figcaption>
         </figure>
@@ -55,9 +73,7 @@ import Site from '../layouts/Site.astro'
             <div class="team-name">Maud</div>
             <div class="team-role">Co-owner · Customer Care · Operations</div>
             <p class="team-bio">
-              Maud joined Shane in running the business in 2019, bringing a sharp business mind
-              and a passion for ethical, people-first service. She makes sure every customer feels
-              like part of the SEQ Campers family.
+              Maud joined Shane in running the business in 2019, bringing a sharp business mind and a passion for ethical, people-first service. She makes sure every customer feels like part of the SEQ Campers family.
             </p>
           </figcaption>
         </figure>
@@ -65,66 +81,41 @@ import Site from '../layouts/Site.astro'
     </div>
   </section>
 
-  <!-- Our story + horizontal timeline (consolidated into one section) -->
-  <section class="section" style="background:var(--sand-deep); padding-top:48px; padding-bottom:48px;">
+  <!-- Four chapters timeline -->
+  <section class="section">
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:24px;">
         <div class="page-eyebrow" style="color:var(--rust);">Our path here</div>
-        <h2 class="section-title">Three decades, four chapters</h2>
+        <h2 class="section-title">Four chapters, one passion.</h2>
       </div>
 
-      <!-- Prose intro (narrative + quotes) sits above the timeline cards -->
-      <div style="max-width:720px; margin:0 auto 36px;">
-        <p style="color:var(--ink); line-height:1.75; font-size:1.02rem; margin-bottom:14px;">
-          We started this business in 1996 because we loved getting out into the bush
-          and we got sick of gear that couldn't keep up. Shane had spent years on the
-          tools - building, modifying, fixing - and Maud could talk to anyone, anywhere,
-          about anything. We figured if we put those two things together and only sold
-          rigs we'd actually take camping ourselves, we'd be alright. Three decades on,
-          that's still the rule.
-        </p>
-        <blockquote style="margin:22px 0; padding:0 0 0 22px; border-left:1px solid var(--tan-border); color:var(--ink); font-style:italic; font-size:1.08rem; line-height:1.55;">
-          "If Shane wouldn't take it on a trip, it doesn't go on the floor."
-        </blockquote>
-        <p style="color:var(--ink); line-height:1.75; font-size:1.02rem; margin-bottom:14px;">
-          We've built relationships with the two manufacturers we trust most -
-          <strong>Kimberley Kampers</strong> and <strong>Stockman Products</strong> -
-          and stuck with them because they build the way we want things built. Tough,
-          lightweight where it matters, comfortable where it counts.
-        </p>
-        <blockquote style="margin:22px 0 0; padding:0 0 0 22px; border-left:1px solid var(--tan-border); color:var(--ink); font-style:italic; font-size:1.08rem; line-height:1.55;">
-          "When you buy from us, you get a relationship, not just a receipt."
-        </blockquote>
-      </div>
-
-      <!-- Horizontal timeline cards -->
       <ol class="story-timeline" aria-label="Company history">
         <li class="story-step">
-          <div class="story-year">1996</div>
-          <h3 class="story-title">Doors open on the Sunshine Coast</h3>
-          <p class="story-body">Two demo units, an old service ute, one rule: sell what we'd take camping ourselves.</p>
+          <div class="story-year">2013</div>
+          <h3 class="story-title">Shane walks through the door</h3>
+          <p class="story-body">Started as a staff member with a love of the outdoors and an eye for a good rig. Turns out, it was the beginning of something bigger than just a job.</p>
         </li>
         <li class="story-step">
-          <div class="story-year">2000s</div>
-          <h3 class="story-title">Kimberley Kampers partnership</h3>
-          <p class="story-body">Shared values, quality you could feel in the chassis. The backbone of what we stock.</p>
+          <div class="story-year">2019</div>
+          <h3 class="story-title">Shane &amp; Maud take the wheel</h3>
+          <p class="story-body">Shane purchased SEQ Campers and alongside Maud, wasted no time making it their own - moving to a new location, building out the team and launching the SEQ Campers YouTube channel all in the same year. Same great business, fresh energy, and a whole new chapter underway.</p>
         </li>
         <li class="story-step">
-          <div class="story-year">2010s</div>
-          <h3 class="story-title">Stockman joins the lineup</h3>
-          <p class="story-body">Tough, lightweight, purpose-built. The right fit for families going further.</p>
+          <div class="story-year">2020-2021</div>
+          <h3 class="story-title">COVID couldn't stop us</h3>
+          <p class="story-body">When the showroom doors had to close, the cameras stayed rolling. What started as a way to keep connected with customers turned into a real community - and the YouTube channel now boasts 2,000+ subscribers and counting.</p>
         </li>
         <li class="story-step">
-          <div class="story-year">2026</div>
-          <h3 class="story-title">Thirty years, still going</h3>
-          <p class="story-body">2,000+ YouTube subscribers, workshop running flat out, same plan as 1996.</p>
+          <div class="story-year">2025</div>
+          <h3 class="story-title">New home, new website, still going strong</h3>
+          <p class="story-body">We packed up and moved to our best location yet - Marcoola, just minutes from the Sunshine Coast Airport and a stone's throw from one of the coast's most beautiful beach towns. We've also just launched this brand spanking new website to match. Easy to find whether you're local or travelling from further afield - and yes, the site looks just as good as the rigs. Come see us.</p>
         </li>
       </ol>
     </div>
   </section>
 
   <!-- Why buy from us - three differentiators -->
-  <section class="section">
+  <section class="section" style="background:var(--sand-deep);">
     <div class="container" style="max-width:980px;">
       <div class="page-eyebrow" style="color:var(--rust);">Why buy from us</div>
       <h2 class="section-title" style="margin-top:6px; margin-bottom:28px;">What you get from us</h2>
@@ -141,6 +132,19 @@ import Site from '../layouts/Site.astro'
           <h3>No rush to close</h3>
           <p>We're not in a hurry to close a sale. We're in a hurry to make sure you walk out with the right van.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-dark" style="margin-top:0;">
+    <div class="container" style="text-align:center; max-width:680px; margin:0 auto;">
+      <h2 style="color:var(--sand); font-size:1.6rem; margin-bottom:12px;">Come and see us in Marcoola.</h2>
+      <p style="color:var(--gold); margin-bottom:24px;">
+        Showroom appointments preferred, after-hours always welcome.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="/contact" class="btn-primary">Book a visit</a>
+        <a href="/stock" class="btn-ghost">Browse used stock</a>
       </div>
     </div>
   </section>

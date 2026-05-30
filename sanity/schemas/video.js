@@ -42,10 +42,27 @@ export default {
     },
 
     {
-      name: 'category',
-      title: 'Category',
+      name: 'brandFamily',
+      title: 'Brand family',
       type: 'string',
-      description: 'Where this video lives on the /videos page.',
+      description: 'Which brand tree this video belongs to on the /videos (Watch) page. Pick one.',
+      options: {
+        list: [
+          { title: 'Kimberley Kampers', value: 'kimberley' },
+          { title: 'Stockman', value: 'stockman' },
+          { title: 'General / both / other', value: 'general' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'general',
+      validation: (Rule) => Rule.required(),
+    },
+
+    {
+      name: 'category',
+      title: 'Category (sub-section)',
+      type: 'string',
+      description: 'Sub-section within the brand family.',
       options: {
         list: [
           { title: 'Getting Started - intros and overviews', value: 'getting-started' },

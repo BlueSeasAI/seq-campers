@@ -1,7 +1,9 @@
 ---
 /**
- * Reusable video card. Shows the YouTube thumbnail with a play overlay,
- * title, optional category badge, and description.
+ * Reusable video card. Default state: YouTube thumbnail with play overlay.
+ * Click: swaps in an iframe with sound on (user click satisfies the browser
+ * gesture requirement for unmuted autoplay). Plays INSIDE the page - per
+ * Shane, we don't want users bouncing off to YouTube.
  *
  * Props:
  *   video - { title, youtubeUrl, description, category }
@@ -13,7 +15,6 @@ import { youtubeId, youtubeThumb } from '../lib/sanity.js'
 const { video: v, showCategory = true, size = 'default' } = Astro.props
 const thumb = youtubeThumb(v.youtubeUrl)
 const id = youtubeId(v.youtubeUrl)
-const watchUrl = id ? `https://www.youtube.com/watch?v=${id}` : (v.youtubeUrl || '#')
 
 const categoryLabel = {
   'getting-started': 'Getting Started',
@@ -23,8 +24,8 @@ const categoryLabel = {
 }[v.category] || v.category
 ---
 
-<a href={watchUrl} target="_blank" rel="noopener" class={`video-card video-card-${size}`} aria-label={`Watch on YouTube: ${v.title}`}>
-  <div class="video-thumb">
+<article class={`video-card video-card-${size}`} data-video-id={id}>
+  <button type="button" class="video-thumb" aria-label={`Play: ${v.title}`}>
     {thumb ? (
       <img src={thumb} alt={v.title} loading="lazy" />
     ) : (
@@ -37,10 +38,72 @@ const categoryLabel = {
         <path d="M8 5v14l11-7z"/>
       </svg>
     </div>
-  </div>
+    <div class="video-iframe-wrap" aria-hidden="true"></div>
+  </button>
   <div class="video-meta">
     {showCategory && categoryLabel && <span class="video-category">{categoryLabel}</span>}
     <h3 class="video-title">{v.title}</h3>
     {size !== 'small' && v.description && <p class="video-desc">{v.description}</p>}
   </div>
-</a>
+</article>
+
+<style>
+  .video-card .video-thumb {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #1a1a1c;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+  }
+  .video-card .video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.25s;
+  }
+  .video-card.is-playing .video-play-overlay,
+  .video-card.is-playing .video-thumb img {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .video-iframe-wrap {
+    position: absolute;
+    inset: 0;
+  }
+  .video-iframe-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>
+
+<script is:inline define:vars={{ videoId: id }}>
+  (function () {
+    const card = document.currentScript?.previousElementSibling
+    // The script tag sits AFTER the <style> AFTER the <article>. Find the article.
+    const articles = document.querySelectorAll('article.video-card[data-video-id="' + videoId + '"]')
+    articles.forEach(function (article) {
+      const btn = article.querySelector('.video-thumb')
+      const wrap = article.querySelector('.video-iframe-wrap')
+      if (!btn || !wrap || article.dataset.bound) return
+      article.dataset.bound = '1'
+      btn.addEventListener('click', function () {
+        if (article.classList.contains('is-playing')) return
+        const iframe = document.createElement('iframe')
+        iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId +
+          '?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3'
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture')
+        iframe.setAttribute('allowfullscreen', '')
+        wrap.appendChild(iframe)
+        article.classList.add('is-playing')
+      })
+    })
+  })()
+</script>

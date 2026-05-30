@@ -98,6 +98,29 @@ export default {
     },
 
     {
+      name: 'stockType',
+      title: 'New or Used',
+      type: 'string',
+      description: 'Which page this caravan appears on. NEW caravans show on /new (with configurator entry). USED caravans show on /stock (with B-roll video tiles).',
+      options: {
+        list: [
+          { title: 'NEW - factory build', value: 'new' },
+          { title: 'USED - second-hand / consignment', value: 'used' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'used',
+      validation: (Rule) => Rule.required(),
+    },
+
+    {
+      name: 'brollVideoUrl',
+      title: 'B-roll YouTube video (for USED caravans)',
+      type: 'url',
+      description: 'Walk-around video tile shown on the /stock listings page. Paste the full YouTube URL. Auto-plays muted with no controls - the tile clicks through to the spec page.',
+    },
+
+    {
       name: 'condition',
       title: 'Condition rating',
       type: 'string',

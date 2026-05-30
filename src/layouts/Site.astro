@@ -66,6 +66,41 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
   />
 
   <slot name="head" />
+  <style>
+    .inline-form-thanks {
+      background: linear-gradient(135deg, #E8F5EC 0%, #C8E6D0 100%);
+      border: 1px solid #6BB893;
+      border-left: 5px solid #2BA85F;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 18px 0;
+      color: #1A4D2E;
+      font-size: 1.02rem;
+      line-height: 1.6;
+    }
+    .inline-form-thanks strong {
+      display: block;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.15rem;
+      color: #133D24;
+      margin-bottom: 4px;
+    }
+    .inline-form-thanks a {
+      color: #C0341A;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .inline-form-error {
+      background: #FDECEA;
+      border: 1px solid #E5A6A1;
+      border-left: 4px solid #C0341A;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      color: #6F1A0E;
+      font-size: 0.92rem;
+    }
+  </style>
 </head>
 <body data-home={isHome ? 'true' : 'false'}>
   <header class={`site-header ${isHome ? 'site-header-overlay' : ''}`}>
@@ -87,17 +122,75 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       </button>
 
       <nav id="primary-nav">
+        <a href="/new" class={isActive('/new') ? 'is-active' : ''}>New</a>
         <a href="/stock" class={isActive('/stock') ? 'is-active' : ''}>Stock</a>
         <a href="/videos" class={isActive('/videos') ? 'is-active' : ''}>Videos</a>
         <a href="/service" class={isActive('/service') ? 'is-active' : ''}>Service</a>
         <a href="/brisbane-show-2026" class={isActive('/brisbane-show-2026') ? 'is-active' : ''}>Brisbane Show</a>
-        <a href="/about" class={isActive('/about') ? 'is-active' : ''}>About</a>
         <a href="/brisbane-show-2026" class="nav-cta">Reserve a show slot</a>
       </nav>
     </div>
   </header>
 
   <script is:inline>
+    /* Inline form submission for every Netlify form on the site. Stops the
+       browser navigating away to the ugly default thanks page. POSTs via
+       fetch + shows an in-place success message.
+       MUST wait for DOM ready because the forms live AFTER this script in
+       the document (this script is in <header>, forms render in <main>). */
+    function bindNetlifyAjaxForms() {
+      const forms = document.querySelectorAll('form[data-netlify="true"]')
+      forms.forEach(function (form) {
+        if (form.dataset.ajaxBound) return
+        form.dataset.ajaxBound = '1'
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault()
+          const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]')
+          if (submitBtn) {
+            submitBtn.disabled = true
+            submitBtn.dataset.originalText = submitBtn.textContent
+            submitBtn.textContent = 'Sending...'
+          }
+          try {
+            const data = new FormData(form)
+            const body = new URLSearchParams()
+            for (const [k, v] of data.entries()) body.append(k, String(v))
+            const res = await fetch('/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: body.toString(),
+            })
+            if (!res.ok && res.status !== 0) throw new Error('Submit failed ' + res.status)
+            const thanks = document.createElement('div')
+            thanks.className = 'inline-form-thanks'
+            thanks.setAttribute('role', 'status')
+            thanks.innerHTML = '<strong>Thanks! Your message is on its way.</strong><br>We\'ll come back to you shortly. If urgent, call <a href="tel:0753707933">(07) 5370 7933</a> or text <a href="sms:0422624920">0422 624 920</a>.'
+            form.parentNode.insertBefore(thanks, form)
+            form.style.display = 'none'
+            thanks.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          } catch (err) {
+            console.error('Form submission error:', err)
+            if (submitBtn) {
+              submitBtn.disabled = false
+              submitBtn.textContent = submitBtn.dataset.originalText || 'Send'
+            }
+            const errBox = form.querySelector('.inline-form-error') || (function () {
+              const el = document.createElement('div')
+              el.className = 'inline-form-error'
+              form.insertBefore(el, form.firstChild)
+              return el
+            })()
+            errBox.textContent = 'Something went wrong - please try again, or call (07) 5370 7933.'
+          }
+        })
+      })
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bindNetlifyAjaxForms)
+    } else {
+      bindNetlifyAjaxForms()
+    }
+
     (function () {
       const btn = document.querySelector('.nav-toggle')
       const nav = document.getElementById('primary-nav')
@@ -151,13 +244,12 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         <div class="footer-col">
           <h4>Showroom hours</h4>
           <div class="footer-hours-compact">
-            <strong>Mon - Wed</strong> 7:30am - 3pm<br />
-            <strong>Thu - Fri</strong> 8:30am - 3pm<br />
+            <strong>Mon - Fri</strong> 8:30am - 3pm<br />
             <strong>Saturday</strong> 8:30am - 12:30pm<br />
             <strong>Sunday</strong> Closed
           </div>
           <p style="margin-top:12px; font-size:0.78rem; color:rgba(244,237,224,0.5);">
-            Visits by appointment recommended.
+            Showroom appointments preferred - after-hours always welcome.
           </p>
         </div>
 
