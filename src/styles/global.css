@@ -147,38 +147,40 @@ a { color: inherit; }
   line-height: 0;
 }
 
-/* Logo at the SAME prominent size across every page. Per Bart: match the
-   home page size on inner pages too. The header itself gets taller as a
-   result - that's intentional. */
+/* Logo at the SAME 220px size on every page (per Bart - match the home
+   hero exactly). Inner page headers get visibly taller (~248px) as a
+   result. The home page already has the same 220px on its overlay header,
+   so home + inner pages now look identical at the logo. */
 .logo img {
   display: block;
-  height: 140px;
+  height: 220px;
   width: auto;
   max-width: 100%;
   transition: height 0.2s;
 }
 
-/* On the home page hero (transparent header), the logo is even larger -
-   skyerv.com pattern. Larger negative top margin lifts it so the TOP edge
-   of the logo sits well above the menu items, with the menu items aligned
-   to roughly the vertical middle of the logo. */
+/* Home hero overlay - same 220px logo, lifted with negative top margin
+   so the menu items align with the logo's vertical middle. */
 .site-header-overlay .logo img {
   height: 220px;
   margin-top: -78px;
 }
+/* When the user scrolls past the hero, the header turns solid AND the
+   logo shrinks to a reasonable 140px so the sticky header does not
+   dominate the viewport on lower sections. */
 .site-header-overlay.is-scrolled .logo img {
   height: 140px;
   margin-top: 0;
 }
 
 @media (max-width: 860px) {
-  .logo img { height: 96px; }
+  .logo img { height: 150px; }
   .site-header-overlay .logo img { height: 150px; margin-top: -52px; }
   .site-header-overlay.is-scrolled .logo img { height: 96px; margin-top: 0; }
 }
 
 @media (max-width: 520px) {
-  .logo img { height: 72px; }
+  .logo img { height: 110px; }
   .site-header-overlay .logo img { height: 110px; margin-top: -36px; }
   .site-header-overlay.is-scrolled .logo img { height: 72px; margin-top: 0; }
 }
