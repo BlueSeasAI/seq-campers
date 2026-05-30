@@ -208,11 +208,13 @@ const faqSchema = {
         allow="autoplay; encrypted-media"
         allowfullscreen="false"
         tabindex="-1"
+        inert
       ></iframe>
       <!-- Bulletproof click-blocker: covers the whole iframe at high z-index,
            swallows ALL pointer events + touch + selection so YouTube can
            never show its hover/tap controls overlay. Video keeps playing
-           underneath because the iframe receives no user input at all. -->
+           underneath because the iframe is also `inert` so it receives no
+           focus / pointer / keyboard input at all. -->
       <div class="hero-video-block" aria-hidden="true"></div>
     </div>
   </section>
