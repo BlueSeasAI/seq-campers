@@ -67,28 +67,79 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
 
   <slot name="head" />
   <style>
+    /* Form thanks panel - HIGH CONTRAST against cream page background so
+       users can't miss it. Solid green confirmation block, big tick icon,
+       prominent CTA fallbacks. */
     .inline-form-thanks {
-      background: linear-gradient(135deg, #E8F5EC 0%, #C8E6D0 100%);
-      border: 1px solid #6BB893;
-      border-left: 5px solid #2BA85F;
-      border-radius: 10px;
-      padding: 20px 24px;
-      margin: 18px 0;
-      color: #1A4D2E;
-      font-size: 1.02rem;
-      line-height: 1.6;
+      background: linear-gradient(135deg, #2BA85F 0%, #1F8049 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin: 28px 0;
+      box-shadow: 0 10px 30px rgba(43, 168, 95, 0.30);
+      text-align: center;
+      animation: thanks-pop-in 0.4s ease-out;
     }
-    .inline-form-thanks strong {
-      display: block;
+    @keyframes thanks-pop-in {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .inline-form-thanks-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      margin: 0 auto 14px;
+    }
+    .inline-form-thanks-title {
       font-family: 'Inter Tight', sans-serif;
-      font-size: 1.15rem;
-      color: #133D24;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 8px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .inline-form-thanks-body {
+      color: rgba(255, 255, 255, 0.94);
+      font-size: 1.02rem;
+      line-height: 1.55;
+      max-width: 520px;
+      margin: 0 auto 18px;
+    }
+    .inline-form-thanks-cta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .inline-form-thanks-label {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.92rem;
+      width: 100%;
       margin-bottom: 4px;
     }
-    .inline-form-thanks a {
-      color: #C0341A;
-      font-weight: 600;
+    .inline-form-thanks-cta a {
+      display: inline-block;
+      padding: 10px 18px;
+      background: #fff;
+      color: #1F8049;
+      font-weight: 700;
+      font-family: 'Inter Tight', sans-serif;
+      border-radius: 999px;
       text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .inline-form-thanks-cta a:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
     }
     .inline-form-error {
       background: #FDECEA;
@@ -173,9 +224,26 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
             const thanks = document.createElement('div')
             thanks.className = 'inline-form-thanks'
             thanks.setAttribute('role', 'status')
-            thanks.innerHTML = '<strong>Thanks! Your message is on its way.</strong><br>We\'ll come back to you shortly. If urgent, call <a href="tel:0753707933">(07) 5370 7933</a> or text <a href="sms:0422624920">0422 624 920</a>.'
-            form.parentNode.insertBefore(thanks, form)
-            form.style.display = 'none'
+            thanks.innerHTML =
+              '<div class="inline-form-thanks-icon" aria-hidden="true">' +
+              '<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
+              '</div>' +
+              '<h2 class="inline-form-thanks-title">Thanks! Your message is on its way.</h2>' +
+              '<p class="inline-form-thanks-body">We\'ll come back to you shortly with the next step. Most enquiries get a reply same day.</p>' +
+              '<div class="inline-form-thanks-cta">' +
+              '<span class="inline-form-thanks-label">Need us sooner?</span>' +
+              '<a href="tel:0753707933">Call (07) 5370 7933</a>' +
+              '<a href="sms:0422624920">Text 0422 624 920</a>' +
+              '</div>'
+            /* Replace the WHOLE enquiry section so the "Let\'s make sure
+               this van is right for you" heading + subheading + form all
+               disappear together. Walk up to the nearest enquiry wrapper,
+               fall back to the form\'s direct parent. */
+            const container = form.closest('.listing-enquiry-inner, .enquiry-form-wrap') || form.parentNode
+            Array.from(container.children).forEach(function (child) {
+              child.style.display = 'none'
+            })
+            container.appendChild(thanks)
             thanks.scrollIntoView({ behavior: 'smooth', block: 'center' })
           } catch (err) {
             console.error('Form submission error:', err)
