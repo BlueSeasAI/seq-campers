@@ -212,13 +212,16 @@ const firstVariantId = brand.variants[0]?.id
 
         <div class="qb-actions">
           <button type="submit" class="btn-primary qb-submit">Send my quote request</button>
-          <button type="button" class="btn-ghost qb-share" data-qb-share>
-            <span aria-hidden="true">↗</span> Share quote
+          <button type="button" class="qb-share" data-qb-share-email>
+            <span aria-hidden="true">✉</span> Share by email
+          </button>
+          <button type="button" class="qb-share" data-qb-share>
+            <span aria-hidden="true">↗</span> Copy share link
           </button>
         </div>
 
         <p class="qb-share-help" data-share-help hidden>
-          Share link copied to your clipboard. Paste it in a text or email to send this exact spec to your partner or family.
+          Share link copied to your clipboard. Paste it in a text, message or email to send this exact spec to your partner or family.
         </p>
       </form>
     </div>
@@ -331,26 +334,40 @@ const firstVariantId = brand.variants[0]?.id
         })
       })
 
-      // Share button: Web Share API on mobile, clipboard URL fallback elsewhere
-      $('[data-qb-share]').addEventListener('click', async () => {
-        // Build a URL with the current state encoded
+      // Build share URL + text from current state. Used by both buttons.
+      function buildShare() {
         const params = new URLSearchParams()
         params.set('v', currentVariant)
         if (selected.size) params.set('o', Array.from(selected).join(','))
         const shareUrl = pageUrl + (params.toString() ? '?' + params.toString() : '')
         const v = variantData[currentVariant]
         const total = $('[data-summary-total]').textContent
-        const shareText = `Here's the ${v.name} spec I'm thinking about from SEQ Campers - indicative total ${total}. Take a look: ${shareUrl}`
+        const lines = []
+        lines.push(`Have a look at this ${v.name} spec I am thinking about from SEQ Campers.`)
+        lines.push('')
+        lines.push(`Indicative total: ${total}`)
+        if (selected.size) {
+          lines.push('')
+          lines.push('Options I have ticked:')
+          $$('.qb-opt').forEach((el) => {
+            if (selected.has(el.dataset.optId)) {
+              lines.push('- ' + el.querySelector('.qb-opt-label').textContent.trim())
+            }
+          })
+        }
+        lines.push('')
+        lines.push(`Open the live spec (you can tweak it): ${shareUrl}`)
+        return { shareUrl, shareText: lines.join('\n'), brandName: brandData.name, variantName: v.name }
+      }
 
+      // Copy-link button: Web Share API on mobile, clipboard fallback elsewhere
+      $('[data-qb-share]').addEventListener('click', async () => {
+        const { shareUrl, shareText, brandName } = buildShare()
         if (navigator.share) {
           try {
-            await navigator.share({
-              title: `${brandData.name} spec - SEQ Campers`,
-              text: shareText,
-              url: shareUrl,
-            })
+            await navigator.share({ title: `${brandName} spec - SEQ Campers`, text: shareText, url: shareUrl })
             return
-          } catch (err) { /* user cancelled, fall through to clipboard */ }
+          } catch (err) { /* user cancelled, fall through */ }
         }
         try {
           await navigator.clipboard.writeText(shareText)
@@ -358,8 +375,16 @@ const firstVariantId = brand.variants[0]?.id
           setTimeout(() => { $('[data-share-help]').hidden = true }, 6000)
         } catch (err) {
           // Final fallback: open mailto
-          window.location.href = 'mailto:?subject=' + encodeURIComponent(`${brandData.name} spec - SEQ Campers`) + '&body=' + encodeURIComponent(shareText)
+          window.location.href = 'mailto:?subject=' + encodeURIComponent(`${brandName} spec - SEQ Campers`) + '&body=' + encodeURIComponent(shareText)
         }
+      })
+
+      // Share-by-email button: always opens the user's mail client with subject + body prefilled.
+      $('[data-qb-share-email]').addEventListener('click', () => {
+        const { shareText, brandName, variantName } = buildShare()
+        const subject = `${variantName} spec - SEQ Campers`
+        const mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(shareText)
+        window.location.href = mailto
       })
 
       // On load: parse URL params + apply

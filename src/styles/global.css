@@ -118,16 +118,17 @@ a { color: inherit; }
   display: flex;
   justify-content: space-between;
   /* Logo + nav items both ANCHORED TO THE TOP so the inner-page menu
-     items sit at the same Y position as the home overlay menu items.
-     Inner pages used to use align-items:center which pushed menu items
-     way down the (now-much-taller) 220px-logo header. */
+     items sit at the same Y position as the home overlay menu items. */
   align-items: flex-start;
-  padding: 8px 38px;
-  max-width: none;
+  /* Inner pages: stay inside the standard container width so the logo
+     sits FLUSH with the content below it (not detached on the screen
+     edge). Previously max-width:none which pushed the logo way out. */
+  padding: 8px 24px;
 }
 
-/* Home hero overlay - same padding + anchoring as inner pages so the
-   logo + menu sit at identical Y positions across the whole site. */
+/* Home hero overlay - extends edge-to-edge over the full-screen video
+   (skyerv.com style). Logo + nav hug the screen corners because the
+   video fills the viewport below, no centred content to align with. */
 .site-header-overlay .container {
   max-width: none;
   padding: 8px 38px;
@@ -139,9 +140,15 @@ a { color: inherit; }
   align-items: center;
 }
 
-/* Nudge the nav items down a touch (matches home: menu items sit ~10px
-   below the very top edge, in line with the visual centre of the small
-   nav-cta button). */
+/* Inner-page logo also lifts up like the home hero so its visual
+   position matches across the whole site. Lifting puts the logo's top
+   above the header sand background, which is fine because the page
+   header below is also sand (no visible seam). */
+.site-header:not(.site-header-overlay) .logo img {
+  margin-top: -78px;
+}
+
+/* Nudge the nav items down a touch (matches home overlay). */
 .site-header nav {
   padding-top: 10px;
 }
@@ -149,9 +156,15 @@ a { color: inherit; }
   padding-top: 0;
 }
 
+@media (max-width: 860px) {
+  .site-header:not(.site-header-overlay) .logo img { margin-top: -52px; }
+}
 @media (max-width: 720px) {
   .site-header .container { padding: 6px 18px; }
   .site-header-overlay .container { padding: 6px 18px; }
+}
+@media (max-width: 520px) {
+  .site-header:not(.site-header-overlay) .logo img { margin-top: -36px; }
 }
 
 .logo {

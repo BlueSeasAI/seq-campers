@@ -437,12 +437,15 @@ const productSchema = {
 
           <div class="qb-actions" style="margin-top:18px;">
             <button type="submit" class="qb-submit">Send enquiry</button>
+            <button type="button" class="qb-share" data-listing-share-email>
+              <span aria-hidden="true">✉</span> Share by email
+            </button>
             <button type="button" class="qb-share" data-listing-share>
-              <span aria-hidden="true">↗</span> Share with partner
+              <span aria-hidden="true">↗</span> Copy share link
             </button>
           </div>
           <p class="qb-share-help" data-listing-share-help hidden>
-            Link copied. Paste it in a text or email to share this caravan with your partner or family.
+            Link copied. Paste it in a text, message or email to share this caravan with your partner or family.
           </p>
         </form>
       </div>
@@ -450,13 +453,14 @@ const productSchema = {
 
     <script is:inline>
       (function () {
-        const btn = document.querySelector('[data-listing-share]')
+        const linkBtn = document.querySelector('[data-listing-share]')
+        const emailBtn = document.querySelector('[data-listing-share-email]')
         const help = document.querySelector('[data-listing-share-help]')
-        if (!btn) return
-        btn.addEventListener('click', async () => {
-          const url = window.location.href.split('#')[0]
-          const title = document.title
-          const text = `Have a look at this caravan I'm thinking about from SEQ Campers: ${title} - ${url}`
+        const url = window.location.href.split('#')[0]
+        const title = document.title
+        const text = `Have a look at this caravan I am thinking about from SEQ Campers.\n\n${title}\n\nOpen the listing: ${url}`
+
+        if (linkBtn) linkBtn.addEventListener('click', async () => {
           if (navigator.share) {
             try { await navigator.share({ title, text, url }); return } catch (e) { /* fallback */ }
           }
@@ -467,6 +471,10 @@ const productSchema = {
           } catch (e) {
             window.location.href = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text)
           }
+        })
+
+        if (emailBtn) emailBtn.addEventListener('click', () => {
+          window.location.href = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text)
         })
       })()
     </script>
