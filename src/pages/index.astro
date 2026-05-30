@@ -3,7 +3,6 @@ import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
-import MountainIcon from '../components/MountainIcon.astro'
 import { getFeaturedCaravans, getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
 
 let featured = []
@@ -238,8 +237,7 @@ const faqSchema = {
             <div class="pathway-tile-overlay" aria-hidden="true"></div>
           </div>
           <div class="pathway-tile-inner">
-            <MountainIcon color="#F5B544" accent="#D89425" size={56} />
-            <div class="pathway-tile-label"><span class="pathway-tile-num">1.</span> Watch</div>
+            <div class="pathway-tile-label">1. Watch</div>
             <div class="pathway-tile-sub">Our video library - every model, Kimberley and Stockman.</div>
           </div>
         </a>
@@ -252,8 +250,7 @@ const faqSchema = {
             <div class="pathway-tile-overlay" aria-hidden="true"></div>
           </div>
           <div class="pathway-tile-inner">
-            <MountainIcon color="#E97B3C" accent="#C0341A" size={56} />
-            <div class="pathway-tile-label"><span class="pathway-tile-num">2.</span> Visit</div>
+            <div class="pathway-tile-label">2. Visit</div>
             <div class="pathway-tile-sub">Pre-loved and new display vans available now.</div>
           </div>
         </a>
@@ -266,8 +263,7 @@ const faqSchema = {
             <div class="pathway-tile-overlay" aria-hidden="true"></div>
           </div>
           <div class="pathway-tile-inner">
-            <MountainIcon color="#4cea89" accent="#2BA85F" size={56} />
-            <div class="pathway-tile-label"><span class="pathway-tile-num">3.</span> Adventure</div>
+            <div class="pathway-tile-label">3. Adventure</div>
             <div class="pathway-tile-sub">From our driveway to your driveway. Camping support.</div>
           </div>
         </a>
@@ -481,22 +477,13 @@ const faqSchema = {
       color: #fff;
       pointer-events: none;
     }
-    .pathway-tile-inner > svg {
-      margin-bottom: 10px;
-      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
-    }
     .pathway-tile-label {
       font-family: 'Inter Tight', sans-serif;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       font-weight: 800;
       letter-spacing: -0.01em;
       line-height: 1.1;
       text-shadow: 0 2px 16px rgba(0,0,0,0.5);
-    }
-    .pathway-tile-num {
-      font-weight: 600;
-      opacity: 0.7;
-      margin-right: 4px;
     }
     .pathway-tile-sub {
       margin-top: 6px;

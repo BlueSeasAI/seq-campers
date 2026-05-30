@@ -66,7 +66,7 @@ const description = `Browse ${caravans.length} hand-picked used off-road caravan
   <TrustStrip />
 
   <div class="container" style="padding-top:24px; padding-bottom:48px;">
-    {caravans.length === 0 ? (
+    {tiles.length === 0 ? (
       <div class="empty-state">
         <div class="empty-title">Used stock listings loading</div>
         <p>We're rebuilding the used stock library right now. Check back shortly, or call (07) 5370 7933 to ask what's about to land.</p>
@@ -89,8 +89,14 @@ const description = `Browse ${caravans.length} hand-picked used off-road caravan
           </form>
         )}
 
+        {placeholdersNeeded > 0 && (
+          <div style="background:#FFF5EC; border:1px solid #F0CDA8; border-left:4px solid var(--rust); border-radius:8px; padding:12px 16px; margin: 0 0 18px; color:#5A3818; font-size:0.88rem; line-height:1.5;">
+            <strong>Heads up:</strong> {placeholdersNeeded} of these {tiles.length} tiles are placeholder videos until Maud fills in the walk-around video URL for each used caravan in Sanity.
+          </div>
+        )}
+
         <div class="broll-grid" id="stock-grid">
-          {caravans.map((c) => <BrollCard caravan={c} />)}
+          {tiles.map((c) => <BrollCard caravan={c} />)}
         </div>
 
         <div class="filter-empty" id="filter-empty-state" style="display:none;">

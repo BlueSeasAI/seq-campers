@@ -89,9 +89,17 @@ export function conditionLabel(value) {
 // ---------------------------------------------------------------------------
 
 export async function getForSaleCaravans(stockType = null) {
-  const filter = stockType
-    ? `*[_type == "caravan" && status == "for-sale" && stockType == "${stockType}"]`
-    : `*[_type == "caravan" && status == "for-sale"]`
+  // For 'used' we include caravans with stockType undefined too - existing
+  // Sanity records pre-date the field and default to used (the common case).
+  // For 'new' we require explicit stockType=="new".
+  let filter
+  if (stockType === 'used') {
+    filter = `*[_type == "caravan" && status == "for-sale" && (stockType == "used" || !defined(stockType))]`
+  } else if (stockType === 'new') {
+    filter = `*[_type == "caravan" && status == "for-sale" && stockType == "new"]`
+  } else {
+    filter = `*[_type == "caravan" && status == "for-sale"]`
+  }
   const raw = await client.fetch(`
     ${filter}
     | order(featured desc, price asc) {
