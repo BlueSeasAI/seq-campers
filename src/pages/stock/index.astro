@@ -11,7 +11,46 @@ try {
   console.warn('Sanity unreachable for /stock:', err.message)
 }
 
-const brands = [...new Set(caravans.map((c) => c.brand).filter(Boolean))].sort()
+// Per Shane: every used van is a B-roll video tile. We're waiting on the
+// real B-roll URLs - in the meantime top up to 15 tiles using SEQ's
+// existing channel videos as placeholders so the page shows what it WILL
+// look like once Maud fills in brollVideoUrl for each van.
+const PLACEHOLDER_VIDEOS = [
+  'tozC7prVbOg', 'xYf81xUZtNE', 'WwgapQt3xO4',
+]
+const PLACEHOLDER_BRANDS = [
+  { brand: 'Kimberley Kampers', model: 'Karavan' },
+  { brand: 'Kimberley Kampers', model: 'Kube' },
+  { brand: 'Kimberley Kampers', model: 'Kruiser T' },
+  { brand: 'Kimberley Kampers', model: 'Kruiser S' },
+  { brand: 'Stockman', model: 'Trekka' },
+  { brand: 'Stockman', model: 'Rover' },
+  { brand: 'Stockman', model: 'Pod Trailer' },
+]
+function makePlaceholder(i) {
+  const vidId = PLACEHOLDER_VIDEOS[i % PLACEHOLDER_VIDEOS.length]
+  const b = PLACEHOLDER_BRANDS[i % PLACEHOLDER_BRANDS.length]
+  const year = 2018 + (i % 8)
+  const stockNo = String(6000 + i * 11).padStart(4, '0')
+  return {
+    _id: `placeholder-${i}`,
+    title: `${b.brand} ${b.model} ${year}`,
+    slug: { current: 'placeholder' },
+    brand: b.brand,
+    brollVideoUrl: `https://www.youtube.com/watch?v=${vidId}`,
+    specs: { year },
+    compliance: { stockNumber: stockNo },
+    _isPlaceholder: true,
+  }
+}
+const TARGET_TILES = 15
+const placeholdersNeeded = Math.max(0, TARGET_TILES - caravans.length)
+const tiles = [
+  ...caravans,
+  ...Array.from({ length: placeholdersNeeded }, (_, i) => makePlaceholder(i)),
+]
+
+const brands = [...new Set(tiles.map((c) => c.brand).filter(Boolean))].sort()
 const description = `Browse ${caravans.length} hand-picked used off-road caravan${caravans.length === 1 ? '' : 's'} for sale at SEQ Campers in Queensland. Walk-around video for every van.`
 ---
 

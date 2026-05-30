@@ -266,10 +266,21 @@ export function youtubeEmbedUrl(url, opts = {}) {
 export async function getAllVideos() {
   return client.fetch(`
     *[_type == "video"]
-    | order(category asc, order asc, _createdAt desc) {
-      _id, title, youtubeUrl, description, category, featured, order
+    | order(brandFamily asc, category asc, order asc, _createdAt desc) {
+      _id, title, youtubeUrl, description, category, brandFamily, featured, order
     }
   `)
+}
+
+export async function getVideosByBrandFamily() {
+  const all = await getAllVideos()
+  const groups = { kimberley: [], stockman: [], general: [] }
+  all.forEach((v) => {
+    const key = v.brandFamily || 'general'
+    if (!groups[key]) groups[key] = []
+    groups[key].push(v)
+  })
+  return groups
 }
 
 export async function getFeaturedVideos(limit = 3) {

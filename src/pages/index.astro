@@ -109,7 +109,7 @@ const testimonials = [
 const upcomingNews = [
   { date: '10 May', type: 'New Arrival', title: 'New Stockman Rover 02 arrival', body: 'The 2026 model is in the showroom. Come see the upgrades in person.' },
   { date: '17 May', type: 'Handover', title: 'Mitchell family handover', body: 'Another family heading out on their first big trip. Safe travels!' },
-  { date: '03 Jun', type: 'Event', title: 'Brisbane Caravan, Camping & Touring Supershow', body: 'Three days at the Brisbane Showgrounds. Come and find us at the show - or book a chat before we go.', href: '/brisbane-show-2026' },
+  { date: '03 Jun', type: 'Event', title: 'Brisbane Caravan, Camping & Touring Supershow', body: 'Five days at the Brisbane Showgrounds, stand 2693 in the Main Oval. Come and find us at the show - or book a chat before we go.', href: '/brisbane-show-2026' },
 ]
 
 // LocalBusiness schema - tells Google/AI "we are an Australian caravan dealer"
@@ -132,8 +132,7 @@ const localBusiness = {
     addressCountry: 'AU',
   },
   openingHoursSpecification: [
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday'], opens: '07:30', closes: '15:00' },
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Thursday', 'Friday'], opens: '08:30', closes: '15:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:30', closes: '15:00' },
     { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '08:30', closes: '12:30' },
   ],
   priceRange: '$$$',
@@ -202,102 +201,122 @@ const faqSchema = {
        (the controls that occasionally flicker in). -->
   <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&showinfo=0&enablejsapi=0"
-        title="SEQ Campers"
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen="false"
+      <video
+        class="hero-video-mp4"
+        src="/hero-video.mp4"
+        poster="/hero-poster.jpg"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        disablepictureinpicture
+        controlslist="nodownload nofullscreen noremoteplayback"
         tabindex="-1"
-        inert
-      ></iframe>
-      <!-- Bulletproof click-blocker: covers the whole iframe at high z-index,
-           swallows ALL pointer events + touch + selection so YouTube can
-           never show its hover/tap controls overlay. Video keeps playing
-           underneath because the iframe is also `inert` so it receives no
-           focus / pointer / keyboard input at all. -->
+      ></video>
       <div class="hero-video-block" aria-hidden="true"></div>
     </div>
   </section>
 
-  <!-- Three Mountain Banners (Watch / Visit / Adventure) - Shane's preferred
-       home page architecture. Each banner is a full-viewport section with a
-       mountain icon in one of the SEQ logo colours. Clicking jumps to the
-       relevant page where the "tree" lives (videos, used stock, service). -->
-  <section class="mountain-banner mountain-watch" id="watch">
-    <a href="/videos" class="mountain-banner-link">
-      <div class="mountain-banner-bg">
-        <iframe
-          src="https://www.youtube-nocookie.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0"
-          title="Watch our video library"
-          frameborder="0"
-          allow="autoplay; encrypted-media"
-          allowfullscreen="false"
-          tabindex="-1"
-          inert
-        ></iframe>
-        <div class="mountain-banner-block" aria-hidden="true"></div>
-        <div class="mountain-banner-overlay" aria-hidden="true"></div>
+  <!-- Three pathway video tiles (Kimberley-style 4-box pattern but with 3 +
+       video-backgrounds). Shane's preferred home page architecture: compact
+       side-by-side boxes with looping muted B-roll inside, mountain icon and
+       label overlaid. Click goes down the relevant "tree". -->
+  <section class="section pathway-tiles-section" aria-label="Three steps to your next adventure">
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
+        <div class="page-eyebrow" style="color:var(--rust);">How it works</div>
+        <h2 class="section-title">Three steps to your next adventure.</h2>
       </div>
-      <div class="mountain-banner-inner">
-        <MountainIcon color="#F5B544" accent="#D89425" size={88} />
-        <div class="mountain-banner-eyebrow">1. Watch</div>
-        <h2 class="mountain-banner-title">Browse our video library.</h2>
-        <p class="mountain-banner-desc">See every model inside and out - Kimberley and Stockman. Get a feel for what suits your travel style before you visit.</p>
-        <span class="mountain-banner-cta">See all models →</span>
+
+      <div class="pathway-tile-grid">
+        <a href="/videos" class="pathway-tile pathway-tile-watch" data-video-id="tozC7prVbOg">
+          <div class="pathway-tile-media">
+            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/tozC7prVbOg/hqdefault.jpg" alt="" loading="lazy" />
+            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
+            <div class="pathway-tile-block" aria-hidden="true"></div>
+            <div class="pathway-tile-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="pathway-tile-inner">
+            <MountainIcon color="#F5B544" accent="#D89425" size={56} />
+            <div class="pathway-tile-label"><span class="pathway-tile-num">1.</span> Watch</div>
+            <div class="pathway-tile-sub">Our video library - every model, Kimberley and Stockman.</div>
+          </div>
+        </a>
+
+        <a href="/stock" class="pathway-tile pathway-tile-visit" data-video-id="xYf81xUZtNE">
+          <div class="pathway-tile-media">
+            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/xYf81xUZtNE/hqdefault.jpg" alt="" loading="lazy" />
+            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
+            <div class="pathway-tile-block" aria-hidden="true"></div>
+            <div class="pathway-tile-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="pathway-tile-inner">
+            <MountainIcon color="#E97B3C" accent="#C0341A" size={56} />
+            <div class="pathway-tile-label"><span class="pathway-tile-num">2.</span> Visit</div>
+            <div class="pathway-tile-sub">Pre-loved and new display vans available now.</div>
+          </div>
+        </a>
+
+        <a href="/service" class="pathway-tile pathway-tile-adventure" data-video-id="WwgapQt3xO4">
+          <div class="pathway-tile-media">
+            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/WwgapQt3xO4/hqdefault.jpg" alt="" loading="lazy" />
+            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
+            <div class="pathway-tile-block" aria-hidden="true"></div>
+            <div class="pathway-tile-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="pathway-tile-inner">
+            <MountainIcon color="#4cea89" accent="#2BA85F" size={56} />
+            <div class="pathway-tile-label"><span class="pathway-tile-num">3.</span> Adventure</div>
+            <div class="pathway-tile-sub">From our driveway to your driveway. Camping support.</div>
+          </div>
+        </a>
       </div>
-    </a>
+    </div>
   </section>
 
-  <section class="mountain-banner mountain-visit" id="visit">
-    <a href="/stock" class="mountain-banner-link">
-      <div class="mountain-banner-bg">
-        <iframe
-          src="https://www.youtube-nocookie.com/embed/xYf81xUZtNE?autoplay=1&mute=1&loop=1&playlist=xYf81xUZtNE&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0"
-          title="Visit our stock"
-          frameborder="0"
-          allow="autoplay; encrypted-media"
-          allowfullscreen="false"
-          tabindex="-1"
-          inert
-        ></iframe>
-        <div class="mountain-banner-block" aria-hidden="true"></div>
-        <div class="mountain-banner-overlay" aria-hidden="true"></div>
-      </div>
-      <div class="mountain-banner-inner">
-        <MountainIcon color="#E97B3C" accent="#C0341A" size={88} />
-        <div class="mountain-banner-eyebrow">2. Visit</div>
-        <h2 class="mountain-banner-title">Available now for sale.</h2>
-        <p class="mountain-banner-desc">Every used caravan on the lot, with a walk-around video. Book a showroom visit or call us to lock one in.</p>
-        <span class="mountain-banner-cta">See in-stock caravans →</span>
-      </div>
-    </a>
-  </section>
+  <script is:inline>
+    /* Pathway tiles: hover (or touch) swaps the poster for an autoplay iframe.
+       Mouse-leave / tap-out clears the iframe so other tiles never trigger
+       multiple videos at once. */
+    (function () {
+      const tiles = document.querySelectorAll('.pathway-tile')
+      tiles.forEach(function (tile) {
+        const videoId = tile.getAttribute('data-video-id')
+        if (!videoId) return
+        const wrap = tile.querySelector('.pathway-tile-iframe-wrap')
+        let iframe = null
 
-  <section class="mountain-banner mountain-adventure" id="adventure">
-    <a href="/service" class="mountain-banner-link">
-      <div class="mountain-banner-bg">
-        <iframe
-          src="https://www.youtube-nocookie.com/embed/WwgapQt3xO4?autoplay=1&mute=1&loop=1&playlist=WwgapQt3xO4&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0"
-          title="Adventure - handover and service"
-          frameborder="0"
-          allow="autoplay; encrypted-media"
-          allowfullscreen="false"
-          tabindex="-1"
-          inert
-        ></iframe>
-        <div class="mountain-banner-block" aria-hidden="true"></div>
-        <div class="mountain-banner-overlay" aria-hidden="true"></div>
-      </div>
-      <div class="mountain-banner-inner">
-        <MountainIcon color="#4cea89" accent="#2BA85F" size={88} />
-        <div class="mountain-banner-eyebrow">3. Adventure</div>
-        <h2 class="mountain-banner-title">From our driveway to yours.</h2>
-        <p class="mountain-banner-desc">Handover, upgrades, annual service, repairs - whatever the road throws at it, we're here.</p>
-        <span class="mountain-banner-cta">Camping support →</span>
-      </div>
-    </a>
-  </section>
+        function play() {
+          if (iframe) return
+          iframe = document.createElement('iframe')
+          iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId +
+            '?autoplay=1&mute=1&loop=1&playlist=' + videoId +
+            '&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0'
+          iframe.setAttribute('frameborder', '0')
+          iframe.setAttribute('allow', 'autoplay; encrypted-media')
+          iframe.setAttribute('tabindex', '-1')
+          iframe.setAttribute('inert', '')
+          wrap.appendChild(iframe)
+          tile.classList.add('is-playing')
+        }
+        function stop() {
+          if (!iframe) return
+          iframe.remove()
+          iframe = null
+          tile.classList.remove('is-playing')
+        }
+        tile.addEventListener('mouseenter', play)
+        tile.addEventListener('mouseleave', stop)
+        tile.addEventListener('focusin', play)
+        tile.addEventListener('focusout', stop)
+        /* Touch devices: tap once = preview, tap twice / link follow = navigate */
+        tile.addEventListener('touchstart', function (e) {
+          if (!iframe) { e.preventDefault(); play() }
+        }, { passive: false })
+      })
+    })()
+  </script>
 
   <TrustStrip />
 
@@ -373,115 +392,143 @@ const faqSchema = {
   )}
 
   <style>
-    /* Three Mountain Banners - SkyRV-style full viewport sections.
-       Per Shane's brief: seamless, video-led, each banner is a full
-       screen height with a mountain icon and minimal text overlay. */
-    .mountain-banner {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      min-height: 560px;
-      overflow: hidden;
-      background: #1a1a1c;
+    /* Three Pathway Tiles - Kimberley-style side-by-side video boxes.
+       Default state: still YouTube thumbnail. Hover/touch: iframe swaps in
+       and auto-plays muted. Mouse-leave clears the iframe so multiple tiles
+       never play at once. */
+    .pathway-tiles-section {
+      padding-top: 32px;
+      padding-bottom: 32px;
     }
-    .mountain-banner-link {
-      display: block;
+    .pathway-tile-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 880px) {
+      .pathway-tile-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+    .pathway-tile {
       position: relative;
-      width: 100%;
-      height: 100%;
+      display: block;
+      aspect-ratio: 4 / 5;
+      border-radius: 14px;
+      overflow: hidden;
       text-decoration: none;
       color: inherit;
+      background: #1a1a1c;
+      transition: transform 0.25s, box-shadow 0.25s;
     }
-    .mountain-banner-bg {
+    .pathway-tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 38px rgba(42, 22, 8, 0.22);
+    }
+    .pathway-tile-media {
       position: absolute;
       inset: 0;
       overflow: hidden;
     }
-    .mountain-banner-bg iframe {
+    .pathway-tile-poster {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s;
+    }
+    .pathway-tile.is-playing .pathway-tile-poster {
+      opacity: 0;
+    }
+    .pathway-tile-iframe-wrap {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .pathway-tile-iframe-wrap iframe {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 177.78vh;
-      height: 100vh;
+      width: 177.78%;
+      height: 100%;
       min-width: 100%;
       min-height: 56.25vw;
       transform: translate(-50%, -50%);
       border: 0;
-      pointer-events: none;
     }
-    .mountain-banner-block {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: auto;
-    }
-    .mountain-banner-overlay {
+    .pathway-tile-block {
       position: absolute;
       inset: 0;
       z-index: 3;
-      background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.65) 100%);
       pointer-events: none;
     }
-    .mountain-banner-inner {
-      position: relative;
+    .pathway-tile-overlay {
+      position: absolute;
+      inset: 0;
       z-index: 4;
+      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.78) 100%);
+      pointer-events: none;
+    }
+    .pathway-tile-inner {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
       text-align: center;
-      height: 100%;
-      padding: 40px 24px;
+      padding: 24px 22px 26px;
       color: #fff;
       pointer-events: none;
     }
-    .mountain-banner-inner > * { pointer-events: auto; }
-    .mountain-banner-eyebrow {
-      margin-top: 18px;
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 0.92rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.85);
+    .pathway-tile-inner > svg {
+      margin-bottom: 10px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
     }
-    .mountain-banner-title {
-      margin: 10px 0 14px;
+    .pathway-tile-label {
       font-family: 'Inter Tight', sans-serif;
-      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-size: 1.6rem;
       font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      color: #fff;
-      text-shadow: 0 2px 24px rgba(0,0,0,0.35);
-      max-width: 820px;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.5);
     }
-    .mountain-banner-desc {
-      max-width: 640px;
-      font-size: 1.05rem;
-      line-height: 1.6;
-      color: rgba(255,255,255,0.9);
-      margin: 0 0 22px;
-      text-shadow: 0 1px 12px rgba(0,0,0,0.35);
+    .pathway-tile-num {
+      font-weight: 600;
+      opacity: 0.7;
+      margin-right: 4px;
     }
-    .mountain-banner-cta {
-      display: inline-block;
-      padding: 14px 28px;
-      background: #fff;
-      color: var(--ink, #2A1608);
-      border-radius: 999px;
-      font-weight: 700;
-      font-family: 'Inter Tight', sans-serif;
-      letter-spacing: 0.02em;
-      transition: transform 0.2s, box-shadow 0.2s;
+    .pathway-tile-sub {
+      margin-top: 6px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.92);
+      max-width: 280px;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.45);
     }
-    .mountain-banner-link:hover .mountain-banner-cta {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+
+    /* Hero video section: full viewport height. Self-hosted MP4 fills the
+       hero in both dimensions via object-fit cover. */
+    :global(.hero-video.hero-video-clean) {
+      padding: 0 !important;
+      min-height: 100vh !important;
+      height: 100vh;
+    }
+    :global(.hero-video-mp4) {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border: 0;
+      pointer-events: none;
     }
     @media (max-width: 768px) {
-      .mountain-banner { height: 80vh; min-height: 480px; }
-      .mountain-banner-desc { font-size: 0.95rem; }
+      :global(.hero-video.hero-video-clean) {
+        min-height: 85vh !important;
+        height: 85vh;
+      }
     }
   </style>
 

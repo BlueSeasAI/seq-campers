@@ -1,69 +1,127 @@
 ---
 import Site from '../layouts/Site.astro'
 import VideoCard from '../components/VideoCard.astro'
-import { getVideosByCategory } from '../lib/sanity.js'
+import { getVideosByBrandFamily } from '../lib/sanity.js'
 
-let groups = {}
+let groups = { kimberley: [], stockman: [], general: [] }
 try {
-  groups = await getVideosByCategory()
+  groups = await getVideosByBrandFamily()
 } catch (err) {
   console.warn('Sanity unreachable on build - videos empty:', err.message)
 }
 
-// Placeholder videos shown when Sanity has nothing yet, so the page is
-// presentable on day one. Maud replaces these by adding real videos in
-// the Studio - the placeholders disappear automatically once any video
-// of that category is added.
-const PLACEHOLDER_VIDEO = 'https://www.youtube.com/watch?v=dQw4w9WcXgQ'
-const placeholderGroups = {
-  'getting-started': [
-    { title: 'Introduction to Kimberley Kampers', youtubeUrl: PLACEHOLDER_VIDEO, description: 'A complete overview of the Kimberley Kampers range - who they\'re built for, what makes them different, and why they\'ve earned a reputation as Australia\'s toughest off-road campers.', category: 'getting-started' },
-    { title: 'Why Buy a Kimberley Kamper?', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Shane walks through what sets the Kimberley range apart - build quality, after-sales support, and the kind of trips they were built for.', category: 'getting-started' },
-    { title: 'Features on a Platinum Camper-Trailer', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The premium features that come standard on every Platinum: chassis, suspension, kitchen, electrics, and the small touches that matter.', category: 'getting-started' },
-  ],
-  'setup': [
-    { title: 'Preparing to Set-Up Your Karavan', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Site selection, positioning, and the checks that save you hassle later.', category: 'setup' },
-    { title: 'Setting Up the Stabilisers & Levelling', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The step-by-step on getting the van level fast - even on rough ground.', category: 'setup' },
-    { title: 'Pushing the Bed Out on Your Karavan', youtubeUrl: PLACEHOLDER_VIDEO, description: 'How the bed extension works, what to watch for, and the easiest pack-down sequence.', category: 'setup' },
-    { title: 'Packing Up Your Kimberley Karavan', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The full pack-down workflow - the things first-time owners always miss.', category: 'setup' },
-  ],
-  'deep-dive': [
-    { title: 'The New 2026 Stockman Rover 02 is Here!', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Every upgrade, every improvement - Shane walks you through it all.', category: 'deep-dive' },
-    { title: 'Touring the Sleek "Night Storm" Interior', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Luxury finishes, Corian benchtops, and dimmable lighting throughout.', category: 'deep-dive' },
-    { title: 'Inside the Stockman Rover: No More Cramped Pods!', youtubeUrl: PLACEHOLDER_VIDEO, description: 'See how the new Rover layout makes off-grid living actually comfortable.', category: 'deep-dive' },
-  ],
-  'on-the-road': [
-    { title: 'Can a Mercedes Van Handle Deep Mud?', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Testing the Kimberley Kruiswagen where it\'s supposed to go.', category: 'on-the-road' },
-    { title: 'Testing the 50mm Lift Kit Off-Road', youtubeUrl: PLACEHOLDER_VIDEO, description: 'What the lift kit actually gets you on real outback corrugations.', category: 'on-the-road' },
-    { title: 'The Ultimate Kimberley Kruiswagen Review', youtubeUrl: PLACEHOLDER_VIDEO, description: 'A full review of the Kruiswagen - what it\'s great at, what it isn\'t, and who it\'s for.', category: 'on-the-road' },
-  ],
-}
-
-const categorySpec = [
-  { key: 'getting-started', title: 'Getting Started', intro: 'New to off-road camping or to the Kimberley / Stockman range? Start here.' },
-  { key: 'setup', title: 'Setup & Packing', intro: 'Everything you need to do before you start setting up camp - and how to pack it back down without missing anything.' },
-  { key: 'deep-dive', title: 'Product Deep-Dives', intro: 'Walk through specific models and features. The detail that matters when you\'re comparing options.' },
-  { key: 'on-the-road', title: 'On the Road', intro: 'We take them where most people wouldn\'t dare drive. Watch what happens.' },
+// Placeholder videos for each brand tree - used until Maud adds real
+// videos with brandFamily set in Sanity Studio. They disappear automatically
+// once any real video is added to a tree.
+const PLACEHOLDER_VIDEO = 'https://www.youtube.com/watch?v=tozC7prVbOg'
+const kimberleyPlaceholders = [
+  { _id: 'k1', title: 'Kimberley Karavan walk-around', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Inside and out of the Karavan - the original hybrid that started it all.', category: 'deep-dive', brandFamily: 'kimberley' },
+  { _id: 'k2', title: 'Kimberley Kube - compact off-road', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The smaller, lighter cousin. Same Kimberley build standard.', category: 'deep-dive', brandFamily: 'kimberley' },
+  { _id: 'k3', title: 'Kimberley Kruiswagen - expedition motorhome', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Mercedes 4x4 chassis. Drive it, sleep in it, live out of it.', category: 'deep-dive', brandFamily: 'kimberley' },
+  { _id: 'k4', title: 'Kimberley Kruiser T Class', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The luxury off-road tourer. Long-haul ready.', category: 'deep-dive', brandFamily: 'kimberley' },
+  { _id: 'k5', title: 'Kimberley Kruiser S Class', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The flagship. Apartment-grade interior, expedition chassis.', category: 'deep-dive', brandFamily: 'kimberley' },
+  { _id: 'k6', title: 'Kimberley Karavan setup walk-through', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Step-by-step setup of the pop-top mechanism and stabilisers.', category: 'setup', brandFamily: 'kimberley' },
+]
+const stockmanPlaceholders = [
+  { _id: 's1', title: 'Stockman Trekka - the hard-floor camper', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Lower, lighter, tougher. Built for serious tracks.', category: 'deep-dive', brandFamily: 'stockman' },
+  { _id: 's2', title: 'Stockman Rover - the all-rounder', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Off-grid ready, family friendly, 90-second setup.', category: 'deep-dive', brandFamily: 'stockman' },
+  { _id: 's3', title: 'Stockman Pod Trailer walk-around', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The compact pod for couples and weekend warriors.', category: 'deep-dive', brandFamily: 'stockman' },
+  { _id: 's4', title: 'Setting up a Stockman in 90 seconds', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Arrival to kettle-on. Time-lapse of the easiest setup in the range.', category: 'setup', brandFamily: 'stockman' },
+  { _id: 's5', title: 'Stockman Rover off-road test', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Sand, corrugations, river crossings. Real tracks, no studio.', category: 'on-the-road', brandFamily: 'stockman' },
 ]
 
-const usingPlaceholders = Object.keys(groups).length === 0
-const displayGroups = usingPlaceholders ? placeholderGroups : groups
+const kimberley = groups.kimberley?.length ? groups.kimberley : kimberleyPlaceholders
+const stockman = groups.stockman?.length ? groups.stockman : stockmanPlaceholders
+const general = groups.general || []
+const usingPlaceholders = !groups.kimberley?.length && !groups.stockman?.length
 ---
 
 <Site
-  title="Learn From the Experts"
-  description="The SEQ Campers video library - walkthroughs, setup tutorials, deep-dives and off-road testing. Watch before you visit."
+  title="Watch - the SEQ video library"
+  description="Browse the SEQ Campers video library. Kimberley Kampers and Stockman walk-arounds, setup tutorials, deep-dives and off-road testing - all in one place."
 >
   <div class="page-header">
     <div class="container">
-      <div class="page-eyebrow">Education</div>
-      <h1>Learn From the Experts</h1>
-      <p>The SEQ Campers video library - walkthroughs, setup tutorials, deep-dives and real off-road testing.</p>
+      <div class="page-eyebrow">Watch</div>
+      <h1>Every model on video.</h1>
+      <p>Two trees. Pick a brand and dive in - walk-arounds, setup, deep-dives and real off-road testing.</p>
     </div>
   </div>
 
-  <!-- YouTube CTA bar -->
-  <div class="container" style="margin-top:28px;">
+  {usingPlaceholders && (
+    <div class="container" style="margin-top:24px;">
+      <div class="configurator-placeholder-note">
+        Sample video library shown for layout. Replace each placeholder by
+        adding real videos in Sanity Studio (Videos library → + Create new),
+        making sure to set the brand family to Kimberley or Stockman.
+      </div>
+    </div>
+  )}
+
+  <!-- Two top-level tree entry tiles - Shane's "two trees that come out of Watch" -->
+  <section class="section" style="padding-top:32px; padding-bottom:24px;">
+    <div class="container">
+      <div class="watch-tree-tiles">
+        <a href="#kimberley-tree" class="watch-tree-tile watch-tree-kimberley">
+          <div class="watch-tree-eyebrow">Brand 1</div>
+          <h2>Kimberley Kampers</h2>
+          <p>30+ years Australian-built. Karavan, Kube, Kruiswagen, Kruiser T &amp; S.</p>
+          <span class="watch-tree-cta">See Kimberley videos ↓</span>
+        </a>
+        <a href="#stockman-tree" class="watch-tree-tile watch-tree-stockman">
+          <div class="watch-tree-eyebrow">Brand 2</div>
+          <h2>Stockman</h2>
+          <p>Built tough, ready for the track. Trekka, Rover, Pod Trailer.</p>
+          <span class="watch-tree-cta">See Stockman videos ↓</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kimberley tree -->
+  <section id="kimberley-tree" class="section" style="padding-top:24px;">
+    <div class="container">
+      <div class="section-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Kimberley Kampers</div>
+        <h2 class="section-title">The Kimberley tree</h2>
+        <p style="color:var(--muted); margin-top:6px;">{kimberley.length} video{kimberley.length !== 1 ? 's' : ''} across the Kimberley range.</p>
+      </div>
+      <div class="video-grid" style="margin-top:18px;">
+        {kimberley.map((v) => <VideoCard video={v} showCategory={false} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Stockman tree -->
+  <section id="stockman-tree" class="section" style="background:var(--sand-deep); padding-top:32px;">
+    <div class="container">
+      <div class="section-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Stockman</div>
+        <h2 class="section-title">The Stockman tree</h2>
+        <p style="color:var(--muted); margin-top:6px;">{stockman.length} video{stockman.length !== 1 ? 's' : ''} across the Stockman range.</p>
+      </div>
+      <div class="video-grid" style="margin-top:18px;">
+        {stockman.map((v) => <VideoCard video={v} showCategory={false} />)}
+      </div>
+    </div>
+  </section>
+
+  {general.length > 0 && (
+    <section class="section" style="padding-top:32px;">
+      <div class="container">
+        <div class="section-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+          <div class="page-eyebrow" style="color:var(--rust);">General</div>
+          <h2 class="section-title">Other videos</h2>
+        </div>
+        <div class="video-grid" style="margin-top:18px;">
+          {general.map((v) => <VideoCard video={v} showCategory={false} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- YouTube CTA bar (kept - Shane wants the full library accessible) -->
+  <div class="container" style="margin-top:32px;">
     <div class="youtube-cta-bar">
       <div class="youtube-cta-text">
         <div class="page-eyebrow" style="color:var(--rust); margin-bottom:6px;">YouTube</div>
@@ -98,44 +156,69 @@ const displayGroups = usingPlaceholders ? placeholderGroups : groups
     </div>
   </div>
 
-  {usingPlaceholders && (
-    <div class="container" style="margin-top:24px;">
-      <div class="configurator-placeholder-note">
-        Sample video library shown for layout. Replace each placeholder by
-        adding real videos in Sanity Studio (left sidebar → Videos library →
-        + Create new). Once any real video is added in a category, that
-        category's placeholders disappear automatically.
-      </div>
-    </div>
-  )}
-
-  <section class="section">
-    <div class="container">
-      {categorySpec.map((cat) => {
-        const vids = displayGroups[cat.key] || []
-        if (vids.length === 0) return null
-        return (
-          <div class="video-category-block">
-            <div class="video-category-header">
-              <h2 class="section-title">{cat.title}</h2>
-              <p class="video-category-intro">{cat.intro}</p>
-            </div>
-            <div class="video-grid">
-              {vids.map((v) => <VideoCard video={v} showCategory={false} />)}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  </section>
-
-  <section class="band-dark">
+  <section class="band-dark" style="margin-top:48px;">
     <div class="container" style="text-align:center; max-width:680px; margin:0 auto;">
       <h2 style="color:var(--sand); font-size:1.8rem; margin-bottom:12px;">There's nothing like walking through one yourself.</h2>
       <p style="color:var(--gold); margin-bottom:24px;">
         Book a time and Shane or Maud will show you around.
       </p>
-      <a href="/brisbane-show-2026" class="btn-primary">Reserve a show slot</a>
+      <a href="/contact" class="btn-primary">Book a showroom visit</a>
     </div>
   </section>
+
+  <style>
+    .watch-tree-tiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 760px) { .watch-tree-tiles { grid-template-columns: 1fr; } }
+    .watch-tree-tile {
+      display: block;
+      padding: 26px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .watch-tree-tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+    }
+    .watch-tree-kimberley {
+      background: linear-gradient(135deg, #2B5A3F 0%, #1A3A28 100%);
+    }
+    .watch-tree-stockman {
+      background: linear-gradient(135deg, #8B4513 0%, #5A2E0C 100%);
+    }
+    .watch-tree-eyebrow {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 6px;
+    }
+    .watch-tree-tile h2 {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 8px;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+    .watch-tree-tile p {
+      color: rgba(255,255,255,0.88);
+      font-size: 0.98rem;
+      line-height: 1.55;
+      margin: 0 0 14px;
+    }
+    .watch-tree-cta {
+      display: inline-block;
+      font-weight: 600;
+      color: #fff;
+      opacity: 0.95;
+    }
+  </style>
 </Site>

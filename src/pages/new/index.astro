@@ -81,6 +81,121 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
     </section>
   )}
 
+  <!-- Brochure-download enquiry. Per Shane: based on the Kimberley site
+       pattern. Structured questions only - no vague "what would you like
+       to know" free-text. NEVER ask about trade-in or finance. -->
+  <section class="section" style="padding-top:32px; padding-bottom:48px;">
+    <div class="container" style="max-width:720px;">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:14px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Want the full picture?</div>
+        <h2 class="section-title">Request a brochure and price guide.</h2>
+        <p style="color:var(--muted); margin-top:6px; line-height:1.65;">
+          We'll send you the full spec sheets and current pricing for the brands you're interested in. No call from us unless you ask for one.
+        </p>
+      </div>
+
+      <form
+        class="enquiry-form"
+        name="brochure-download"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/thanks/"
+      >
+        <input type="hidden" name="form-name" value="brochure-download" />
+        <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+        <div class="form-row">
+          <label>
+            Your name
+            <input type="text" name="customer_name" required autocomplete="name" />
+          </label>
+          <label>
+            Email
+            <input type="email" name="customer_email" required autocomplete="email" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Phone (optional)
+            <input type="tel" name="customer_phone" autocomplete="tel" placeholder="04xx xxx xxx" />
+          </label>
+          <label>
+            State you live in
+            <select name="customer_state" required>
+              <option value="">-- Pick one --</option>
+              <option value="QLD">Queensland</option>
+              <option value="NSW">New South Wales</option>
+              <option value="VIC">Victoria</option>
+              <option value="WA">Western Australia</option>
+              <option value="SA">South Australia</option>
+              <option value="TAS">Tasmania</option>
+              <option value="ACT">ACT</option>
+              <option value="NT">Northern Territory</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Which brand or model interests you?
+          <select name="brand_interest" required>
+            <option value="">-- Pick one --</option>
+            <option value="kimberley-karavan">Kimberley Karavan</option>
+            <option value="kimberley-kube">Kimberley Kube</option>
+            <option value="kimberley-kruiswagen">Kimberley Kruiswagen</option>
+            <option value="kimberley-kruiser-t">Kimberley Kruiser T Class</option>
+            <option value="kimberley-kruiser-s">Kimberley Kruiser S Class</option>
+            <option value="stockman-trekka">Stockman Trekka</option>
+            <option value="stockman-rover">Stockman Rover</option>
+            <option value="stockman-pod">Stockman Pod Trailer</option>
+            <option value="multiple">Multiple - send everything</option>
+            <option value="not-sure">Not sure yet - help me work it out</option>
+          </select>
+        </label>
+
+        <label>
+          What vehicle would you tow with?
+          <input type="text" name="tow_vehicle" placeholder="e.g. 200-Series LandCruiser, Ranger, Patrol, or 'not sure yet'" />
+        </label>
+
+        <label>
+          Are you upgrading or downsizing?
+          <select name="motivation" required>
+            <option value="">-- Pick one --</option>
+            <option value="first-caravan">First caravan ever</option>
+            <option value="upgrading">Upgrading from my current van</option>
+            <option value="downsizing">Downsizing from my current van</option>
+            <option value="replacing">Replacing a similar-size van</option>
+            <option value="not-sure">Not sure yet</option>
+          </select>
+        </label>
+
+        <label>
+          When are you looking to buy?
+          <select name="timeline">
+            <option value="">-- Pick one --</option>
+            <option value="asap">ASAP - happy to take available stock</option>
+            <option value="3-months">Within 3 months</option>
+            <option value="6-12-months">6 to 12 months</option>
+            <option value="researching">Just researching for now</option>
+          </select>
+        </label>
+
+        <label>
+          Anything else? (optional)
+          <textarea name="message" placeholder="Specific feature, layout preference, off-grid needs..."></textarea>
+        </label>
+
+        <p class="form-policy-note" style="font-size:0.82rem; color:var(--muted, #8B6A40); margin: 6px 0 14px;">
+          Heads-up: we don't do trade-ins or finance - we just want this to be the right van for you.
+        </p>
+
+        <button type="submit" class="btn-primary">Send my details</button>
+      </form>
+    </div>
+  </section>
+
   <script is:inline>
     (function () {
       const form = document.getElementById('new-filters')

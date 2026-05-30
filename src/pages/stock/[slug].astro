@@ -390,9 +390,9 @@ const productSchema = {
     <section id="listing-enquiry" class="listing-enquiry">
       <div class="listing-enquiry-inner">
         <div class="page-eyebrow" style="color:var(--rust);">Enquire about this caravan</div>
-        <h2 class="listing-enquiry-title">Send us your details. We will reply within one business day.</h2>
+        <h2 class="listing-enquiry-title">Let's make sure this van is right for you.</h2>
         <p class="listing-enquiry-sub">
-          We have all the specs for <strong>{caravan.title}</strong>{caravan.compliance?.stockNumber ? ` (stock #${caravan.compliance.stockNumber})` : ''} on file - tell us what you need to know or where you would like to take it.
+          A few quick details about you and how you'll use it - that's all we need to have a useful chat.
         </p>
 
         <form
@@ -425,15 +425,61 @@ const productSchema = {
             </label>
           </div>
 
+          <div class="form-row">
+            <label>
+              Email
+              <input type="email" name="customer_email" required autocomplete="email" />
+            </label>
+            <label>
+              State you live in
+              <select name="customer_state" required>
+                <option value="">-- Pick one --</option>
+                <option value="QLD">Queensland</option>
+                <option value="NSW">New South Wales</option>
+                <option value="VIC">Victoria</option>
+                <option value="WA">Western Australia</option>
+                <option value="SA">South Australia</option>
+                <option value="TAS">Tasmania</option>
+                <option value="ACT">ACT</option>
+                <option value="NT">Northern Territory</option>
+              </select>
+            </label>
+          </div>
+
           <label>
-            Email
-            <input type="email" name="customer_email" required autocomplete="email" />
+            What vehicle are you towing with?
+            <input type="text" name="tow_vehicle" placeholder="e.g. 200-Series LandCruiser, Ranger, Patrol" />
           </label>
 
           <label>
-            What would you like to know?
-            <textarea name="message" placeholder="Trade-in van details, finance questions, want to book a viewing, anything we should factor in..."></textarea>
+            Have you owned a caravan before?
+            <select name="experience">
+              <option value="">-- Pick one --</option>
+              <option value="first-time">New to camping</option>
+              <option value="tents-before">Camped in tents or swags, first caravan</option>
+              <option value="one-before">Owned a caravan before</option>
+              <option value="multiple">Multiple caravans over the years</option>
+            </select>
           </label>
+
+          <label>
+            What video or photo brought you here? (optional)
+            <input type="text" name="video_watched" placeholder="e.g. the 2018 Karavan walk-around, or just 'browsing the lot'" />
+          </label>
+
+          <label class="qb-checkbox-row">
+            <input type="checkbox" name="send_spec_sheet" value="yes" />
+            <span>Send me the full spec sheet for this van.</span>
+          </label>
+
+          <label>
+            Anything else? (optional)
+            <textarea name="message" placeholder="Want to book a viewing, intended trip, anything we should know..."></textarea>
+          </label>
+
+          <p class="form-policy-note" style="font-size:0.82rem; color:var(--muted, #8B6A40); margin: 6px 0 14px;">
+            Heads-up: we don't do trade-ins or finance - we just want this to be the right van for you.
+          </p>
 
           <div class="qb-actions" style="margin-top:18px;">
             <button type="submit" class="qb-submit">Send enquiry</button>
@@ -493,8 +539,7 @@ const productSchema = {
       </div>
       {!faqIsCustom && (
         <p class="faq-note">
-          Have a question not answered here? <a href="/contact">Get in touch</a>
-          - we will reply within one business day.
+          Want more detail? <a href="#listing-enquiry">Send us a quick note</a> and we'll get back to you.
         </p>
       )}
     </section>

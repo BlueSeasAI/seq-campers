@@ -57,9 +57,9 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
       <!-- Two-column: form + map -->
       <div class="contact-grid">
         <div>
-          <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608; margin-bottom:16px;">Send us a message</h2>
+          <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608; margin-bottom:16px;">Tell us a bit about you</h2>
           <p style="color:#8B6A40; margin-bottom:20px;">
-            Tell us about the caravan you are after and we will get back to you within one business day.
+            We'll come back to you with what we think suits - and we'll keep it useful, not salesy.
           </p>
 
           <!-- Netlify Form -->
@@ -94,15 +94,35 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
 
             <label>
               Caravan you are interested in
-              <input type="text" name="caravan_interest" placeholder="e.g. Kimberley Kamper Kompact, or 'browsing'" />
+              <input type="text" name="caravan_interest" placeholder="e.g. Kimberley Karavan, or 'browsing'" />
             </label>
 
             <label>
-              How can we help?
-              <textarea name="message" required placeholder="Tell us a bit about what you are looking for - any specific specs, budget, timeline."></textarea>
+              Are you new at camping or had a caravan before?
+              <select name="experience">
+                <option value="">-- Pick one --</option>
+                <option value="first-time">New to camping</option>
+                <option value="tents-before">Camped in tents or swags, first caravan</option>
+                <option value="one-before">Owned a caravan before</option>
+                <option value="multiple">Multiple caravans over the years</option>
+              </select>
             </label>
 
-            <button type="submit">Send enquiry</button>
+            <label>
+              What video brought you here? (optional)
+              <input type="text" name="video_watched" placeholder="e.g. the Kruiswagen walk-around, or just 'found you via Google'" />
+            </label>
+
+            <label>
+              Anything else? (optional)
+              <textarea name="message" placeholder="A specific layout, budget range, tow vehicle, planned trip..."></textarea>
+            </label>
+
+            <p style="font-size:0.82rem; color:#8B6A40; margin: 6px 0 14px;">
+              Heads-up: we don't do trade-ins or finance - we just want to help you find the right rig.
+            </p>
+
+            <button type="submit">Send my details</button>
           </form>
         </div>
 
