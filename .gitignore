@@ -6,3 +6,4 @@ dist/
 .astro/
 npm-install-*.log
 *.log
+debug-*.txt
