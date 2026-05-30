@@ -26,7 +26,10 @@ function youtubeId(url) {
   return m ? m[1] : null
 }
 
-function youtubeEmbed(url, { autoplay = false } = {}) {
+function youtubeEmbed(url) {
+  // Listing detail page videos: standard YouTube embed with controls so the
+  // user can press play and hear the audio. No autoplay - we don't want
+  // multiple videos shouting at the visitor when the page loads.
   const id = youtubeId(url)
   if (!id) return null
   const params = new URLSearchParams({
@@ -35,13 +38,6 @@ function youtubeEmbed(url, { autoplay = false } = {}) {
     iv_load_policy: '3',
     playsinline: '1',
   })
-  if (autoplay) {
-    params.set('autoplay', '1')
-    params.set('mute', '1')
-    params.set('loop', '1')
-    params.set('playlist', id)
-    params.set('controls', '0')
-  }
   return `https://www.youtube.com/embed/${id}?${params.toString()}`
 }
 
@@ -223,11 +219,11 @@ const productSchema = {
             <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">Walkaround</div>
             <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:14px;">See it in motion</h2>
             <div class={`video-grid videos-${videoCount}`}>
-              {videos.slice(0, 3).map((v, i) => {
-                const embedUrl = youtubeEmbed(v.url, { autoplay: i === 0 })
+              {videos.slice(0, 3).map((v) => {
+                const embedUrl = youtubeEmbed(v.url)
                 return embedUrl ? (
                   <div class="video-embed">
-                    <iframe src={embedUrl} title={v.label ?? caravan.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen={i !== 0 ? true : undefined}></iframe>
+                    <iframe src={embedUrl} title={v.label ?? caravan.title} allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                   </div>
                 ) : null
               })}
@@ -467,9 +463,14 @@ const productSchema = {
             <input type="text" name="video_watched" placeholder="e.g. the 2018 Karavan walk-around, or just 'browsing the lot'" />
           </label>
 
-          <label class="qb-checkbox-row">
-            <input type="checkbox" name="send_spec_sheet" value="yes" />
-            <span>Send me the full spec sheet for this van.</span>
+          <label class="qb-checkbox-row" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:14px 16px; background:var(--sand-deep, #F4EDE0); border:1px solid var(--tan-border, #DCCBA8); border-radius:8px; margin: 6px 0 12px;">
+            <input
+              type="checkbox"
+              name="send_spec_sheet"
+              value="yes"
+              style="width:22px; height:22px; margin:0; flex-shrink:0; accent-color:var(--rust, #C0341A); cursor:pointer;"
+            />
+            <span style="font-weight:600; color:var(--ink, #2A1608); line-height:1.4;">Send me the full spec sheet for this van.</span>
           </label>
 
           <label>
