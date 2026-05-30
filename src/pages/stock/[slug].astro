@@ -435,10 +435,41 @@ const productSchema = {
             <textarea name="message" placeholder="Trade-in van details, finance questions, want to book a viewing, anything we should factor in..."></textarea>
           </label>
 
-          <button type="submit">Send enquiry</button>
+          <div class="qb-actions" style="margin-top:18px;">
+            <button type="submit" class="qb-submit">Send enquiry</button>
+            <button type="button" class="qb-share" data-listing-share>
+              <span aria-hidden="true">↗</span> Share with partner
+            </button>
+          </div>
+          <p class="qb-share-help" data-listing-share-help hidden>
+            Link copied. Paste it in a text or email to share this caravan with your partner or family.
+          </p>
         </form>
       </div>
     </section>
+
+    <script is:inline>
+      (function () {
+        const btn = document.querySelector('[data-listing-share]')
+        const help = document.querySelector('[data-listing-share-help]')
+        if (!btn) return
+        btn.addEventListener('click', async () => {
+          const url = window.location.href.split('#')[0]
+          const title = document.title
+          const text = `Have a look at this caravan I'm thinking about from SEQ Campers: ${title} - ${url}`
+          if (navigator.share) {
+            try { await navigator.share({ title, text, url }); return } catch (e) { /* fallback */ }
+          }
+          try {
+            await navigator.clipboard.writeText(text)
+            help.hidden = false
+            setTimeout(() => { help.hidden = true }, 6000)
+          } catch (e) {
+            window.location.href = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text)
+          }
+        })
+      })()
+    </script>
 
     <!-- FAQ section (FAQPage schema is in <head>) -->
     <section class="faq-section" aria-label="Frequently asked questions">

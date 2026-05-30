@@ -2742,6 +2742,298 @@ a:focus-visible, button:focus-visible {
 }
 
 /* ============================================================
+   Quote builder wizard (/quote/{brand}) - mirror of Maud's pages
+   ============================================================ */
+.qb-step-eyebrow {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 6px;
+}
+.qb-step-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 18px;
+  letter-spacing: -0.01em;
+}
+
+.qb-variants {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+.qb-variant {
+  display: block;
+  position: relative;
+  background: #fff;
+  border: 2px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.18s;
+}
+.qb-variant:hover {
+  border-color: var(--ink);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.qb-variant-selected {
+  border-color: var(--rust);
+  box-shadow: 0 0 0 1px var(--rust);
+}
+.qb-variant-radio {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--rust);
+  cursor: pointer;
+}
+.qb-variant-head { padding-right: 32px; }
+.qb-variant-name {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.qb-variant-price {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--rust);
+  letter-spacing: -0.01em;
+}
+.qb-variant-subtext {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: 8px 0 14px;
+}
+.qb-variant-included {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--tan-border);
+  padding-top: 14px;
+}
+.qb-variant-included li {
+  font-size: 0.86rem;
+  color: var(--muted);
+  padding: 3px 0 3px 18px;
+  position: relative;
+  line-height: 1.45;
+}
+.qb-variant-included li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--rust);
+  font-weight: 700;
+}
+
+.qb-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .qb-options-grid { grid-template-columns: 1fr; }
+}
+
+.qb-options { min-width: 0; }
+.qb-cat {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.qb-cat-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 22px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.qb-cat-summary::-webkit-details-marker { display: none; }
+.qb-cat-icon {
+  color: var(--rust);
+  font-size: 1.4rem;
+  font-weight: 400;
+  transition: transform 0.2s;
+  line-height: 1;
+}
+.qb-cat[open] .qb-cat-icon { transform: rotate(45deg); }
+.qb-cat-body {
+  border-top: 1px solid var(--tan-border);
+  padding: 8px 0;
+}
+.qb-opt {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 14px;
+  padding: 12px 22px;
+  align-items: start;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.qb-opt:hover { background: var(--sand); }
+.qb-opt-unavailable {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.qb-opt-check {
+  margin: 2px 0 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--rust);
+  cursor: pointer;
+}
+.qb-opt-body { min-width: 0; }
+.qb-opt-label {
+  font-size: 0.92rem;
+  color: var(--ink);
+  line-height: 1.4;
+  font-weight: 500;
+}
+.qb-opt-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.qb-opt-price {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--rust);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.qb-summary { position: sticky; top: 100px; }
+.qb-summary-inner {
+  background: var(--ink);
+  color: var(--sand);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-md);
+}
+.qb-summary-eyebrow {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.qb-summary-variant {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--sand);
+  margin-bottom: 16px;
+}
+.qb-summary-base, .qb-summary-options-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(244, 237, 224, 0.15);
+  font-size: 0.92rem;
+}
+.qb-summary-base strong, .qb-summary-options-line strong {
+  font-family: 'Inter Tight', sans-serif;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.qb-summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 12px;
+  padding-top: 10px;
+}
+.qb-summary-total span {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.qb-summary-total strong {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--sand);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.qb-summary-fineprint {
+  font-size: 0.74rem;
+  color: rgba(244, 237, 224, 0.65);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+.qb-summary-cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--rust);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  padding: 14px;
+  border-radius: var(--radius);
+}
+.qb-summary-cta:hover { background: var(--rust-dark); }
+
+.qb-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+.qb-submit { flex: 1; min-width: 200px; }
+.qb-share {
+  background: rgba(42, 22, 8, 0.06);
+  color: var(--ink);
+  border: 1.5px solid var(--tan-border);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 14px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.qb-share:hover {
+  background: rgba(42, 22, 8, 0.12);
+  border-color: var(--ink);
+}
+.qb-share-help {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #FFF7EC;
+  border: 1px solid #E8D5A8;
+  border-radius: var(--radius);
+  color: #7A4F1A;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+/* ============================================================
    Per-listing enquiry form (caravan detail page)
    ============================================================ */
 .listing-enquiry {

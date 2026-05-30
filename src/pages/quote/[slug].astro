@@ -1,173 +1,390 @@
 ---
 import Site from '../../layouts/Site.astro'
-import { quoteBrands, getQuoteBrand } from '../../data/quote-brands.js'
+import { quoteBuilders, getQuoteBuilder } from '../../data/quote-builders.js'
 
 export async function getStaticPaths() {
-  return quoteBrands.map((b) => ({ params: { slug: b.slug } }))
+  return quoteBuilders.map((b) => ({ params: { slug: b.slug } }))
 }
 
 const { slug } = Astro.params
-const brand = getQuoteBrand(slug)
+const brand = getQuoteBuilder(slug)
 
 if (!brand) return Astro.redirect('/stock')
 
 const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
 const pageUrl = `${siteBase}/quote/${brand.slug}`
+const firstVariantId = brand.variants[0]?.id
 ---
 
 <Site
-  title={`Build your ${brand.name} spec`}
-  description={`Tell SEQ Campers what you want in your ${brand.name}. ${brand.showSpecial} Quick 60-second enquiry form - we will reply with a written quote within one business day.`}
+  title={`Build your ${brand.name}`}
+  description={`Configure your ${brand.name} and send your spec to SEQ Campers. Reply within one business day.`}
 >
   <div class="page-header">
     <div class="container">
       <div class="page-eyebrow">{brand.brandFamily} · Build your spec</div>
       <h1>{brand.name}</h1>
-      <p>{brand.headline}</p>
+      <p>{brand.intro}</p>
     </div>
   </div>
 
-  <section class="section" style="padding-top:48px; padding-bottom:24px;">
-    <div class="container" style="max-width:760px;">
-
-      <p style="color:var(--muted); font-size:1.05rem; line-height:1.75; margin-bottom:18px;">
-        {brand.intro}
-      </p>
-
-      <p style="color:var(--muted); font-size:0.92rem; margin-top:14px;">
-        Indicative pricing: <strong style="color:var(--ink);">{brand.indicativePrice}</strong>.
-      </p>
-
-    </div>
-  </section>
-
-  <!-- Show-week value stack: what you get on top of the van at no extra cost.
-       Per Hormozi/Laja: list inclusions with dollar values, total, make the
-       gap obvious. Stronger than just stating "show special - free X". -->
-  {brand.inclusions && brand.inclusions.length > 0 && (
-    <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
-      <div class="container" style="max-width:760px;">
-        <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
-          <div class="page-eyebrow" style="color:var(--rust);">Show-week value stack</div>
-          <h2 class="section-title">What you get on top of the {brand.name}</h2>
-          <p style="color:var(--muted); max-width:520px; margin:6px auto 0; line-height:1.6;">
-            Order during the show and these are stacked on top of the van at no extra cost.
-          </p>
-        </div>
-        <div class="value-stack">
-          {brand.inclusions.map((item) => (
-            <div class="value-stack-row">
-              <div class="value-stack-tick" aria-hidden="true">✓</div>
-              <div class="value-stack-body">
-                <div class="value-stack-label">{item.label}</div>
-                {item.note && <div class="value-stack-note">{item.note}</div>}
-              </div>
-              <div class="value-stack-price">{item.value > 0 ? `$${item.value.toLocaleString('en-AU')}` : 'Included'}</div>
-            </div>
-          ))}
-          <div class="value-stack-row value-stack-total">
-            <div class="value-stack-tick value-stack-tick-total" aria-hidden="true">=</div>
-            <div class="value-stack-body">
-              <div class="value-stack-label">Total value stacked on every show-week order</div>
-              <div class="value-stack-note">Apply to orders placed 3 - 7 June 2026. Refundable $500 hold locks the package in.</div>
-            </div>
-            <div class="value-stack-price value-stack-price-total">${brand.inclusions.reduce((s, i) => s + (i.value || 0), 0).toLocaleString('en-AU')}</div>
-          </div>
-        </div>
+  {brand.placeholderNote && (
+    <section style="background:#FFF7EC; border-bottom:1px solid #E8D5A8; padding:14px 0;">
+      <div class="container">
+        <p style="margin:0; color:#7A4F1A; font-size:0.92rem; line-height:1.5;">{brand.placeholderNote}</p>
       </div>
     </section>
   )}
 
-  <!-- Quote enquiry form (Netlify Forms - posts to sales@seqcampers.com.au)
-       Reliable across all devices including iOS without configured mail clients.
-       Single form-name "quote-enquiry" with hidden brand fields so we can
-       configure ONE email notification in Netlify and route everywhere. -->
-  <section class="section" style="padding-top:24px;">
-    <div class="container" style="max-width:760px;">
-      <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:32px 36px; box-shadow:var(--shadow-sm);">
-        <div class="page-eyebrow" style="color:var(--rust);">Send us your spec</div>
-        <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:var(--ink); margin:6px 0 8px;">
-          Your spec, your way
-        </h2>
-        <p style="color:var(--muted); font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
-          Reply within one business day. Direct from Shane or the team - no call centre.
-        </p>
-
-        <form
-          class="quote-form enquiry-form"
-          name="quote-enquiry"
-          method="POST"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-          action="/thanks/"
-        >
-          <!-- Required by Netlify Forms for static deploys -->
-          <input type="hidden" name="form-name" value="quote-enquiry" />
-          <p class="hp" style="display:none;">
-            <label>Don't fill this out: <input name="bot-field" /></label>
-          </p>
-
-          <!-- Brand context (for routing + reply) -->
-          <input type="hidden" name="brand_name" value={brand.name} />
-          <input type="hidden" name="brand_slug" value={brand.slug} />
-          <input type="hidden" name="page_url" value={pageUrl} />
-
-          <div class="quote-fieldset">
-            <div class="quote-fieldset-title">About you</div>
-
-            <div class="quote-row">
-              <label class="quote-field">
-                <span>Your name</span>
-                <input type="text" name="customer_name" required autocomplete="name" />
-              </label>
-              <label class="quote-field">
-                <span>Phone</span>
-                <input type="tel" name="customer_phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
-              </label>
+  <!-- Step 1: choose model -->
+  <section class="section" style="padding-top:32px; padding-bottom:24px;">
+    <div class="container" style="max-width:1100px;">
+      <div class="qb-step-eyebrow">Step 1 of 3</div>
+      <h2 class="qb-step-title">Choose your model</h2>
+      <div class="qb-variants" data-variants>
+        {brand.variants.map((v, i) => (
+          <label class={`qb-variant ${i === 0 ? 'qb-variant-selected' : ''}`} data-variant-id={v.id}>
+            <input type="radio" name="variant" value={v.id} checked={i === 0} class="qb-variant-radio" />
+            <div class="qb-variant-head">
+              <h3 class="qb-variant-name">{v.name}</h3>
+              <div class="qb-variant-price">${v.basePrice.toLocaleString('en-AU')}</div>
             </div>
-            <label class="quote-field">
-              <span>Email</span>
-              <input type="email" name="customer_email" required autocomplete="email" />
-            </label>
-          </div>
-
-          <div class="quote-fieldset">
-            <div class="quote-fieldset-title">Your build preferences (tick the closest)</div>
-
-            {brand.keyChoices.map((q) => (
-              <fieldset class="quote-choice">
-                <legend>{q.label}</legend>
-                <div class="quote-choice-options">
-                  {q.options.map((opt) => (
-                    <label class="quote-choice-option">
-                      <input type="radio" name={`choice_${q.id}`} value={opt} />
-                      <span>{opt}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-            ))}
-
-            <label class="quote-field" style="margin-top:18px;">
-              <span>Anything else we should know? (optional)</span>
-              <textarea name="extra_notes" rows="3" placeholder="Tow vehicle details, timing, special requirements, trade-in van, anything we should factor in..."></textarea>
-            </label>
-          </div>
-
-          <button type="submit" class="btn-primary quote-submit">
-            Send my spec to SEQ Campers
-          </button>
-
-          <p style="font-size:0.78rem; color:var(--muted); margin-top:14px; text-align:center; line-height:1.5;">
-            Submissions go directly to the SEQ Campers team. We reply within one business day.
-          </p>
-        </form>
+            <p class="qb-variant-subtext">Ex-factory Ballina NSW, incl. GST. Excludes dealer delivery + on-road costs.</p>
+            <ul class="qb-variant-included">
+              {v.included.map((feature) => <li>{feature}</li>)}
+            </ul>
+          </label>
+        ))}
       </div>
-
-      <p style="text-align:center; margin-top:28px; color:var(--muted); font-size:0.92rem;">
-        Prefer to chat? <a href="tel:0753707933" style="color:var(--rust); font-weight:600;">Call (07) 5370 7933</a> or
-        <a href="/contact" style="color:var(--rust); font-weight:600;">book a Sunshine Coast visit</a>.
-      </p>
     </div>
   </section>
+
+  <!-- Step 2: options -->
+  <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
+    <div class="container" style="max-width:1100px;">
+      <div class="qb-step-eyebrow">Step 2 of 3</div>
+      <h2 class="qb-step-title">Add options & accessories</h2>
+      <p style="color:var(--muted); margin-bottom:18px; max-width:680px;">
+        Tick what you want. Open each section to expand. Items marked "Included" come with the variant you chose; "POA" means we'll confirm pricing on request.
+      </p>
+
+      <div class="qb-options-grid">
+        <!-- Left: option categories -->
+        <div class="qb-options" data-options-root>
+          {brand.categories.map((cat) => (
+            <details class="qb-cat" open>
+              <summary class="qb-cat-summary">
+                <span>{cat.title}</span>
+                <span class="qb-cat-icon" aria-hidden="true">+</span>
+              </summary>
+              <div class="qb-cat-body">
+                {cat.options.map((opt) => {
+                  const pricePerVariant = brand.variants.reduce((acc, v) => {
+                    const p = opt.priceByVariant ? opt.priceByVariant[v.id] : opt.price
+                    acc[v.id] = p
+                    return acc
+                  }, {})
+                  return (
+                    <label class="qb-opt" data-opt-id={opt.id} data-price-by-variant={JSON.stringify(pricePerVariant)}>
+                      <input type="checkbox" class="qb-opt-check" />
+                      <div class="qb-opt-body">
+                        <div class="qb-opt-label">{opt.label}</div>
+                        {opt.note && <div class="qb-opt-note">{opt.note}</div>}
+                      </div>
+                      <div class="qb-opt-price" data-opt-price-display></div>
+                    </label>
+                  )
+                })}
+              </div>
+            </details>
+          ))}
+        </div>
+
+        <!-- Right: sticky running total summary -->
+        <aside class="qb-summary" data-summary>
+          <div class="qb-summary-inner">
+            <div class="qb-summary-eyebrow">Your quote so far</div>
+            <div class="qb-summary-variant" data-summary-variant>—</div>
+            <div class="qb-summary-base">
+              <span>Base</span>
+              <strong data-summary-base>$0</strong>
+            </div>
+            <div class="qb-summary-options-line">
+              <span>Options (<span data-summary-count>0</span>)</span>
+              <strong data-summary-options>+$0</strong>
+            </div>
+            <div class="qb-summary-total">
+              <span>Indicative total</span>
+              <strong data-summary-total>$0</strong>
+            </div>
+            <p class="qb-summary-fineprint">
+              Indicative only. Final quote confirmed by SEQ Campers within one business day. Excludes dealer delivery ($3,500) + stamp duty + registration.
+            </p>
+            <a href="#qb-details" class="btn-primary qb-summary-cta">Continue to your details ↓</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 3: customer details + submit -->
+  <section id="qb-details" class="section" style="padding-top:32px; padding-bottom:48px;">
+    <div class="container" style="max-width:780px;">
+      <div class="qb-step-eyebrow">Step 3 of 3</div>
+      <h2 class="qb-step-title">Your details</h2>
+      <p style="color:var(--muted); margin-bottom:24px; max-width:600px;">
+        Reply within one business day. Direct from Shane or the team - no call centre.
+      </p>
+
+      <form
+        class="enquiry-form"
+        name="quote-builder"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/thanks/"
+        data-qb-form
+      >
+        <input type="hidden" name="form-name" value="quote-builder" />
+        <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+        <!-- Brand + spec context (auto-populated by JS on submit) -->
+        <input type="hidden" name="brand_name" value={brand.name} />
+        <input type="hidden" name="brand_slug" value={brand.slug} />
+        <input type="hidden" name="page_url" value={pageUrl} />
+        <input type="hidden" name="variant_name" data-hidden-variant-name />
+        <input type="hidden" name="variant_base_price" data-hidden-variant-base />
+        <input type="hidden" name="selected_options" data-hidden-options />
+        <input type="hidden" name="total_indicative_price" data-hidden-total />
+
+        <div class="form-row">
+          <label>
+            First name
+            <input type="text" name="first_name" required autocomplete="given-name" />
+          </label>
+          <label>
+            Last name
+            <input type="text" name="last_name" required autocomplete="family-name" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Email
+            <input type="email" name="customer_email" required autocomplete="email" />
+          </label>
+          <label>
+            Phone
+            <input type="tel" name="customer_phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Suburb
+            <input type="text" name="suburb" autocomplete="address-level2" />
+          </label>
+          <label>
+            State
+            <select name="state">
+              <option value="">- Select -</option>
+              <option value="QLD">QLD</option>
+              <option value="NSW">NSW</option>
+              <option value="VIC">VIC</option>
+              <option value="SA">SA</option>
+              <option value="WA">WA</option>
+              <option value="TAS">TAS</option>
+              <option value="NT">NT</option>
+              <option value="ACT">ACT</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Tow vehicle (if any)
+          <input type="text" name="tow_vehicle" placeholder="e.g. 200-Series LandCruiser, Ranger XLT" />
+        </label>
+
+        <label>
+          Anything else we should know?
+          <textarea name="message" rows="3" placeholder="Timing, trade-in van, finance questions, anything else..."></textarea>
+        </label>
+
+        <div class="qb-actions">
+          <button type="submit" class="btn-primary qb-submit">Send my quote request</button>
+          <button type="button" class="btn-ghost qb-share" data-qb-share>
+            <span aria-hidden="true">↗</span> Share quote
+          </button>
+        </div>
+
+        <p class="qb-share-help" data-share-help hidden>
+          Share link copied to your clipboard. Paste it in a text or email to send this exact spec to your partner or family.
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <!-- Wizard JS: state, summary updates, share, submit serialisation -->
+  <script is:inline define:vars={{ brandData: brand, firstVariantId, pageUrl }}>
+    (function () {
+      const variantData = {}
+      brandData.variants.forEach((v) => { variantData[v.id] = v })
+
+      let currentVariant = firstVariantId
+      const selected = new Set()
+
+      const $ = (sel) => document.querySelector(sel)
+      const $$ = (sel) => Array.from(document.querySelectorAll(sel))
+
+      const fmt = (n) => '$' + Math.abs(n).toLocaleString('en-AU')
+      const fmtSigned = (n) => (n < 0 ? '-' : '+') + fmt(n)
+
+      function getOptionPrice(optEl, variantId) {
+        const map = JSON.parse(optEl.dataset.priceByVariant || '{}')
+        return map[variantId]
+      }
+
+      function renderOptionPrices() {
+        $$('.qb-opt').forEach((optEl) => {
+          const p = getOptionPrice(optEl, currentVariant)
+          const display = optEl.querySelector('[data-opt-price-display]')
+          if (p === null || p === undefined) {
+            display.textContent = 'N/A'
+            optEl.classList.add('qb-opt-unavailable')
+            optEl.querySelector('.qb-opt-check').disabled = true
+            optEl.querySelector('.qb-opt-check').checked = false
+            selected.delete(optEl.dataset.optId)
+          } else if (p === 'POA') {
+            display.textContent = 'POA'
+            optEl.classList.remove('qb-opt-unavailable')
+            optEl.querySelector('.qb-opt-check').disabled = false
+          } else if (p === 0) {
+            display.textContent = 'Included'
+            optEl.classList.remove('qb-opt-unavailable')
+            optEl.querySelector('.qb-opt-check').disabled = false
+          } else if (p < 0) {
+            display.textContent = fmtSigned(p) + ' credit'
+            optEl.classList.remove('qb-opt-unavailable')
+            optEl.querySelector('.qb-opt-check').disabled = false
+          } else {
+            display.textContent = fmtSigned(p)
+            optEl.classList.remove('qb-opt-unavailable')
+            optEl.querySelector('.qb-opt-check').disabled = false
+          }
+        })
+      }
+
+      function renderSummary() {
+        const v = variantData[currentVariant]
+        $('[data-summary-variant]').textContent = v.name
+        $('[data-summary-base]').textContent = fmt(v.basePrice)
+
+        let optionsTotal = 0
+        let count = 0
+        $$('.qb-opt').forEach((optEl) => {
+          if (selected.has(optEl.dataset.optId)) {
+            const p = getOptionPrice(optEl, currentVariant)
+            if (typeof p === 'number') optionsTotal += p
+            count++
+          }
+        })
+        $('[data-summary-count]').textContent = count
+        $('[data-summary-options]').textContent = fmtSigned(optionsTotal)
+        $('[data-summary-total]').textContent = fmt(v.basePrice + optionsTotal)
+
+        // Update hidden form fields
+        $('[data-hidden-variant-name]').value = v.name
+        $('[data-hidden-variant-base]').value = v.basePrice
+        $('[data-hidden-total]').value = v.basePrice + optionsTotal
+        const selectedOptList = $$('.qb-opt')
+          .filter((el) => selected.has(el.dataset.optId))
+          .map((el) => {
+            const label = el.querySelector('.qb-opt-label').textContent.trim()
+            const price = getOptionPrice(el, currentVariant)
+            const priceStr = price === 'POA' ? 'POA' : (typeof price === 'number' ? '$' + price : '?')
+            return `${label} (${priceStr})`
+          })
+        $('[data-hidden-options]').value = selectedOptList.join(' | ')
+      }
+
+      // Variant change
+      $$('.qb-variant').forEach((vEl) => {
+        vEl.addEventListener('click', (e) => {
+          if (e.target.tagName === 'A') return
+          const newVariant = vEl.dataset.variantId
+          if (newVariant === currentVariant) return
+          currentVariant = newVariant
+          $$('.qb-variant').forEach((el) => el.classList.toggle('qb-variant-selected', el.dataset.variantId === newVariant))
+          vEl.querySelector('input[type=radio]').checked = true
+          renderOptionPrices()
+          renderSummary()
+        })
+      })
+
+      // Option toggle
+      $$('.qb-opt-check').forEach((cb) => {
+        cb.addEventListener('change', (e) => {
+          const optEl = cb.closest('.qb-opt')
+          if (cb.checked) selected.add(optEl.dataset.optId)
+          else selected.delete(optEl.dataset.optId)
+          renderSummary()
+        })
+      })
+
+      // Share button: Web Share API on mobile, clipboard URL fallback elsewhere
+      $('[data-qb-share]').addEventListener('click', async () => {
+        // Build a URL with the current state encoded
+        const params = new URLSearchParams()
+        params.set('v', currentVariant)
+        if (selected.size) params.set('o', Array.from(selected).join(','))
+        const shareUrl = pageUrl + (params.toString() ? '?' + params.toString() : '')
+        const v = variantData[currentVariant]
+        const total = $('[data-summary-total]').textContent
+        const shareText = `Here's the ${v.name} spec I'm thinking about from SEQ Campers - indicative total ${total}. Take a look: ${shareUrl}`
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: `${brandData.name} spec - SEQ Campers`,
+              text: shareText,
+              url: shareUrl,
+            })
+            return
+          } catch (err) { /* user cancelled, fall through to clipboard */ }
+        }
+        try {
+          await navigator.clipboard.writeText(shareText)
+          $('[data-share-help]').hidden = false
+          setTimeout(() => { $('[data-share-help]').hidden = true }, 6000)
+        } catch (err) {
+          // Final fallback: open mailto
+          window.location.href = 'mailto:?subject=' + encodeURIComponent(`${brandData.name} spec - SEQ Campers`) + '&body=' + encodeURIComponent(shareText)
+        }
+      })
+
+      // On load: parse URL params + apply
+      const urlParams = new URLSearchParams(window.location.search)
+      const urlVariant = urlParams.get('v')
+      if (urlVariant && variantData[urlVariant]) {
+        currentVariant = urlVariant
+        $$('.qb-variant').forEach((el) => {
+          el.classList.toggle('qb-variant-selected', el.dataset.variantId === urlVariant)
+          el.querySelector('input[type=radio]').checked = (el.dataset.variantId === urlVariant)
+        })
+      }
+      const urlOptions = urlParams.get('o')
+      if (urlOptions) {
+        urlOptions.split(',').forEach((optId) => {
+          const optEl = document.querySelector(`.qb-opt[data-opt-id="${optId}"]`)
+          if (optEl) {
+            const cb = optEl.querySelector('.qb-opt-check')
+            if (!cb.disabled) { cb.checked = true; selected.add(optId) }
+          }
+        })
+      }
+
+      renderOptionPrices()
+      renderSummary()
+    })()
+  </script>
 </Site>

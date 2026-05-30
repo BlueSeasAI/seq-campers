@@ -24,10 +24,10 @@ const inclusions = [
 ]
 const totalValue = inclusions.reduce((sum, i) => sum + i.value, 0)
 
-// Quote pages built and maintained by Maud on Netlify. These are the
-// canonical configurators - QR codes + "Build your spec" buttons all point
-// at these pages so visitors see the same quote tool Maud has been refining.
-const MAUD_QUOTE_BASE = 'https://rainbow-babka-6e2adc.netlify.app'
+// Quote builder pages now live on our own domain at /quote/{brand}.
+// (Mirrored from Maud's rainbow-babka.netlify.app pages with Netlify Forms
+// + per-variant pricing + share-quote button.)
+const QUOTE_BASE = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
 
 // 7 brands to feature with QR codes + quote builders at the show.
 // QR codes are displayed on desktop only (no point scanning a QR on your own
@@ -266,7 +266,7 @@ const eventSchema = {
 
       <div class="qr-grid">
         {brandQuotes.map((b) => {
-          const quoteUrl = `${MAUD_QUOTE_BASE}/${b.slug}`
+          const quoteUrl = `${QUOTE_BASE}/quote/${b.slug}`
           return (
             <div class="qr-card">
               <div class="qr-card-meta">
@@ -277,7 +277,7 @@ const eventSchema = {
                   <span class="page-eyebrow" style="color:var(--gold); margin:0; display:block; margin-bottom:4px;">Show special</span>
                   {b.showSpecial}
                 </div>
-                <a href={quoteUrl} target="_blank" rel="noopener" class="btn-primary qr-card-cta">Build your {b.brand} spec</a>
+                <a href={`/quote/${b.slug}`} class="btn-primary qr-card-cta">Build your {b.brand} spec</a>
               </div>
               <div class="qr-card-qr" aria-hidden="false">
                 <img
