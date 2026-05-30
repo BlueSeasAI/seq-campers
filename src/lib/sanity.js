@@ -89,7 +89,7 @@ export function conditionLabel(value) {
 // ---------------------------------------------------------------------------
 
 export async function getForSaleCaravans() {
-  return client.fetch(`
+  const raw = await client.fetch(`
     *[_type == "caravan" && status == "for-sale"]
     | order(featured desc, price asc) {
       _id, title, slug, price, status, condition, featured,
@@ -98,12 +98,34 @@ export async function getForSaleCaravans() {
       specs { sleeps, length, tareWeight }
     }
   `)
+  // Normalise slug to the same safe form getAllCaravanPaths produces so
+  // card href links point at URLs that actually exist in the build output.
+  return raw.map((c) => ({
+    ...c,
+    slug: { current: safeSlug(c.slug?.current) || safeSlug(c.title) },
+  }))
 }
 
 export async function getCaravan(slug) {
+  // First fetch all caravans (cheap - just title/slug/_id) so we can
+  // match the safe-slugified version against the cleaned slug requested.
+  // Editor-entered slugs may contain spaces/capitals/# that we have
+  // already cleaned in getAllCaravanPaths.
+  const all = await client.fetch(`
+    *[_type == "caravan" && status == "for-sale"] {
+      _id, title, "slug": slug.current
+    }
+  `)
+  const match = all.find((c) => {
+    const fromSlug = safeSlug(c.slug)
+    const fromTitle = safeSlug(c.title)
+    return fromSlug === slug || fromTitle === slug
+  })
+  if (!match) return null
+
   return client.fetch(
     `
-    *[_type == "caravan" && slug.current == $slug][0] {
+    *[_id == $id][0] {
       _id, title, price, status, condition, description, features,
       "brand": brand->name,
       "photos": photos[].asset->url,
@@ -116,7 +138,7 @@ export async function getCaravan(slug) {
       configurator
     }
   `,
-    { slug }
+    { id: match._id }
   )
 }
 
@@ -132,19 +154,69 @@ export async function getSoldCaravans() {
 }
 
 export async function getFeaturedCaravans() {
-  return client.fetch(`
+  const raw = await client.fetch(`
     *[_type == "caravan" && featured == true && status == "for-sale"][0..2] {
       _id, title, slug, price, condition,
       "brand": brand->name,
       "mainImage": photos[0].asset->url
     }
   `)
+  return raw.map((c) => ({
+    ...c,
+    slug: { current: safeSlug(c.slug?.current) || safeSlug(c.title) },
+  }))
+}
+
+/**
+ * Defensive slug cleaner. Sanity editors sometimes leave the URL slug field
+ * with raw title text (spaces, capitals, # characters, double-spaces). Those
+ * break Astro's static build cleanup step because filesystem paths cannot
+ * contain certain encoded characters. This function turns any input into a
+ * safe lowercase-letters-numbers-and-hyphens slug.
+ */
+export function safeSlug(input) {
+  if (!input) return null
+  const s = String(input)
+    .toLowerCase()
+    .normalize('NFKD')                  // strip accents
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')       // drop everything except letters/numbers/space/hyphen
+    .trim()
+    .replace(/\s+/g, '-')               // spaces -> single hyphen
+    .replace(/-+/g, '-')                // collapse multiple hyphens
+    .slice(0, 96)
+  return s || null
 }
 
 export async function getAllCaravanPaths() {
-  return client.fetch(`
-    *[_type == "caravan" && status == "for-sale"] { "slug": slug.current }
+  const raw = await client.fetch(`
+    *[_type == "caravan" && status == "for-sale"] {
+      _id, title, "slug": slug.current
+    }
   `)
+  // Auto-clean any slug that has spaces, capitals or invalid characters.
+  // Skip any caravan whose slug AND title both fail to produce something
+  // usable - those entries need editor attention in Sanity.
+  const cleaned = []
+  for (const c of raw) {
+    const fromSlug = safeSlug(c.slug)
+    const fromTitle = safeSlug(c.title)
+    const slug = fromSlug || fromTitle
+    if (slug) cleaned.push({ slug, _id: c._id, originalSlug: c.slug })
+    else console.warn(`Caravan ${c._id} skipped: cannot produce a valid slug from "${c.slug}" or "${c.title}"`)
+  }
+  // Dedupe in case two caravans collide on the cleaned slug
+  const seen = new Set()
+  const unique = []
+  for (const c of cleaned) {
+    if (seen.has(c.slug)) {
+      console.warn(`Caravan ${c._id} skipped: slug "${c.slug}" already used by another caravan`)
+      continue
+    }
+    seen.add(c.slug)
+    unique.push(c)
+  }
+  return unique
 }
 
 /**
@@ -217,7 +289,7 @@ export async function getVideosByCategory() {
 // ---------------------------------------------------------------------------
 
 export async function getSiteSettings() {
-  return client.fetch(`
+  const raw = await client.fetch(`
     *[_id == "siteSettings"][0] {
       heroVideo,
       "shanesPick": shanesPick {
@@ -235,6 +307,12 @@ export async function getSiteSettings() {
       streetAddress
     }
   `)
+  if (raw?.shanesPick?.caravan) {
+    raw.shanesPick.caravan.slug = {
+      current: safeSlug(raw.shanesPick.caravan.slug?.current) || safeSlug(raw.shanesPick.caravan.title),
+    }
+  }
+  return raw
 }
 
 /**
