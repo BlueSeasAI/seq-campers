@@ -17,6 +17,7 @@ const showStock = [
   { name: 'Kimberley Kruiser S Class', detail: 'flagship apartment-grade' },
   { name: 'Stockman Trekka', detail: 'serious off-road camper trailer' },
   { name: 'Stockman Rover', detail: 'all-rounder family off-grid' },
+  { name: 'Stockman POD All-Roader', detail: 'demo unit - 20% off, rooftop tent included' },
 ]
 
 // Grand Slam show-offer value stack (Hormozi pattern, merged onto this page
@@ -29,7 +30,9 @@ const inclusions = [
   { label: 'Full annual service voucher', value: 1450, note: 'Bearings, brakes, gas, electrics. Pre-trip ready.' },
   { label: 'Premium hitch upgrade', value: 1290, note: 'Off-road coupling, full articulation.' },
   { label: '12 months roadside cover', value: 580, note: 'Australia-wide breakdown assistance.' },
-  { label: 'Free 2000W inverter (Stockman Rover)', value: 1900, note: 'Run lights, fridge, devices off-grid.' },
+  { label: 'Stockman Rover accessory pack', value: 2500, note: '$2,500 of off-grid accessories - lithium, solar, awning, your pick.' },
+  { label: 'Stockman Trekka accessory pack', value: 5000, note: '$5,000 of trail-ready accessories. Show-only inclusion.' },
+  { label: 'Stockman POD accessory pack', value: 500, note: '$500 of POD accessories to kit your trailer out.' },
   { label: '$3,000 accessory credit (Kimberley)', value: 3000, note: 'Solar, lithium, or whatever upgrade matters most.' },
   { label: 'Stone deflector + rock tamer kit', value: 880, note: 'Save your windows on corrugations.' },
   { label: 'Show floor handover pack', value: 540, note: 'Levellers, sand pegs, hose, mat. Ready to camp.' },
@@ -51,14 +54,14 @@ const brandQuotes = [
     brand: 'Stockman',
     slug: 'rover',
     tagline: 'The all-rounder. Off-grid ready, family friendly, 90 second setup.',
-    showSpecial: 'Free 2000W inverter upgrade (worth $1,900)',
+    showSpecial: '$2,500 of free accessories included - show only',
   },
   {
     name: 'Stockman Trekka',
     brand: 'Stockman',
     slug: 'trekka',
     tagline: 'The serious off-road camper trailer. Tough, light, made for tracks.',
-    showSpecial: 'Show pricing only available at the stand',
+    showSpecial: '$5,000 of free accessories included - show only',
   },
   {
     name: 'Kimberley Karavan',
@@ -207,8 +210,18 @@ const eventSchema = {
         </div>
       </div>
 
-      <div style="margin-top:18px; background:#FFF5EC; border:1px solid #F0CDA8; border-left:4px solid var(--rust); border-radius:8px; padding:14px 18px; color:#5A3818; font-size:0.92rem; line-height:1.55;">
+      <div style="margin-top:18px; background:#E8F5EC; border:1px solid #6BB893; border-left:4px solid #2BA85F; border-radius:8px; padding:14px 18px; color:#133D24; font-size:0.95rem; line-height:1.55;">
+        <strong>Tip - free trains to the show:</strong> your Brisbane Caravan Supershow ticket also covers free Queensland Rail travel to Bowen Hills station (right at the Showgrounds gate). Save the parking fee, skip the traffic.
+      </div>
+
+      <div style="margin-top:12px; background:#FFF5EC; border:1px solid #F0CDA8; border-left:4px solid var(--rust); border-radius:8px; padding:14px 18px; color:#5A3818; font-size:0.92rem; line-height:1.55;">
         <strong>Showroom closed Saturday 6 June:</strong> the whole SEQ team is at the show floor. Drop in to the stand to see us, or call <a href={`tel:${podiumNumber.replace(/\s/g, '')}`} style="color:var(--rust); font-weight:600; text-decoration:none;">{podiumNumber}</a> for a text reply during show hours.
+      </div>
+
+      <div style="margin-top:12px; background:linear-gradient(135deg, #FFF1CC 0%, #FFE08A 100%); border:1px solid #E5B53C; border-left:5px solid #C0341A; border-radius:10px; padding:18px 22px; color:#3D2A05; line-height:1.55;">
+        <div style="display:inline-block; background:#C0341A; color:#fff; font-size:0.72rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; padding:4px 10px; border-radius:4px; margin-bottom:8px;">Show floor exclusive</div>
+        <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:700; color:#2A1608; margin-bottom:4px;">Stockman demo POD All-Roader - 20% off</div>
+        <div style="font-size:0.94rem;">Our demo POD All-Roader is on the show floor with the rooftop tent already fitted - and it's <strong>20% off the standard price</strong> for any show-week buyer. One unit only. First in, best dressed.</div>
       </div>
     </div>
   </section>
