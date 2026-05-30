@@ -5,19 +5,29 @@ const { variant = 'light' } = Astro.props
 <div class={`trust-strip trust-strip-${variant}`} role="region" aria-label="Dealer credentials">
   <div class="container">
     <div class="trust-strip-inner">
-      <span class="trust-item">
-        <span class="trust-tick" aria-hidden="true">✓</span>
-        Authorised Kimberley Kampers Dealer
+      <!-- AU badge - image is self-contained (already has "Australian Designed
+           & Built" text baked in), so no duplicate text label here. -->
+      <span class="trust-item trust-item-aus" title="Australian Designed and Built since 1996">
+        <img
+          class="trust-aus-icon"
+          src="/au-built-badge.png"
+          alt="Australian Designed and Built, est. 1996"
+          width="200"
+          height="200"
+          loading="lazy"
+        />
       </span>
-      <span class="trust-divider" aria-hidden="true"></span>
       <span class="trust-item">
         <span class="trust-tick" aria-hidden="true">✓</span>
-        Authorised Stockman Dealer
+        <span class="trust-item-label">Authorised Kimberley Dealer</span>
       </span>
-      <span class="trust-divider" aria-hidden="true"></span>
       <span class="trust-item">
         <span class="trust-tick" aria-hidden="true">✓</span>
-        30 years on the Sunshine Coast
+        <span class="trust-item-label">Authorised Stockman Dealer</span>
+      </span>
+      <span class="trust-item">
+        <span class="trust-tick" aria-hidden="true">✓</span>
+        <span class="trust-item-label">30 years on the Sunshine Coast</span>
       </span>
     </div>
   </div>

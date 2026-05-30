@@ -1,31 +1,122 @@
 ---
 import Site from '../layouts/Site.astro'
-import TrustStrip from '../components/TrustStrip.astro'
 
 // Brisbane Caravan, Camping & Touring Supershow 2026
-// Held at the Brisbane Showgrounds (Bowen Hills) - dates per the SEQ
-// roadmap. Update the dates + stand number here when the show confirms
-// final details.
 const showDates = '3 - 5 June 2026'
 const venue = 'Brisbane Showgrounds, Bowen Hills'
-const standNumber = 'TBC - check back closer to the show'
+const standNumber = '#2693'
+
+// Grand Slam show-offer value stack (Hormozi pattern, merged onto this page
+// per Bart - one URL, no separate /show-offer page).
+// TBC items - Shane to confirm via the checklist in the SEQ folder.
+const SHOW_EXPIRY_ISO = '2026-06-07T23:00:00+10:00'
+const VANS_REMAINING = 14
+const HOLD_AMOUNT = 500
+const inclusions = [
+  { label: 'Full annual service voucher', value: 1450, note: 'Bearings, brakes, gas, electrics. Pre-trip ready.' },
+  { label: 'Premium hitch upgrade', value: 1290, note: 'Off-road coupling, full articulation.' },
+  { label: '12 months roadside cover', value: 580, note: 'Australia-wide breakdown assistance.' },
+  { label: 'Free 2000W inverter (Stockman Rover)', value: 1900, note: 'Run lights, fridge, devices off-grid.' },
+  { label: '$3,000 accessory credit (Kimberley)', value: 3000, note: 'Solar, lithium, or whatever upgrade matters most.' },
+  { label: 'Stone deflector + rock tamer kit', value: 880, note: 'Save your windows on corrugations.' },
+  { label: 'Show floor handover pack', value: 540, note: 'Levellers, sand pegs, hose, mat. Ready to camp.' },
+  { label: 'Locked-in 2026 pricing', value: 5000, note: 'Pre-July factory price rises do not apply to show buyers.' },
+]
+const totalValue = inclusions.reduce((sum, i) => sum + i.value, 0)
+
+// Quote pages built and maintained by Maud on Netlify. These are the
+// canonical configurators - QR codes + "Build your spec" buttons all point
+// at these pages so visitors see the same quote tool Maud has been refining.
+const MAUD_QUOTE_BASE = 'https://rainbow-babka-6e2adc.netlify.app'
+
+// 7 brands to feature with QR codes + quote builders at the show.
+// QR codes are displayed on desktop only (no point scanning a QR on your own
+// phone). Mobile visitors get a direct tap-through to the same quote page.
+const brandQuotes = [
+  {
+    name: 'Stockman Rover',
+    brand: 'Stockman',
+    slug: 'rover',
+    tagline: 'The all-rounder. Off-grid ready, family friendly, 90 second setup.',
+    showSpecial: 'Free 2000W inverter upgrade (worth $1,900)',
+  },
+  {
+    name: 'Stockman Trekka',
+    brand: 'Stockman',
+    slug: 'trekka',
+    tagline: 'The serious off-road camper trailer. Tough, light, made for tracks.',
+    showSpecial: 'Show pricing only available at the stand',
+  },
+  {
+    name: 'Kimberley Karavan',
+    brand: 'Kimberley',
+    slug: 'karavan',
+    tagline: 'The iconic Australian-made off-road caravan. 30 years of refinement.',
+    showSpecial: '$3,000 accessory credit (Kimberley factory promotion)',
+  },
+  {
+    name: 'Kimberley Kube',
+    brand: 'Kimberley',
+    slug: 'kube',
+    tagline: 'Compact, capable, premium off-grid living. Couples and small families.',
+    showSpecial: 'Show package - lock in 2026 pricing before July rises',
+  },
+  {
+    name: 'Kimberley Kruiswagen',
+    brand: 'Kimberley',
+    slug: 'kruiswagen',
+    tagline: 'The expedition motorhome. Self-contained, anywhere, any track.',
+    showSpecial: 'Show special - ask Shane on the stand',
+  },
+  {
+    name: 'Kimberley Kruiser T Class',
+    brand: 'Kimberley',
+    slug: 'kruiser-t',
+    tagline: 'The luxury off-road caravan. Touring with everything you need.',
+    showSpecial: 'Show package - lock in 2026 pricing before July rises',
+  },
+  {
+    name: 'Kimberley Kruiser S Class',
+    brand: 'Kimberley',
+    slug: 'kruiser-s',
+    tagline: 'The flagship. Apartment-grade interior in a true off-road shell.',
+    showSpecial: 'Show package - lock in 2026 pricing before July rises',
+  },
+]
+
+// Build QR code image URLs via qrserver.com (free public API, no auth, very
+// reliable). PNG, 240x240 with high error correction so it still scans if
+// the page is photographed at an angle. Phase 2: replace with build-time
+// generated SVGs to remove the third-party dependency.
+function qrUrl(targetUrl) {
+  const encoded = encodeURIComponent(targetUrl)
+  return `https://api.qrserver.com/v1/create-qr-code/?data=${encoded}&size=240x240&ecc=H&margin=0`
+}
 
 const faqs = [
   {
     q: 'Where will SEQ Campers be at the Brisbane Show?',
-    a: `Look for the SEQ Campers stand at ${venue}. Stand number: ${standNumber}. We will post the exact location on this page and our YouTube channel a week before doors open.`,
+    a: `${venue}. Stand number: ${standNumber}. We will post the exact location on this page and our YouTube channel a week before doors open.`,
+  },
+  {
+    q: 'Can I scan a QR code on this page to start building my quote before the show?',
+    a: 'Yes - on a desktop or laptop. Each caravan above has a QR code you can scan with your phone to jump straight into the spec builder. On mobile, tap the "Build your spec" button instead.',
   },
   {
     q: 'Which caravans are you bringing to the show?',
-    a: 'We are bringing a curated mix of Kimberley Kampers and Stockman stock - including at least one off-road camper trailer set up for full bush touring. Final list confirmed closer to the show.',
+    a: 'A curated mix of Kimberley Kampers and Stockman stock - including options set up for serious off-grid touring. Final list confirmed closer to the show.',
   },
   {
     q: 'Can I book a private chat at the show?',
-    a: 'Yes - and we recommend it. Show floors get busy. If you would like a focused 20-minute walk-through of any caravan in our stock, send through the form below and we will lock in a time during the show.',
+    a: 'Yes - and we recommend it. Show floors get busy. If you would like a focused 20-minute walk-through of any caravan in our stock, send through the contact form and we will lock in a time during the show.',
   },
   {
     q: 'Will there be show pricing?',
-    a: 'Yes. We hold back specific show offers for visitors who come and see us in person. We do not list them online before the show.',
+    a: 'Yes. Each brand on this page has a show special listed. We hold these back for visitors who come and see us in person - they are not listed elsewhere online.',
+  },
+  {
+    q: 'I cannot make it to Brisbane. Can I still get show pricing?',
+    a: 'Get in touch before or during the show and we will see what we can do. Show specials are easier to honour for buyers who can visit our Sunshine Coast showroom during the show week.',
   },
 ]
 
@@ -69,7 +160,7 @@ const eventSchema = {
 
 <Site
   title="Brisbane Caravan Show 2026"
-  description="SEQ Campers at the Brisbane Caravan, Camping & Touring Supershow, 3-5 June 2026. Kimberley Kampers, Stockman caravans, and show-only pricing. Book a private chat at the show."
+  description="SEQ Campers at the Brisbane Caravan, Camping & Touring Supershow, 3-5 June 2026. Build your spec for Kimberley Kampers and Stockman caravans, scan the QR codes, and lock in show-only pricing."
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(eventSchema)} />
@@ -82,11 +173,10 @@ const eventSchema = {
     </div>
   </div>
 
-  <TrustStrip />
-
-  <section class="section">
-    <div class="container" style="max-width:840px;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px; margin-bottom:40px;">
+  <!-- When / Where / Stand -->
+  <section class="section" style="padding-bottom:24px;">
+    <div class="container" style="max-width:980px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px;">
         <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
           <div class="page-eyebrow" style="color:var(--rust);">When</div>
           <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{showDates}</div>
@@ -99,41 +189,145 @@ const eventSchema = {
         </div>
         <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
           <div class="page-eyebrow" style="color:var(--rust);">Stand</div>
-          <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{standNumber}</div>
-          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Updated closer to the show</div>
+          <div style="font-family:'Inter Tight', sans-serif; font-size:1.6rem; font-weight:800; color:var(--ink); letter-spacing:-0.01em;">{standNumber}</div>
+          <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">Look for the SEQ Campers banner.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Grand Slam show offer: value stack + countdown + scarcity + hold.
+       Lives between the "when/where" cards and the brand QR grid so it
+       lands before visitors start picking specific caravans. -->
+  <section class="section" style="padding-top:24px; padding-bottom:24px;">
+    <div class="container" style="max-width:980px;">
+      <div style="margin-bottom:18px;">
+        <div class="page-eyebrow" style="color:var(--rust);">The show offer</div>
+        <h2 class="section-title" style="margin-top:6px;">${totalValue.toLocaleString('en-AU')} of inclusions. <span style="color:var(--rust);">Free.</span></h2>
+        <p style="color:var(--muted); margin-top:10px; line-height:1.6;">
+          Lock in a new caravan during the show and we stack the value on top - no discount needed. Offer closes Sunday 7 June at 11pm.
+        </p>
+      </div>
+
+      <div class="show-offer-stats" style="margin-bottom:22px;">
+        <div class="show-offer-stat show-offer-stat-countdown">
+          <div class="show-offer-stat-label">Offer closes in</div>
+          <div class="show-offer-stat-value" data-countdown={SHOW_EXPIRY_ISO}>--d --h --m --s</div>
+        </div>
+        <div class="show-offer-stat show-offer-stat-scarcity">
+          <div class="show-offer-stat-label">Show vans available</div>
+          <div class="show-offer-stat-value">{VANS_REMAINING} <span class="show-offer-stat-suffix">remaining</span></div>
+        </div>
+        <div class="show-offer-stat">
+          <div class="show-offer-stat-label">Reserve with</div>
+          <div class="show-offer-stat-value">${HOLD_AMOUNT} <span class="show-offer-stat-suffix">fully refundable</span></div>
         </div>
       </div>
 
+      <div class="value-stack">
+        {inclusions.map((item) => (
+          <div class="value-stack-row">
+            <div class="value-stack-tick" aria-hidden="true">✓</div>
+            <div class="value-stack-body">
+              <div class="value-stack-label">{item.label}</div>
+              <div class="value-stack-note">{item.note}</div>
+            </div>
+            <div class="value-stack-price">${item.value.toLocaleString('en-AU')}</div>
+          </div>
+        ))}
+        <div class="value-stack-row value-stack-total">
+          <div class="value-stack-tick value-stack-tick-total" aria-hidden="true">=</div>
+          <div class="value-stack-body">
+            <div class="value-stack-label">Total value stacked on every show-week purchase</div>
+            <div class="value-stack-note">All inclusions apply to new Kimberley Kampers and Stockman caravans purchased 3 - 7 June 2026.</div>
+          </div>
+          <div class="value-stack-price value-stack-price-total">${totalValue.toLocaleString('en-AU')}</div>
+        </div>
+      </div>
+
+      <p style="text-align:center; margin-top:14px; font-size:0.86rem; color:var(--muted);">
+        ${HOLD_AMOUNT} hold locks in show pricing and inclusions. Fully refundable if you change your mind by Friday 14 June 2026.
+      </p>
+    </div>
+  </section>
+
+  <!-- Hero quote-builder section: the centrepiece for the show -->
+  <section class="section" style="background:var(--sand-deep); padding-top:48px;">
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:8px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Get show-ready</div>
+        <h2 class="section-title">Build your spec before you arrive at the show.</h2>
+      </div>
+      <p style="text-align:center; max-width:680px; margin:0 auto 36px; color:var(--muted); line-height:1.65;">
+        Pick a model below and lock in what you actually want before you walk onto the stand.
+        <strong style="color:var(--ink);">On desktop:</strong> scan the QR code with your phone to keep building on the go.
+        <strong style="color:var(--ink);">On mobile:</strong> tap the button to start.
+      </p>
+
+      <div class="qr-grid">
+        {brandQuotes.map((b) => {
+          const quoteUrl = `${MAUD_QUOTE_BASE}/${b.slug}`
+          return (
+            <div class="qr-card">
+              <div class="qr-card-meta">
+                <div class="qr-card-brand">{b.brand}</div>
+                <h3 class="qr-card-name">{b.name}</h3>
+                <p class="qr-card-tag">{b.tagline}</p>
+                <div class="qr-card-special">
+                  <span class="page-eyebrow" style="color:var(--gold); margin:0; display:block; margin-bottom:4px;">Show special</span>
+                  {b.showSpecial}
+                </div>
+                <a href={quoteUrl} target="_blank" rel="noopener" class="btn-primary qr-card-cta">Build your {b.brand} spec</a>
+              </div>
+              <div class="qr-card-qr" aria-hidden="false">
+                <img
+                  src={qrUrl(quoteUrl)}
+                  alt={`QR code to build your ${b.name} spec on your phone`}
+                  width="160"
+                  height="160"
+                  loading="lazy"
+                />
+                <div class="qr-card-qr-label">Scan with your phone</div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- Why come / personal walkthrough -->
+  <section class="section">
+    <div class="container" style="max-width:840px;">
       <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.5rem; font-weight:600; color:var(--ink); margin-bottom:14px;">
         Why come and see us in person.
       </h2>
       <p style="color:var(--muted); line-height:1.75; margin-bottom:14px;">
-        Online videos are a great way to start. But there is no substitute for opening every cupboard, running your hand along
-        the joinery, and asking the awkward questions face-to-face. The Brisbane Show is the easiest way to do all of that in one place.
+        Online videos and a spec builder are a great way to start. But there is no substitute for opening every cupboard, running your hand
+        along the joinery, and asking the awkward questions face-to-face. The Brisbane Show is the easiest way to do all of that in one place.
       </p>
       <p style="color:var(--muted); line-height:1.75; margin-bottom:32px;">
-        Shane and the SEQ team will be on the stand for all three days. We are bringing a curated lineup from our Kimberley Kampers
-        and Stockman stock - including options set up for serious off-grid touring.
+        Shane and the SEQ team will be on the stand for all three days, with a curated lineup of Kimberley Kampers and Stockman stock - including
+        options set up for serious off-grid touring.
       </p>
 
-      <div style="background:var(--ink); color:var(--sand); border-radius:var(--radius); padding:28px 32px; border-left:6px solid var(--gold); margin-bottom:32px;">
+      <div style="background:var(--ink); color:var(--sand); border-radius:var(--radius); padding:28px 32px; margin-bottom:32px;">
         <div class="page-eyebrow" style="color:var(--gold);">Skip the queue</div>
         <h3 style="color:var(--sand); font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; margin:8px 0 10px;">
-          Book a private 20-minute chat at the show.
+          Reserve a private 20-minute show slot.
         </h3>
         <p style="color:var(--gold); margin-bottom:18px; line-height:1.6;">
-          Show floors get busy. If you want focused time with Shane to walk through a specific caravan, lock it in now and we will
-          confirm a slot during the show.
+          Show floors get busy. Lock in focused time with Shane to walk through a specific caravan and we will confirm a slot during the show.
         </p>
-        <a href="/contact" class="btn-primary">Request a chat at the show</a>
+        <a href="/contact" class="btn-primary">Reserve a show slot</a>
       </div>
 
       <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.5rem; font-weight:600; color:var(--ink); margin-bottom:14px;">
         Can't make it to Brisbane?
       </h2>
       <p style="color:var(--muted); line-height:1.75; margin-bottom:14px;">
-        No problem. Our Sunshine Coast showroom is open by appointment year-round. Drive an hour north and you will get our
-        undivided attention - no show-floor chaos required.
+        No problem. Our Sunshine Coast showroom is open by appointment year-round - drive an hour north and you will get our
+        undivided attention, no show-floor chaos required.
       </p>
       <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
         <a href="/stock" class="btn-primary">View current stock</a>
@@ -142,6 +336,7 @@ const eventSchema = {
     </div>
   </section>
 
+  <!-- FAQ -->
   <section class="section" style="background:var(--sand-deep); padding-top:40px;">
     <div class="container" style="max-width:840px;">
       <section class="faq-section" aria-label="Brisbane Show frequently asked questions" style="margin:0;">
@@ -158,4 +353,24 @@ const eventSchema = {
       </section>
     </div>
   </section>
+
+  <!-- Countdown ticker for the show offer (above) -->
+  <script is:inline define:vars={{ expiry: SHOW_EXPIRY_ISO }}>
+    (function () {
+      const el = document.querySelector('[data-countdown]')
+      if (!el) return
+      const target = new Date(expiry).getTime()
+      function tick() {
+        const diff = target - Date.now()
+        if (diff <= 0) { el.textContent = 'Show offer closed'; return }
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+        const s = Math.floor((diff % (1000 * 60)) / 1000)
+        el.textContent = d + 'd ' + h + 'h ' + m + 'm ' + s + 's'
+      }
+      tick()
+      setInterval(tick, 1000)
+    })()
+  </script>
 </Site>

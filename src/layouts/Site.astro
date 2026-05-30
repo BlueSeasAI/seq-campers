@@ -14,6 +14,9 @@ const isActive = (path) => {
   if (path === '/') return pathname === '/'
   return pathname === path || pathname.startsWith(path + '/')
 }
+// Home page gets a transparent header that overlays the hero video, like
+// skyerv.com. All other pages get the standard solid sticky header.
+const isHome = pathname === '/'
 
 // Build canonical + absolute OG image URLs from site base
 const siteBase = Astro.site ?? new URL('https://seqcampers.com.au')
@@ -64,11 +67,11 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
 
   <slot name="head" />
 </head>
-<body>
-  <header class="site-header">
+<body data-home={isHome ? 'true' : 'false'}>
+  <header class={`site-header ${isHome ? 'site-header-overlay' : ''}`}>
     <div class="container">
       <a href="/" class="logo" aria-label="SEQ Campers home">
-        <img src="/seq-logo.webp" alt="SEQ Campers" width="2048" height="399" />
+        <img src="/seq-logo-new.png" alt="SEQ Campers - Campers There & Back" width="600" height="338" />
       </a>
 
       <button
@@ -84,13 +87,12 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       </button>
 
       <nav id="primary-nav">
-        <a href="/" class={isActive('/') ? 'is-active' : ''}>Home</a>
         <a href="/stock" class={isActive('/stock') ? 'is-active' : ''}>Stock</a>
         <a href="/videos" class={isActive('/videos') ? 'is-active' : ''}>Videos</a>
         <a href="/service" class={isActive('/service') ? 'is-active' : ''}>Service</a>
-        <a href="/whats-happening" class={isActive('/whats-happening') ? 'is-active' : ''}>News</a>
+        <a href="/brisbane-show-2026" class={isActive('/brisbane-show-2026') ? 'is-active' : ''}>Brisbane Show</a>
         <a href="/about" class={isActive('/about') ? 'is-active' : ''}>About</a>
-        <a href="/contact" class="nav-cta">Book a walkthrough</a>
+        <a href="/brisbane-show-2026" class="nav-cta">Reserve a show slot</a>
       </nav>
     </div>
   </header>
@@ -113,6 +115,18 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           document.body.style.overflow = ''
         })
       })
+
+      // Home page only: toggle .is-scrolled on the header once past the hero
+      const header = document.querySelector('.site-header-overlay')
+      if (header) {
+        const threshold = 80
+        const onScroll = () => {
+          if (window.scrollY > threshold) header.classList.add('is-scrolled')
+          else header.classList.remove('is-scrolled')
+        }
+        onScroll()
+        window.addEventListener('scroll', onScroll, { passive: true })
+      }
     })()
   </script>
 
@@ -127,7 +141,7 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           <h4>SEQ Campers</h4>
           <p class="footer-brand">Premium off-road caravans on the Sunshine Coast. Kimberley Kampers and Stockman, hand-picked and inspected by the SEQ team.</p>
           <address class="footer-address">
-            6 Bonanza Ct<br />
+            3B/6 Bonanza Court<br />
             Marcoola QLD 4564<br />
             <a href="tel:0753707933">(07) 5370 7933</a><br />
             <a href="mailto:office@seqcampers.com.au">office@seqcampers.com.au</a>

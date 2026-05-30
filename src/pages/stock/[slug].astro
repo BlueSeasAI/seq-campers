@@ -1,23 +1,12 @@
 ---
 import Site from '../../layouts/Site.astro'
 import { getAllCaravanPaths, getCaravan, sanityImage, sanitySrcset, conditionLabel, portableTextToHtml } from '../../lib/sanity.js'
-import Configurator from '../../components/Configurator.jsx'
 
-// PLACEHOLDER configurator options. Used only when a caravan does not yet
-// have its own configurator data loaded in Sanity. Remove the fallback once
-// Q-07 (Maud's real per-caravan add-on list) lands and is in the CMS.
-const PLACEHOLDER_CONFIGURATOR_OPTIONS = [
-  { name: 'Solar package upgrade (300W roof + 200W portable)', priceAdd: 3200 },
-  { name: 'Lithium battery upgrade (200Ah LiFePO4)', priceAdd: 4800 },
-  { name: 'Diesel heater (Webasto)', priceAdd: 1900 },
-  { name: 'Air conditioner (rooftop reverse cycle)', priceAdd: 2400 },
-  { name: 'External shower kit + hot water', priceAdd: 650 },
-  { name: 'Bike rack (3-bike rear-mount)', priceAdd: 600 },
-  { name: 'Roll-out awning (Dometic 4m)', priceAdd: 1850 },
-  { name: 'Stone deflector + rock tamer', priceAdd: 880 },
-  { name: 'Off-road jockey wheel + sand pegs kit', priceAdd: 420 },
-  { name: 'Premium mattress upgrade (memory foam)', priceAdd: 1100 },
-]
+// Phase 1 (Brisbane Show 2026): in-page React configurator removed. The
+// "Build your spec" CTA now routes to /quote/{brand} - dedicated brand-aware
+// quote enquiry pages that email sales@seqcampers.com.au. The React
+// Configurator.jsx component is kept in the codebase for Phase 2 when we
+// rebuild a Tesla-style cascading configurator inside the listing page.
 
 export async function getStaticPaths() {
   const caravans = await getAllCaravanPaths()
@@ -32,9 +21,28 @@ if (!caravan) return Astro.redirect('/stock')
 const videos = caravan.videos ?? []
 const videoCount = Math.min(videos.length, 3)
 
-function youtubeEmbed(url) {
-  const match = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/)
-  return match ? `https://www.youtube.com/embed/${match[1]}` : null
+function youtubeId(url) {
+  const m = String(url ?? '').match(/(?:v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
+function youtubeEmbed(url, { autoplay = false } = {}) {
+  const id = youtubeId(url)
+  if (!id) return null
+  const params = new URLSearchParams({
+    modestbranding: '1',
+    rel: '0',
+    iv_load_policy: '3',
+    playsinline: '1',
+  })
+  if (autoplay) {
+    params.set('autoplay', '1')
+    params.set('mute', '1')
+    params.set('loop', '1')
+    params.set('playlist', id)
+    params.set('controls', '0')
+  }
+  return `https://www.youtube.com/embed/${id}?${params.toString()}`
 }
 
 // Build a meta description from structured data
@@ -54,11 +62,6 @@ const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.repla
 
 // Description is Portable Text (rich text blocks). Render to clean HTML.
 const descriptionHtml = portableTextToHtml(caravan.description)
-
-const configuratorOptions = caravan.configurator?.length
-  ? caravan.configurator
-  : PLACEHOLDER_CONFIGURATOR_OPTIONS
-const configuratorIsPlaceholder = !caravan.configurator?.length
 
 // FAQs - use per-caravan custom FAQs from Sanity if present, otherwise
 // generate a smart default set from the caravan's structured data.
@@ -118,6 +121,13 @@ const authorisedDealerLabel = brandLower.includes('kimberley')
   : brandLower.includes('stockman')
     ? 'Authorised Stockman Dealer'
     : null
+
+// Per-listing enquiry form data. Each listing posts to Netlify Forms via the
+// shared "listing-enquiry" form name with the caravan's Sanity-loaded
+// details prefilled as hidden fields. NO routing to Maud's brand pages -
+// those are for new-build spec configuration; this is for THIS specific
+// caravan with its specs already known from Sanity.
+const listingPageUrl = `${siteBase}/stock/${slug}`
 
 // Battery type pretty label
 const batteryTypeLabel = {
@@ -207,6 +217,32 @@ const productSchema = {
           </div>
         )}
 
+        {/* Videos moved up here so they sit alongside photos as the primary visual story */}
+        {videoCount > 0 ? (
+          <div style="margin-top:24px;">
+            <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">Walkaround</div>
+            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:14px;">See it in motion</h2>
+            <div class={`video-grid videos-${videoCount}`}>
+              {videos.slice(0, 3).map((v, i) => {
+                const embedUrl = youtubeEmbed(v.url, { autoplay: i === 0 })
+                return embedUrl ? (
+                  <div class="video-embed">
+                    <iframe src={embedUrl} title={v.label ?? caravan.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen={i !== 0 ? true : undefined}></iframe>
+                  </div>
+                ) : null
+              })}
+            </div>
+          </div>
+        ) : (
+          <div style="margin-top:24px; background:var(--sand-deep); border:1px dashed var(--tan-border); border-radius:var(--radius); padding:20px 24px; text-align:center;">
+            <div class="page-eyebrow" style="color:var(--muted); margin-bottom:6px;">Walkaround video</div>
+            <p style="color:var(--muted); font-size:0.92rem; line-height:1.5;">
+              Shane is filming a B-roll walkthrough of this caravan - it will appear here as soon as it is ready.
+              Want to see it sooner? <a href="/contact" style="color:var(--rust); font-weight:600;">Book a private walkthrough</a>.
+            </p>
+          </div>
+        )}
+
         {descriptionHtml && (
           <div style="margin-top:32px;">
             <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">About this caravan</h2>
@@ -215,36 +251,34 @@ const productSchema = {
         )}
 
         {caravan.tripHistory && (
-          <div style="margin-top:28px; background:#fff; border:1px solid var(--tan-border); border-left:4px solid var(--gold); border-radius:var(--radius); padding:20px 24px;">
+          <div style="margin-top:28px; background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px 26px;">
             <div class="page-eyebrow" style="color:var(--gold); margin-bottom:8px;">Where this van has been</div>
             <p style="color:var(--ink); line-height:1.75; font-style:italic;">{caravan.tripHistory}</p>
           </div>
         )}
 
         {caravan.features?.length > 0 && (
-          <div style="margin-top:28px;">
-            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">Features</h2>
-            <ul style="display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; padding-left:18px;">
-              {caravan.features.map((f) => <li style="font-size:0.9rem; color:var(--text-muted);">{f}</li>)}
-            </ul>
-          </div>
-        )}
-
-        {videoCount > 0 && (
-          <div style="margin-top:36px;">
-            <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:16px;">Videos</h2>
-            <div class={`video-grid videos-${videoCount}`}>
-              {videos.slice(0, 3).map((v) => {
-                const embedUrl = youtubeEmbed(v.url)
-                return embedUrl ? (
-                  <div class="video-embed">
-                    <iframe src={embedUrl} title={v.label ?? caravan.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div style="margin-top:32px;">
+            <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:6px;">Top features</h2>
+            <p style="color:var(--muted); font-size:0.92rem; margin-bottom:18px;">What makes this rig stand out from the lineup.</p>
+            <div class="feature-cards">
+              {caravan.features.map((f) => {
+                // Features can be either a plain string "Lithium upgrade" OR a
+                // markdown-ish "Label - Description" pattern. Split if present.
+                const dashIdx = typeof f === 'string' ? f.search(/\s[-–—]\s/) : -1
+                const label = dashIdx > -1 ? f.slice(0, dashIdx).trim() : f
+                const detail = dashIdx > -1 ? f.slice(dashIdx + 3).trim() : null
+                return (
+                  <div class="feature-card">
+                    <div class="feature-card-label">{label}</div>
+                    {detail && <div class="feature-card-detail">{detail}</div>}
                   </div>
-                ) : null
+                )
               })}
             </div>
           </div>
         )}
+
       </div>
 
       <!-- Right: price + specs + enquire -->
@@ -265,6 +299,8 @@ const productSchema = {
         )}
 
         {caravan.specs && (
+        <div class="specs-block">
+          <div class="specs-block-label">Specs</div>
           <div class="specs-grid">
             {caravan.specs.sleeps && (
               <div class="spec-item">
@@ -315,10 +351,16 @@ const productSchema = {
               </div>
             )}
           </div>
+        </div>
         )}
 
-        {(caravan.compliance?.vin || caravan.compliance?.registrationState) && (
+        {(caravan.compliance?.stockNumber || caravan.compliance?.vin || caravan.compliance?.registrationState) && (
           <div style="margin-top:14px; padding:12px 0; border-top:1px solid var(--tan-border); font-size:0.78rem; color:var(--muted);">
+            {caravan.compliance.stockNumber && (
+              <div style="margin-bottom:4px;">
+                <span style="font-weight:600;">Stock #:</span> {caravan.compliance.stockNumber}
+              </div>
+            )}
             {caravan.compliance.registrationState && (
               <div style="margin-bottom:4px;">
                 <span style="font-weight:600;">Reg state:</span> {caravan.compliance.registrationState}
@@ -332,7 +374,7 @@ const productSchema = {
           </div>
         )}
 
-        <a href="#configurator" class="btn-enquire">Build your spec + get a quote</a>
+        <a href="#listing-enquiry" class="btn-enquire">Enquire about this caravan</a>
 
         <p style="margin-top:16px; font-size:0.78rem; color:var(--text-muted); text-align:center;">
           Or call us on <a href="tel:0753707933" style="color:var(--rust);">(07) 5370 7933</a>
@@ -341,19 +383,62 @@ const productSchema = {
 
     </div>
 
-    <!-- Configurator (React component, client-side hydrated for live total) -->
-    <div id="configurator">
-      <Configurator
-        client:load
-        basePrice={caravan.price}
-        options={configuratorOptions}
-        caravanTitle={caravan.title}
-        caravanSlug={slug}
-        contactEmail="office@seqcampers.com.au"
-        siteBase={siteBase}
-        isPlaceholder={configuratorIsPlaceholder}
-      />
-    </div>
+    <!-- Per-listing enquiry form. Posts via Netlify Forms to office@. The
+         caravan's Sanity-loaded title, brand, stock #, price + URL are
+         all submitted as hidden fields so the team has full context on
+         reply without the customer having to retype anything. -->
+    <section id="listing-enquiry" class="listing-enquiry">
+      <div class="listing-enquiry-inner">
+        <div class="page-eyebrow" style="color:var(--rust);">Enquire about this caravan</div>
+        <h2 class="listing-enquiry-title">Send us your details. We will reply within one business day.</h2>
+        <p class="listing-enquiry-sub">
+          We have all the specs for <strong>{caravan.title}</strong>{caravan.compliance?.stockNumber ? ` (stock #${caravan.compliance.stockNumber})` : ''} on file - tell us what you need to know or where you would like to take it.
+        </p>
+
+        <form
+          class="enquiry-form"
+          name="listing-enquiry"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thanks/"
+        >
+          <input type="hidden" name="form-name" value="listing-enquiry" />
+          <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+          <!-- Caravan context (Sanity-sourced, hidden from the customer) -->
+          <input type="hidden" name="caravan_title" value={caravan.title} />
+          <input type="hidden" name="caravan_brand" value={caravan.brand || ''} />
+          <input type="hidden" name="caravan_price" value={caravan.price || ''} />
+          <input type="hidden" name="caravan_stock_number" value={caravan.compliance?.stockNumber || ''} />
+          <input type="hidden" name="caravan_status" value={caravan.status || ''} />
+          <input type="hidden" name="caravan_url" value={listingPageUrl} />
+
+          <div class="form-row">
+            <label>
+              Your name
+              <input type="text" name="customer_name" required autocomplete="name" />
+            </label>
+            <label>
+              Phone
+              <input type="tel" name="customer_phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
+            </label>
+          </div>
+
+          <label>
+            Email
+            <input type="email" name="customer_email" required autocomplete="email" />
+          </label>
+
+          <label>
+            What would you like to know?
+            <textarea name="message" placeholder="Trade-in van details, finance questions, want to book a viewing, anything we should factor in..."></textarea>
+          </label>
+
+          <button type="submit">Send enquiry</button>
+        </form>
+      </div>
+    </section>
 
     <!-- FAQ section (FAQPage schema is in <head>) -->
     <section class="faq-section" aria-label="Frequently asked questions">

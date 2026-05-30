@@ -68,6 +68,50 @@ a { color: inherit; }
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background 0.25s, border-color 0.25s, padding 0.2s;
+}
+
+/* Home page only: header overlays the hero video, transparent at top of
+   page, becomes solid when user scrolls past the hero (JS adds .is-scrolled). */
+.site-header-overlay {
+  position: absolute;
+  background: transparent;
+  border-bottom-color: transparent;
+  width: 100%;
+}
+.site-header-overlay nav a {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+.site-header-overlay nav a:hover { color: #fff; }
+.site-header-overlay nav a.is-active { border-bottom-color: var(--gold); color: #fff; }
+.site-header-overlay .nav-cta {
+  background: var(--rust);
+  color: #fff;
+}
+.site-header-overlay .nav-toggle-bar {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* When user scrolls down past the hero, JS adds .is-scrolled to restore
+   the solid header for legibility on the lower (light) sections. */
+.site-header-overlay.is-scrolled {
+  position: fixed;
+  top: 0;
+  background: var(--sand);
+  border-bottom: 1px solid var(--tan-border);
+  box-shadow: 0 4px 14px rgba(42, 22, 8, 0.08);
+}
+.site-header-overlay.is-scrolled nav a {
+  color: var(--muted);
+  text-shadow: none;
+}
+.site-header-overlay.is-scrolled nav a:hover { color: var(--ink); }
+.site-header-overlay.is-scrolled nav a.is-active { color: var(--ink); border-bottom-color: var(--rust); }
+.site-header-overlay.is-scrolled .nav-toggle-bar {
+  background: var(--ink);
+  box-shadow: none;
 }
 
 .site-header .container {
@@ -77,6 +121,25 @@ a { color: inherit; }
   padding: 14px 24px;
 }
 
+/* On the overlay header (home hero), push logo + nav harder to the corners
+   like skyerv.com - max-width disabled, padding minimal vertical so the
+   elements sit close to the top edge. Returns to normal container width
+   once .is-scrolled flips the header solid. */
+.site-header-overlay .container {
+  max-width: none;
+  padding: 8px 38px;
+  align-items: flex-start;
+}
+.site-header-overlay.is-scrolled .container {
+  max-width: var(--container);
+  padding: 14px 24px;
+  align-items: center;
+}
+
+@media (max-width: 720px) {
+  .site-header-overlay .container { padding: 6px 18px; }
+}
+
 .logo {
   display: inline-flex;
   align-items: center;
@@ -84,19 +147,40 @@ a { color: inherit; }
   line-height: 0;
 }
 
+/* Logo at the SAME prominent size across every page. Per Bart: match the
+   home page size on inner pages too. The header itself gets taller as a
+   result - that's intentional. */
 .logo img {
   display: block;
-  height: 44px;
+  height: 140px;
   width: auto;
   max-width: 100%;
+  transition: height 0.2s;
+}
+
+/* On the home page hero (transparent header), the logo is even larger -
+   skyerv.com pattern. Negative top margin lifts it so the TOP edge of
+   the logo aligns with the menu items on the right (logo is taller, so
+   without the lift the centres align but the top doesn't). */
+.site-header-overlay .logo img {
+  height: 220px;
+  margin-top: -32px;
+}
+.site-header-overlay.is-scrolled .logo img {
+  height: 140px;
+  margin-top: 0;
 }
 
 @media (max-width: 860px) {
-  .logo img { height: 36px; }
+  .logo img { height: 96px; }
+  .site-header-overlay .logo img { height: 150px; margin-top: -20px; }
+  .site-header-overlay.is-scrolled .logo img { height: 96px; margin-top: 0; }
 }
 
 @media (max-width: 520px) {
-  .logo img { height: 30px; }
+  .logo img { height: 72px; }
+  .site-header-overlay .logo img { height: 110px; margin-top: -14px; }
+  .site-header-overlay.is-scrolled .logo img { height: 72px; margin-top: 0; }
 }
 
 nav { display: flex; gap: 24px; align-items: center; }
@@ -362,7 +446,66 @@ nav a.is-active {
   z-index: 1;
 }
 
+/* Hero with autoplay YouTube background video */
+.hero-video {
+  padding: 140px 0 120px;
+  min-height: 560px;
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 3px solid var(--gold);
+}
+
+.hero-video-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-video-bg iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Cover trick: scale iframe to always fill the hero, preserving 16:9 */
+  width: max(100vw, 177.78vh);
+  height: max(56.25vw, 100vh);
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: 0;
+}
+
+/* Click/pointer blocker - sits over the iframe so YouTube chrome cannot
+   appear on mouseover. Header + below remain interactive (they sit on a
+   higher z-index OR outside the hero). */
+.hero-video-block {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Dark overlay for text legibility */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    100deg,
+    rgba(26, 14, 6, 0.75) 0%,
+    rgba(26, 14, 6, 0.55) 35%,
+    rgba(26, 14, 6, 0.25) 70%,
+    rgba(26, 14, 6, 0.15) 100%
+  );
+}
+
 .hero-content { max-width: 560px; position: relative; z-index: 2; }
+.hero-video .hero-content { z-index: 3; }
 
 .hero h1 {
   font-size: 2.6rem;
@@ -765,6 +908,10 @@ a:focus-visible, button:focus-visible {
   border: 0;
 }
 
+.map-embed-small iframe {
+  height: 220px;
+}
+
 /* ============================================================
    Listing detail (individual caravan page)
    ============================================================ */
@@ -783,19 +930,30 @@ a:focus-visible, button:focus-visible {
 .photo-gallery {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 18px;
 }
 
 .photo-gallery img {
   width: 100%;
   aspect-ratio: 4/3;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photo-gallery img:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .photo-gallery img:first-child {
   grid-column: 1 / -1;
   aspect-ratio: 16/9;
+}
+
+@media (max-width: 600px) {
+  .photo-gallery { gap: 12px; }
 }
 
 .listing-sidebar {
@@ -825,14 +983,25 @@ a:focus-visible, button:focus-visible {
   margin-bottom: 20px;
 }
 
+.specs-block {
+  margin: 20px 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--tan-border);
+  border-bottom: 1px solid var(--tan-border);
+}
+.specs-block-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
 .specs-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin: 20px 0;
-  padding: 20px 0;
-  border-top: 1px solid var(--tan-border);
-  border-bottom: 1px solid var(--tan-border);
 }
 
 .spec-item { display: flex; flex-direction: column; gap: 2px; }
@@ -923,10 +1092,9 @@ a:focus-visible, button:focus-visible {
   text-underline-offset: 2px;
 }
 .rich-text blockquote {
-  margin-left: 0;
-  padding: 12px 18px;
-  border-left: 3px solid var(--gold);
-  background: rgba(212, 148, 58, 0.06);
+  margin: 14px 0 14px 0;
+  padding: 0 0 0 22px;
+  border-left: 1px solid var(--tan-border);
   font-style: italic;
   color: var(--ink);
 }
@@ -1008,13 +1176,13 @@ a:focus-visible, button:focus-visible {
 }
 
 .configurator-placeholder-note {
-  background: #FFF3CD;
-  color: #856404;
-  border-left: 4px solid #D4943A;
-  border-radius: 4px;
-  padding: 12px 16px;
+  background: #FFF7EC;
+  color: #7A4F1A;
+  border: 1px solid #E8D5A8;
+  border-radius: var(--radius);
+  padding: 14px 18px;
   font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 24px;
 }
 
@@ -1216,9 +1384,8 @@ a:focus-visible, button:focus-visible {
    YouTube CTA bar (videos page)
    ============================================================ */
 .youtube-cta-bar {
-  background: linear-gradient(135deg, #fff 0%, var(--sand) 100%);
+  background: #fff;
   border: 1px solid var(--tan-border);
-  border-left: 6px solid var(--rust);
   border-radius: var(--radius);
   padding: 28px 32px;
   display: grid;
@@ -1544,14 +1711,12 @@ a:focus-visible, button:focus-visible {
 }
 
 .shanes-pick-quote {
-  border-left: 3px solid var(--gold);
-  background: var(--sand);
-  padding: 14px 18px;
+  padding: 4px 0 12px 22px;
+  border-left: 1px solid var(--tan-border);
   margin: 0 0 18px;
-  border-radius: 4px;
   color: var(--ink);
   font-style: italic;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   line-height: 1.6;
 }
 
@@ -1637,11 +1802,10 @@ a:focus-visible, button:focus-visible {
 }
 
 .featured-story {
-  background: linear-gradient(135deg, var(--ink), var(--ink-deep));
+  background: var(--ink);
   color: var(--sand);
   border-radius: var(--radius);
   padding: 36px 40px;
-  border-left: 6px solid var(--gold);
 }
 
 .featured-story h2 {
@@ -1817,7 +1981,284 @@ a:focus-visible, button:focus-visible {
 }
 
 .service-card-job {
-  border-left: 3px solid var(--rust);
+  /* No coloured left-stripe - rely on the card border and shadow alone. */
+}
+
+/* ============================================================
+   Quote enquiry form (/quote/[slug])
+   ============================================================ */
+.quote-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.quote-fieldset {
+  margin-bottom: 24px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--tan-border);
+}
+
+.quote-fieldset:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.quote-fieldset-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 16px;
+}
+
+.quote-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .quote-row { grid-template-columns: 1fr; }
+}
+
+.quote-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.quote-field > span { display: block; }
+
+.quote-field input,
+.quote-field textarea {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  padding: 11px 14px;
+  border: 1px solid var(--tan-border);
+  border-radius: 5px;
+  background: var(--sand);
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.quote-field input:focus,
+.quote-field textarea:focus {
+  outline: none;
+  border-color: var(--rust);
+  background: #fff;
+}
+
+.quote-field textarea { resize: vertical; min-height: 80px; }
+
+.quote-choice {
+  border: 0;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.quote-choice legend {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.quote-choice-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quote-choice-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--sand);
+  border: 1px solid var(--tan-border);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+}
+
+.quote-choice-option:hover {
+  border-color: var(--rust);
+}
+
+.quote-choice-option input[type='radio'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--rust);
+  cursor: pointer;
+  margin: 0;
+}
+
+.quote-choice-option:has(input:checked) {
+  background: #fff;
+  border-color: var(--rust);
+  box-shadow: inset 0 0 0 1px var(--rust);
+  font-weight: 600;
+}
+
+.quote-submit {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Inter Tight', sans-serif;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+}
+
+.quote-fallback {
+  background: #FFF7EC;
+  color: #7A4F1A;
+  border: 1px solid #E8D5A8;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-top: 16px;
+}
+
+.quote-fallback a {
+  color: var(--rust);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ============================================================
+   Brisbane Show - QR + brand quote cards
+   ============================================================ */
+.qr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  gap: 22px;
+}
+
+.qr-card {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 24px 26px;
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 22px;
+  align-items: start;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.15s;
+}
+
+.qr-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold);
+  box-shadow: var(--shadow-md);
+}
+
+.qr-card-brand {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 6px;
+}
+
+.qr-card-name {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+  line-height: 1.25;
+}
+
+.qr-card-tag {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.qr-card-special {
+  font-size: 0.86rem;
+  color: var(--ink);
+  background: var(--sand);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.qr-card-cta {
+  display: inline-block;
+  font-size: 0.88rem;
+  padding: 11px 22px;
+}
+
+.qr-card-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--sand);
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+}
+
+.qr-card-qr img {
+  display: block;
+  width: 160px;
+  height: 160px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.qr-card-qr-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Mobile: hide the QR (no point scanning your own phone) - stack card content */
+@media (max-width: 720px) {
+  .qr-grid { grid-template-columns: 1fr; gap: 14px; }
+  .qr-card {
+    grid-template-columns: 1fr;
+    padding: 20px 22px;
+  }
+  .qr-card-qr { display: none; }
 }
 
 /* ============================================================
@@ -1827,7 +2268,9 @@ a:focus-visible, button:focus-visible {
   background: var(--sand);
   border-top: 1px solid var(--tan-border);
   border-bottom: 1px solid var(--tan-border);
-  padding: 18px 0;
+  /* Generous vertical space - per design panel: prominence comes from
+     isolation/breathing room, not just bigger pills. */
+  padding: 36px 0;
 }
 
 .trust-strip-deep {
@@ -1839,49 +2282,68 @@ a:focus-visible, button:focus-visible {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 14px 22px;
-  text-align: center;
+  gap: 18px 36px;
+  text-align: left;
 }
 
 .trust-item {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-family: 'Inter Tight', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: var(--ink);
   text-transform: none;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.trust-item-label {
+  display: inline-block;
+}
+
+/* AU badge is a standalone visual, sized larger to balance the text pills. */
+.trust-item-aus {
+  padding: 0;
 }
 
 .trust-tick {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: var(--rust);
   color: #fff;
-  font-size: 0.7rem;
+  font-size: 0.95rem;
   font-weight: 700;
   flex-shrink: 0;
 }
 
-.trust-divider {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--tan-border);
+.trust-aus-icon {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  object-fit: contain;
+  background: transparent;
   display: inline-block;
 }
 
-@media (max-width: 720px) {
-  .trust-strip { padding: 14px 0; }
-  .trust-strip-inner { gap: 10px 16px; }
-  .trust-item { font-size: 0.76rem; }
-  .trust-divider { display: none; }
+@media (max-width: 860px) {
+  .trust-strip-inner { gap: 14px 22px; }
+  .trust-item { font-size: 0.9rem; gap: 9px; white-space: normal; }
+  .trust-aus-icon { width: 64px; height: 64px; }
+}
+
+@media (max-width: 520px) {
+  .trust-strip { padding: 22px 0; }
+  .trust-strip-inner { gap: 12px 18px; }
+  .trust-item { font-size: 0.85rem; }
+  .trust-tick { width: 24px; height: 24px; font-size: 0.8rem; }
+  .trust-aus-icon { width: 54px; height: 54px; }
 }
 
 /* Mini Authorised Dealer badge (caravan detail sidebar) */
@@ -2042,6 +2504,427 @@ a:focus-visible, button:focus-visible {
 }
 
 /* ============================================================
+   Google reviews social-proof bar (under trust strip)
+   ============================================================ */
+.reviews-bar {
+  background: #fff;
+  border-bottom: 1px solid var(--tan-border);
+  padding: 12px 0;
+}
+.reviews-bar-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: center;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+  flex-wrap: wrap;
+}
+.reviews-stars {
+  color: #f59e0b;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+}
+.reviews-text { font-size: 0.95rem; color: var(--ink); }
+.reviews-text strong { color: var(--ink); font-weight: 700; }
+.reviews-link {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 600;
+  color: var(--rust);
+  font-size: 0.9rem;
+}
+.reviews-bar-inner:hover .reviews-link { text-decoration: underline; }
+@media (max-width: 520px) {
+  .reviews-text { font-size: 0.86rem; }
+  .reviews-stars { font-size: 1.02rem; }
+}
+
+/* ============================================================
+   3-pathway artery block (New / Used / Service) - home page
+   ============================================================ */
+.pathways-section {
+  padding: 56px 0 32px;
+  background: var(--sand);
+}
+.pathway-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.pathway-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.2s;
+}
+.pathway-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--rust);
+}
+.pathway-image {
+  aspect-ratio: 16/10;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--sand-deep);
+  position: relative;
+}
+.pathway-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(42,22,8,0) 40%, rgba(42,22,8,0.5) 100%);
+}
+.pathway-body {
+  padding: 22px 26px 26px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.pathway-eyebrow {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 8px;
+}
+.pathway-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+.pathway-desc {
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  flex: 1;
+}
+.pathway-cta {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--rust);
+  letter-spacing: 0.01em;
+}
+@media (max-width: 860px) {
+  .pathway-grid { grid-template-columns: 1fr; gap: 16px; }
+  .pathways-section { padding: 32px 0 16px; }
+  .pathway-title { font-size: 1.35rem; }
+}
+
+/* ============================================================
+   Horizontal story timeline (About page)
+   ============================================================ */
+.story-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.story-step {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 24px 24px 26px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.story-step:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--ink);
+}
+.story-year {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+.story-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.25;
+}
+.story-body {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  flex: 1;
+}
+@media (max-width: 860px) {
+  .story-timeline { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .story-year { font-size: 2rem; }
+}
+@media (max-width: 520px) {
+  .story-timeline { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Top Features visual cards (caravan detail)
+   ============================================================ */
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.feature-card {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+}
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--ink);
+}
+.feature-card-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+.feature-card-detail {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   Per-listing enquiry form (caravan detail page)
+   ============================================================ */
+.listing-enquiry {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  margin: 32px 0 48px;
+  box-shadow: var(--shadow-sm);
+  scroll-margin-top: 100px;
+}
+.listing-enquiry-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 6px 0 8px;
+  letter-spacing: -0.01em;
+}
+.listing-enquiry-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+@media (max-width: 640px) {
+  .listing-enquiry { padding: 24px 22px; margin: 24px 0 36px; }
+}
+
+/* ============================================================
+   Show offer page - countdown + scarcity + value stack
+   ============================================================ */
+.show-offer-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.show-offer-stat {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  text-align: left;
+}
+.show-offer-stat-countdown {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--sand);
+}
+.show-offer-stat-countdown .show-offer-stat-label { color: var(--gold); }
+.show-offer-stat-countdown .show-offer-stat-value { color: var(--sand); font-family: 'Inter Tight', sans-serif; font-variant-numeric: tabular-nums; }
+.show-offer-stat-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 8px;
+}
+.show-offer-stat-value {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.show-offer-stat-suffix {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0;
+  margin-left: 2px;
+}
+.show-offer-stat-countdown .show-offer-stat-suffix { color: var(--gold); }
+@media (max-width: 760px) {
+  .show-offer-stats { grid-template-columns: 1fr; gap: 12px; }
+  .show-offer-stat-value { font-size: 1.35rem; }
+}
+
+.value-stack {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: var(--radius);
+  padding: 6px 0;
+  box-shadow: var(--shadow-sm);
+}
+.value-stack-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--tan-border);
+}
+.value-stack-row:last-child { border-bottom: none; }
+.value-stack-tick {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.value-stack-tick-total {
+  background: var(--ink);
+  width: 38px;
+  height: 38px;
+  font-size: 1.2rem;
+}
+.value-stack-body { min-width: 0; }
+.value-stack-label {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.value-stack-note {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+.value-stack-price {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--rust);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.value-stack-total {
+  background: var(--sand);
+  padding: 22px 24px;
+}
+.value-stack-total .value-stack-label { font-size: 1.05rem; }
+.value-stack-price-total {
+  font-size: 1.6rem;
+  color: var(--ink);
+}
+@media (max-width: 600px) {
+  .value-stack-row { grid-template-columns: 30px 1fr; gap: 12px; padding: 16px 18px; }
+  .value-stack-tick { width: 26px; height: 26px; font-size: 0.85rem; }
+  .value-stack-price { grid-column: 2; padding-top: 4px; }
+}
+
+/* ============================================================
+   Meet the team video placeholder (service page)
+   ============================================================ */
+.meet-the-team-video {
+  aspect-ratio: 16/8;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink-deep) 100%);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+}
+.meet-the-team-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: var(--sand);
+  text-align: center;
+  padding: 24px;
+}
+.meet-the-team-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--rust);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(192, 52, 26, 0.4);
+}
+.meet-the-team-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 480px;
+}
+.meet-the-team-text strong {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.2rem;
+  color: var(--sand);
+}
+.meet-the-team-text span {
+  color: var(--gold);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* ============================================================
    Footer
    ============================================================ */
 .site-footer {
@@ -2064,11 +2947,19 @@ a:focus-visible, button:focus-visible {
 }
 
 @media (max-width: 860px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
 }
 
 @media (max-width: 520px) {
-  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  /* On mobile show only the essentials - brand+address and hours.
+     The "About SEQ" links are still reachable from the top nav + the
+     thin footer-bottom row. */
+  .footer-grid { grid-template-columns: 1fr; gap: 18px; padding-bottom: 18px; }
+  .footer-grid .footer-col:nth-child(3),
+  .footer-grid .footer-col:nth-child(4) { display: none; }
+  .footer-brand { font-size: 0.86rem; }
+  .footer-address, .footer-hours-compact { font-size: 0.82rem; }
+  .site-footer { padding: 28px 0 18px; margin-top: 48px; }
 }
 
 .footer-col h4 {

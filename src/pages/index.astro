@@ -46,7 +46,19 @@ if (!featuredVideos || featuredVideos.length === 0) {
   ]
 }
 
-// Shane's Pick - resolve from siteSettings, fall back to first featured caravan
+// Shane's Pick - resolve from siteSettings, then fall back to first featured
+// caravan, then to a static placeholder so the section always renders. Maud
+// can override anytime in Sanity Studio > Site Settings > Shane's Pick.
+const PLACEHOLDER_SHANES_PICK_CARAVAN = {
+  _id: 'placeholder-shanes-pick',
+  title: 'Kimberley Karavan 2024',
+  slug: { current: 'stock' },
+  brand: 'Kimberley Kampers',
+  price: 145000,
+  condition: 'excellent',
+  mainImage: null,
+  specs: { sleeps: 4, length: 5.8, tareWeight: 2680 },
+}
 const shanesPick = settings?.shanesPick?.caravan
   ? {
       caravan: settings.shanesPick.caravan,
@@ -61,31 +73,34 @@ const shanesPick = settings?.shanesPick?.caravan
           quote: 'One of the best examples we\'ve had through the lot. Full service history, immaculate condition - the kind of caravan I\'d happily hand the keys to a family member on.',
           isPlaceholder: true,
         }
-      : null)
+      : {
+          caravan: PLACEHOLDER_SHANES_PICK_CARAVAN,
+          originalPrice: null,
+          quote: 'Shane has not picked a featured caravan yet. Browse the full stock list to see what is currently available, or call us on (07) 5370 7933.',
+          isPlaceholder: true,
+        })
 
 // Placeholder testimonials - Maud to replace with real customer quotes.
 // Format intentionally specific (full name + suburb + caravan + star rating)
 // because the audit found Kimberley + Stockman both lack this trust signal.
+// Real Google reviews - verbatim, names + attribution preserved.
 const testimonials = [
   {
-    quote: "Shane spent over an hour walking us through three different vans before we settled on the Trekka. No pressure, no rush, just answered every question we threw at him. Picked the van up two weeks ago - already done one trip out west and couldn't be happier.",
-    name: "Mark & Janelle Whitfield",
-    suburb: "Caloundra, QLD",
-    caravan: "Stockman Trekka",
+    quote: "A huge shout out to SEQ Campers. While traveling we found one of our guide rollers kept coming off the track, after inspecting them discovered the others were in bad shape. A phone call to SEQ campers and a conversation with Shane had us diverting to their workshop, where Grant took control and sorted our van out - he and the crew gave it a thorough check over. The service was something we didn't expect at such short notice, but was very much appreciated as it saved us the hassle of doing that fiddly job while on the road. Thanks fellas!",
+    name: "Willie & Cathy",
+    source: "Catherine Fabris · Google review",
     rating: 5,
   },
   {
-    quote: "We'd watched every Shane video before we visited - so by the time we walked in we already knew which van we wanted. Buying experience was easy, handover was thorough, and when we needed a small tweak two months later they had us in the workshop same week.",
-    name: "Peter Hollis",
-    suburb: "Buderim, QLD",
-    caravan: "Kimberley Kamper",
+    quote: "Great customer service. We brought a karavan under consignment from Shane and Maud, which was a great experience. After using the van, we noticed some issues with it and contacted the SEQ campers team. They were very helpful and carried out the repairs required under warranty. Upon picking the van up, workshop manager Grant was very kind and spent the time to explain the repairs they had carried out. This was appreciated, and I wouldn't hesitate to recommend any of my friends or family to this business.",
+    name: "David Poole",
+    source: "Google review",
     rating: 5,
   },
   {
-    quote: "Bought our first off-road caravan from SEQ at 62. Was nervous about the whole thing. Maud sat with me for an afternoon, talked through tow vehicles, weights, the lot. Six months in and we've done the Flinders Ranges. Wouldn't go anywhere else next time.",
-    name: "Lorraine Pretorius",
-    suburb: "Maleny, QLD",
-    caravan: "Kimberley Karavan",
+    quote: "We purchased a second hand KK to do WA while waiting for a new build. The knowledge and after-sales support was fantastic. The handover and after-sale support was great - it shortened the learning curve significantly. When we sold the van 6 months later they had potential buyers before I could deliver the van. We received the new van and there were some issues but Maud and the team handled everything necessary to rectify everything. Recently they added a bbq table custom made for my Weber - it is fantastic, one less table to carry on the road. I can only say positive things about the relationship I have with the team at SEQ Campers.",
+    name: "T Ireland",
+    source: "Google Local Guide review",
     rating: 5,
   },
 ]
@@ -109,7 +124,7 @@ const localBusiness = {
   areaServed: { '@type': 'State', name: 'Queensland, Australia' },
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '6 Bonanza Ct',
+    streetAddress: '3B/6 Bonanza Court',
     addressLocality: 'Marcoola',
     addressRegion: 'QLD',
     postalCode: '4564',
@@ -180,103 +195,75 @@ const faqSchema = {
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
-  <!-- Hero -->
-  <section class="hero hero-landscape">
-    <!-- Sunset / outback landscape SVG (matches Maud's signoff mockup) -->
-    <svg class="hero-svg" viewBox="0 0 1440 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#3B1A2A" />
-          <stop offset="12%" stop-color="#6B2D38" />
-          <stop offset="26%" stop-color="#A84828" />
-          <stop offset="42%" stop-color="#C87040" />
-          <stop offset="58%" stop-color="#D4883A" />
-          <stop offset="72%" stop-color="#B85A28" />
-          <stop offset="86%" stop-color="#7A2E12" />
-          <stop offset="100%" stop-color="#2A1208" />
-        </linearGradient>
-        <linearGradient id="leftfade" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#1A0A04" stop-opacity="0.9" />
-          <stop offset="40%" stop-color="#1A0A04" stop-opacity="0.55" />
-          <stop offset="70%" stop-color="#1A0A04" stop-opacity="0.1" />
-          <stop offset="100%" stop-color="#1A0A04" stop-opacity="0" />
-        </linearGradient>
-        <linearGradient id="groundfade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#2A1208" stop-opacity="0" />
-          <stop offset="100%" stop-color="#2A1208" stop-opacity="0.85" />
-        </linearGradient>
-        <radialGradient id="sunhalo" cx="68%" cy="28%" r="38%">
-          <stop offset="0%" stop-color="#E8901A" stop-opacity="0.32" />
-          <stop offset="100%" stop-color="#E8901A" stop-opacity="0" />
-        </radialGradient>
-      </defs>
-
-      <rect width="1440" height="600" fill="url(#sky)" />
-
-      <!-- horizontal cloud bands -->
-      <rect y="80" width="1440" height="22" fill="#C87850" opacity="0.18" />
-      <rect y="120" width="1440" height="14" fill="#D48840" opacity="0.14" />
-      <rect y="160" width="1440" height="18" fill="#B86030" opacity="0.16" />
-      <ellipse cx="1090" cy="105" rx="280" ry="22" fill="#D49058" opacity="0.20" />
-      <ellipse cx="930" cy="135" rx="220" ry="14" fill="#C87848" opacity="0.16" />
-      <ellipse cx="1200" cy="165" rx="190" ry="12" fill="#B86030" opacity="0.14" />
-
-      <!-- sun halo -->
-      <rect width="1440" height="600" fill="url(#sunhalo)" />
-
-      <!-- Uluru-style mesa -->
-      <path d="M830,420 Q855,260 950,240 Q1055,220 1145,250 Q1240,278 1310,310 Q1370,335 1440,370 L1440,600 L818,600 Z" fill="#7A2E14" opacity="0.55" />
-      <path d="M880,420 Q900,265 990,245 Q1080,228 1180,258 Q1265,283 1345,318 L1440,600 L860,600 Z" fill="#A03820" opacity="0.35" />
-      <path d="M905,415 Q925,267 1010,250 Q1095,232 1185,260 Q1270,287 1345,322" fill="none" stroke="#D4943A" stroke-width="2" opacity="0.22" />
-
-      <!-- mid-distance hills -->
-      <polygon points="600,600 800,345 920,415 1040,355 1170,425 1310,365 1440,425 1440,600" fill="#3A4818" opacity="0.30" />
-      <polygon points="640,600 830,360 955,425 1075,370 1200,440 1440,600" fill="#566030" opacity="0.18" />
-
-      <!-- foreground earth -->
-      <rect y="520" width="1440" height="80" fill="#1e0c06" opacity="0.78" />
-      <rect y="505" width="1440" height="12" fill="#7A4018" opacity="0.22" />
-      <rect y="492" width="1440" height="8" fill="#906028" opacity="0.15" />
-
-      <!-- layered mountain silhouettes -->
-      <polygon points="0,600 200,430 410,600" fill="#2e3a14" opacity="0.22" />
-      <polygon points="370,600 620,390 870,600" fill="#3a4a1a" opacity="0.18" />
-      <polygon points="0,600 240,400 500,600" fill="#6B7A3A" opacity="0.32" />
-      <polygon points="410,600 670,370 935,600" fill="#566030" opacity="0.22" />
-      <polygon points="935,600 1160,420 1390,600" fill="#C8861A" opacity="0.28" />
-      <polygon points="1040,600 1245,448 1440,600" fill="#D4943A" opacity="0.18" />
-
-      <!-- hero red centre peak -->
-      <polygon points="475,600 805,340 1135,600" fill="#7B2E16" opacity="0.5" />
-      <polygon points="520,600 840,358 1160,600" fill="#C0341A" opacity="0.28" />
-
-      <!-- ground strip -->
-      <rect y="585" width="1440" height="15" fill="#1e0c06" opacity="0.65" />
-
-      <!-- left fade for text legibility -->
-      <rect width="1440" height="600" fill="url(#leftfade)" />
-      <!-- bottom ground fade -->
-      <rect y="460" width="1440" height="140" fill="url(#groundfade)" />
-    </svg>
-
-    <div class="container">
-      <div class="hero-content">
-        <div class="page-eyebrow">SEQ Campers · Sunshine Coast, Queensland</div>
-        <h1>Off-road caravans built for the long way home.</h1>
-        <p>
-          Kimberley Kampers and Stockman caravans, hand-picked and inspected
-          by the SEQ team. Thirty years on the Sunshine Coast and
-          still going further than most.
-        </p>
-        <div class="hero-btns">
-          <a href="/stock" class="btn-primary">View current stock</a>
-          <a href="/contact" class="btn-ghost">Talk to the team</a>
-        </div>
-      </div>
+  <!-- Hero - silent looping video. No text overlay - the brand reads through
+       the header logo + the video itself. A transparent click-blocker layer
+       sits over the iframe so user mouseover never triggers YouTube's chrome
+       (the controls that occasionally flicker in). -->
+  <section class="hero hero-video hero-video-clean">
+    <div class="hero-video-bg" aria-hidden="true">
+      <iframe
+        src="https://www.youtube.com/embed/tozC7prVbOg?autoplay=1&mute=1&loop=1&playlist=tozC7prVbOg&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&cc_load_policy=0&showinfo=0"
+        title="SEQ Campers - premium off-road caravans"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen="false"
+      ></iframe>
+      <!-- Transparent layer that swallows pointer events so YouTube never
+           shows its overlay UI on hover/tap. Video keeps playing underneath. -->
+      <div class="hero-video-block" aria-hidden="true"></div>
     </div>
   </section>
 
   <TrustStrip />
+
+  <!-- Google reviews social proof - display only, no exit link. Per Bart:
+       keep visitors on site. Clicking the bar smooth-scrolls to the
+       testimonials section lower on the page. -->
+  <div class="reviews-bar">
+    <div class="container">
+      <a href="#testimonials" class="reviews-bar-inner">
+        <span class="reviews-stars" aria-hidden="true">★★★★★</span>
+        <span class="reviews-text"><strong>35+ five-star reviews</strong> from SEQ owners</span>
+        <span class="reviews-link">See what they say</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 3-pathway artery block: New / Used / Service. Below trust strip on
+       desktop so the credibility cue lands first, then user picks a path. -->
+  <section class="pathways-section" aria-label="Three pathways">
+    <div class="container">
+      <div class="pathway-grid">
+        <a href="/stock?status=for-sale&condition=new" class="pathway-card pathway-new">
+          <div class="pathway-image" style="background-image:url('/pathway-new.png');"></div>
+          <div class="pathway-body">
+            <div class="pathway-eyebrow">New caravans</div>
+            <h3 class="pathway-title">Buy new</h3>
+            <p class="pathway-desc">Kimberley Kampers and Stockman straight from the factory. Built for the long way home.</p>
+            <span class="pathway-cta">Explore new stock →</span>
+          </div>
+        </a>
+        <a href="/stock?status=for-sale" class="pathway-card pathway-used">
+          <div class="pathway-image" style="background-image:url('/pathway-used.png');"></div>
+          <div class="pathway-body">
+            <div class="pathway-eyebrow">Used caravans</div>
+            <h3 class="pathway-title">Buy used</h3>
+            <p class="pathway-desc">Hand-picked consignment stock. Inspected, prepared, and ready for the road.</p>
+            <span class="pathway-cta">Browse used stock →</span>
+          </div>
+        </a>
+        <a href="/service" class="pathway-card pathway-service">
+          <div class="pathway-image" style="background-image:url('/pathway-service.png');"></div>
+          <div class="pathway-body">
+            <div class="pathway-eyebrow">Workshop</div>
+            <h3 class="pathway-title">Service & support</h3>
+            <p class="pathway-desc">Annual service, warranty work, modifications. The team who knows your van.</p>
+            <span class="pathway-cta">See workshop services →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <!-- Why SEQ + intro pitch -->
   <section class="section" style="padding-bottom:32px;">
@@ -323,29 +310,11 @@ const faqSchema = {
     </div>
   </section>
 
-  <!-- Latest from YouTube -->
-  <section class="section" style="background:var(--sand-deep); padding-top:48px; padding-bottom:48px;">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <div class="page-eyebrow" style="color:var(--rust);">Watch before you visit</div>
-          <h2 class="section-title">Latest from our YouTube channel</h2>
-        </div>
-        <a href="/videos" class="section-link">All videos →</a>
-      </div>
-      <div class="video-grid">
-        {featuredVideos.map((v) => <VideoCard video={v} />)}
-      </div>
-      <p style="text-align:center; color:var(--muted); margin-top:24px; font-size:0.95rem;">
-        Join <strong style="color:var(--ink);">2,000+ off-road enthusiasts</strong> on our YouTube channel -
-        <a href="https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg" target="_blank" rel="noopener" style="color:var(--rust); font-weight:600;">subscribe here</a>
-      </p>
-    </div>
-  </section>
-
-  <!-- Shane's Pick / Sale of the Week -->
+  <!-- Shane's Pick / Sale of the Week - replaces the YouTube grid per Bart.
+       Higher conversion than a 3-card browse grid: single focal point,
+       Shane's personal endorsement, urgency narrative, one clear CTA. -->
   {shanesPick && (
-    <section class="section">
+    <section class="section" style="background:var(--sand-deep); padding-top:48px; padding-bottom:48px;">
       <div class="container">
         <div class="section-header">
           <div>
@@ -379,7 +348,7 @@ const faqSchema = {
             {shanesPick.quote && (
               <blockquote class="shanes-pick-quote">
                 "{shanesPick.quote}"
-                <cite>— SEQ team</cite>
+                <cite>- SEQ team</cite>
               </blockquote>
             )}
             {shanesPick.caravan.specs && (
@@ -393,74 +362,18 @@ const faqSchema = {
               <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="btn-primary">View this listing</a>
               <a href="/stock" class="btn-ghost" style="background:rgba(42,22,8,0.06); color:var(--ink); border-color:var(--tan-border);">See all stock</a>
             </div>
-            {shanesPick.isPlaceholder && (
-              <p style="font-size:0.75rem; color:var(--muted); margin-top:14px; font-style:italic;">
-                Auto-picked from your featured stock. Set a specific Shane's Pick in Sanity Studio → Site Settings.
-              </p>
-            )}
           </div>
         </div>
       </div>
     </section>
   )}
 
-  <!-- Featured caravans -->
-  <section class="section" style="background:var(--sand-deep);">
+  <!-- Testimonials - lives below Shane's Pick. Reviews bar above scrolls
+       here. Real Google reviews. No external link out - keeps visitors
+       on the site. -->
+  <section id="testimonials" class="section">
     <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">More featured stock</h2>
-        <a href="/stock" class="section-link">See all caravans →</a>
-      </div>
-
-      {featured.length === 0 ? (
-        <div class="empty-state">
-          <div class="empty-title">Featured listings coming soon</div>
-          <p>We are loading our caravan inventory into the new site. Check back shortly, or browse the full stock list.</p>
-          <p style="margin-top:16px;"><a href="/stock" class="section-link">Browse all stock →</a></p>
-        </div>
-      ) : (
-        <div class="stock-grid">
-          {featured.map((c) => <CaravanCard caravan={c} />)}
-        </div>
-      )}
-    </div>
-  </section>
-
-  <!-- What's Happening teaser -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <div class="page-eyebrow" style="color:var(--rust);">From the showroom floor</div>
-          <h2 class="section-title">What's happening</h2>
-        </div>
-        <a href="/whats-happening" class="section-link">All news →</a>
-      </div>
-      <div class="news-teaser-grid">
-        {upcomingNews.map((n) => n.href ? (
-          <a href={n.href} class="news-teaser-card news-teaser-card-link">
-            <div class="news-teaser-date">{n.date}</div>
-            <span class="news-type news-type-rust">{n.type}</span>
-            <h3>{n.title}</h3>
-            <p>{n.body}</p>
-            <span class="news-teaser-arrow" aria-hidden="true">Read more →</span>
-          </a>
-        ) : (
-          <div class="news-teaser-card">
-            <div class="news-teaser-date">{n.date}</div>
-            <span class="news-type news-type-rust">{n.type}</span>
-            <h3>{n.title}</h3>
-            <p>{n.body}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section class="section" style="background:var(--sand-deep);">
-    <div class="container">
-      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px;">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:8px;">
         <div class="page-eyebrow" style="color:var(--rust);">In their own words</div>
         <h2 class="section-title">Real owners, real trips, real stories</h2>
       </div>
@@ -473,27 +386,11 @@ const faqSchema = {
             <blockquote class="testimonial-quote">"{t.quote}"</blockquote>
             <figcaption class="testimonial-meta">
               <div class="testimonial-name">{t.name}</div>
-              <div class="testimonial-sub">{t.suburb} · {t.caravan}</div>
+              <div class="testimonial-sub">{t.source}</div>
             </figcaption>
           </figure>
         ))}
       </div>
     </div>
   </section>
-
-  <!-- Service teaser -->
-  <section class="band-dark">
-    <div class="container" style="text-align:center; max-width:780px; margin:0 auto;">
-      <div class="page-eyebrow" style="color:var(--gold); margin-bottom:12px;">Workshop</div>
-      <h2 style="color:var(--sand); font-size:1.8rem; margin-bottom:16px;">
-        We don't just sell them. We service them.
-      </h2>
-      <p style="color:var(--gold); margin-bottom:28px; line-height:1.7;">
-        Our workshop handles everything from annual servicing to custom modifications.
-        You bought it here - we'll look after it for life.
-      </p>
-      <a href="/service" class="btn-primary">See workshop services</a>
-    </div>
-  </section>
-
 </Site>
