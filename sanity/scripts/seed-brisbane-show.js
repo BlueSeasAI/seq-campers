@@ -125,8 +125,6 @@ const doc = {
   standCaravans: [
     { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Kruiswagen', detail: 'Mercedes 4x4 motorhome' },
     { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Karavan Eco Suite', detail: 'with media release' },
-    { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Kruiser T Class', detail: 'luxury off-road tourer' },
-    { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Kruiser S Class', detail: 'flagship apartment-grade' },
     { _type: 'standCaravan', _key: key('s'), name: 'Stockman Trekka', detail: 'serious off-road camper trailer' },
     { _type: 'standCaravan', _key: key('s'), name: 'Stockman Rover', detail: 'all-rounder family off-grid' },
     { _type: 'standCaravan', _key: key('s'), name: 'Stockman POD All-Roader', detail: 'demo unit - 20% off, rooftop tent included' },
@@ -167,8 +165,6 @@ const doc = {
     { _type: 'brandCard', _key: key('q'), name: 'Kimberley Karavan', brand: 'Kimberley', quoteSlug: 'karavan', tagline: 'The iconic Australian-made off-road caravan. 30 years of refinement.', showSpecial: '$3,000 accessory credit (Kimberley factory promotion)' },
     { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kube', brand: 'Kimberley', quoteSlug: 'kube', tagline: 'Compact, capable, premium off-grid living. Couples and small families.', showSpecial: 'Show package - lock in 2026 pricing before July rises' },
     { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiswagen', brand: 'Kimberley', quoteSlug: 'kruiswagen', tagline: 'The expedition motorhome. Self-contained, anywhere, any track.', showSpecial: 'Show special - ask Shane on the stand' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiser T Class', brand: 'Kimberley', quoteSlug: 'kruiser-t', tagline: 'The luxury off-road caravan. Touring with everything you need.', showSpecial: 'Show package - lock in 2026 pricing before July rises' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiser S Class', brand: 'Kimberley', quoteSlug: 'kruiser-s', tagline: 'The flagship. Apartment-grade interior in a true off-road shell.', showSpecial: 'Show package - lock in 2026 pricing before July rises' },
   ],
 
   // ─── Narrative copy ─────────────────────────────────────
@@ -209,7 +205,7 @@ const doc = {
       _type: 'faq',
       _key: key('f'),
       q: 'Which caravans are you bringing to the show?',
-      a: 'Kimberley Kruiswagen (Mercedes 4x4 motorhome), Kimberley Karavan Eco Suite (with media release), Kimberley Kruiser T Class and S Class, plus Stockman Trekka and Stockman Rover. A full lineup across the Kimberley and Stockman ranges.',
+      a: 'Kimberley Kruiswagen (Mercedes 4x4 motorhome), Kimberley Karavan Eco Suite (with media release), plus Stockman Trekka, Stockman Rover and our demo Stockman POD All-Roader. A solid lineup across the Kimberley and Stockman ranges.',
     },
     {
       _type: 'faq',
