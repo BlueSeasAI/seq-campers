@@ -254,54 +254,6 @@ export function youtubeEmbedUrl(url, opts = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Video library queries
-// ---------------------------------------------------------------------------
-
-export async function getAllVideos() {
-  return client.fetch(`
-    *[_type == "video"]
-    | order(brandFamily asc, category asc, order asc, _createdAt desc) {
-      _id, title, youtubeUrl, description, category, brandFamily, featured, order
-    }
-  `)
-}
-
-export async function getVideosByBrandFamily() {
-  const all = await getAllVideos()
-  const groups = { kimberley: [], stockman: [], general: [] }
-  all.forEach((v) => {
-    const key = v.brandFamily || 'general'
-    if (!groups[key]) groups[key] = []
-    groups[key].push(v)
-  })
-  return groups
-}
-
-export async function getFeaturedVideos(limit = 3) {
-  return client.fetch(
-    `
-    *[_type == "video" && featured == true]
-    | order(order asc, _createdAt desc)
-    [0...$limit] {
-      _id, title, youtubeUrl, description, category
-    }
-  `,
-    { limit }
-  )
-}
-
-export async function getVideosByCategory() {
-  const all = await getAllVideos()
-  const groups = {}
-  all.forEach((v) => {
-    const key = v.category || 'uncategorised'
-    if (!groups[key]) groups[key] = []
-    groups[key].push(v)
-  })
-  return groups
-}
-
-// ---------------------------------------------------------------------------
 // Site Settings singleton
 // ---------------------------------------------------------------------------
 
@@ -321,8 +273,9 @@ export async function getSiteSettings() {
       },
       showSpecial { headline, endDate, ctaText, ctaUrl },
       reserveCta { enabled, buttonText, stripeUrl, helperText },
-      aboutPageIntro,
-      showsIndexIntro
+      homepageVideo1 { youtubeUrl, title, description },
+      homepageVideo2 { youtubeUrl, title, description },
+      homepageVideo3 { youtubeUrl, title, description }
     }
   `)
   if (raw?.shanesPick?.caravan) {
@@ -340,6 +293,29 @@ export async function getSiteSettings() {
     }
   }
   return raw
+}
+
+/**
+ * Flatten the 3 home page video slots from siteSettings into an array of
+ * tile objects, filtering out any slot that has no YouTube URL set. Each
+ * tile shape: { _id, title, youtubeUrl, description, category } to match
+ * the VideoCard component.
+ */
+export function flattenHomepageVideos(settings) {
+  if (!settings) return []
+  const out = []
+  for (let i = 1; i <= 3; i++) {
+    const s = settings[`homepageVideo${i}`]
+    if (!s || !s.youtubeUrl) continue
+    out.push({
+      _id: `homepageVideo${i}`,
+      title: s.title || `Featured video ${i}`,
+      youtubeUrl: s.youtubeUrl,
+      description: s.description || '',
+      category: 'deep-dive',
+    })
+  }
+  return out
 }
 
 /**

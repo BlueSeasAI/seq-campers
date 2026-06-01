@@ -4,6 +4,9 @@ import {
   TagIcon, ClockIcon, PauseIcon, CheckmarkCircleIcon, OlistIcon,
   PlayIcon, CogIcon, EditIcon, FilterIcon,
 } from '@sanity/icons'
+// Video doc schema removed 1 June 2026. /videos page now reads from
+// videosPageSettings (12 fixed slots), home page videos from siteSettings.
+// No per-clip records needed anymore.
 import { schemaTypes } from './schemas/index.js'
 import { SeqCampersLogo } from './theme.jsx'
 
@@ -100,21 +103,6 @@ export default defineConfig({
                 S.list()
                   .title('Pages & content')
                   .items([
-                    S.listItem()
-                      .title('Videos library (per-clip records)')
-                      .icon(PlayIcon)
-                      .schemaType('video')
-                      .child(
-                        S.documentList()
-                          .title('Videos library')
-                          .schemaType('video')
-                          .filter('_type == "video"')
-                          .defaultOrdering([
-                            { field: 'brandFamily', direction: 'asc' },
-                            { field: 'category', direction: 'asc' },
-                            { field: 'order', direction: 'asc' },
-                          ])
-                      ),
                     S.listItem()
                       .title('Videos page (12 fixed slots)')
                       .icon(PlayIcon)

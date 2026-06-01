@@ -22,9 +22,9 @@ export default {
 
   groups: [
     { name: 'home', title: 'Home page', default: true },
+    { name: 'homeVideos', title: 'Home page videos (3 slots)' },
     { name: 'banner', title: 'Show Special banner' },
     { name: 'reserve', title: 'Reserve $1,000 CTA' },
-    { name: 'marketing', title: 'Marketing intros' },
   ],
 
   fields: [
@@ -164,26 +164,44 @@ export default {
       ],
     },
 
-    // ─── MARKETING INTROS ─────────────────────────────────────────
+    // ─── HOME PAGE VIDEOS (3 slots) ─────────────────────────────
     {
-      name: 'aboutPageIntro',
-      title: 'About page - intro paragraph',
-      type: 'text',
-      group: 'marketing',
-      rows: 4,
-      description: 'The intro paragraph at the top of /about. Plain text. Leave blank to fall back to the default hard-coded copy.',
-      validation: (Rule) => Rule.max(600),
+      name: 'homepageVideo1',
+      title: 'Home page video - slot 1',
+      type: 'object',
+      group: 'homeVideos',
+      options: { columns: 1, collapsible: true, collapsed: false },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
+        { name: 'title', title: 'Tile title', type: 'string', validation: (Rule) => Rule.max(120) },
+        { name: 'description', title: 'Short description', type: 'string', description: 'One sentence shown under the title.', validation: (Rule) => Rule.max(220) },
+      ],
+    },
+    {
+      name: 'homepageVideo2',
+      title: 'Home page video - slot 2',
+      type: 'object',
+      group: 'homeVideos',
+      options: { columns: 1, collapsible: true, collapsed: true },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
+        { name: 'title', title: 'Tile title', type: 'string', validation: (Rule) => Rule.max(120) },
+        { name: 'description', title: 'Short description', type: 'string', description: 'One sentence shown under the title.', validation: (Rule) => Rule.max(220) },
+      ],
+    },
+    {
+      name: 'homepageVideo3',
+      title: 'Home page video - slot 3',
+      type: 'object',
+      group: 'homeVideos',
+      options: { columns: 1, collapsible: true, collapsed: true },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
+        { name: 'title', title: 'Tile title', type: 'string', validation: (Rule) => Rule.max(120) },
+        { name: 'description', title: 'Short description', type: 'string', description: 'One sentence shown under the title.', validation: (Rule) => Rule.max(220) },
+      ],
     },
 
-    {
-      name: 'showsIndexIntro',
-      title: 'Shows page - intro paragraph',
-      type: 'text',
-      group: 'marketing',
-      rows: 4,
-      description: 'The intro paragraph at the top of the /shows index page. Plain text. Leave blank to fall back to the default hard-coded copy.',
-      validation: (Rule) => Rule.max(600),
-    },
   ],
 
   preview: {

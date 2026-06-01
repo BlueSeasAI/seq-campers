@@ -3,22 +3,20 @@ import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
-import { getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
+import { getSiteSettings, flattenHomepageVideos, sanityImage, conditionLabel } from '../lib/sanity.js'
 
-let featuredVideos = []
 let settings = null
 try {
-  ;[featuredVideos, settings] = await Promise.all([
-    getFeaturedVideos(3),
-    getSiteSettings(),
-  ])
+  settings = await getSiteSettings()
 } catch (err) {
   console.warn('Sanity unreachable on build:', err.message)
 }
 
-// Fallback videos pulled from the real SEQ Campers YouTube channel. Used until
-// Maud marks any video as Featured in Sanity Studio.
-if (!featuredVideos || featuredVideos.length === 0) {
+let featuredVideos = flattenHomepageVideos(settings)
+
+// Fallback videos from the real SEQ Campers YouTube channel - used until
+// Maud fills in the 3 slots in Site Settings → Home page videos.
+if (featuredVideos.length === 0) {
   featuredVideos = [
     {
       _id: 'p1',
