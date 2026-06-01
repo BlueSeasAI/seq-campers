@@ -102,8 +102,8 @@ export async function getForSaleCaravans(stockType = null) {
   }
   const raw = await client.fetch(`
     ${filter}
-    | order(featured desc, price asc) {
-      _id, title, slug, price, status, condition, stockType, brollVideoUrl, featured,
+    | order(price asc) {
+      _id, title, slug, price, status, condition, stockType, brollVideoUrl,
       "brand": brand->name,
       "mainImage": photos[0].asset->url,
       specs { sleeps, length, tareWeight, year },
@@ -171,20 +171,6 @@ export async function getSoldCaravans() {
       "mainImage": photos[0].asset->url
     }
   `)
-}
-
-export async function getFeaturedCaravans() {
-  const raw = await client.fetch(`
-    *[_type == "caravan" && featured == true && status == "for-sale"][0..2] {
-      _id, title, slug, price, condition,
-      "brand": brand->name,
-      "mainImage": photos[0].asset->url
-    }
-  `)
-  return raw.map((c) => ({
-    ...c,
-    slug: { current: safeSlug(c.slug?.current) || safeSlug(c.title) },
-  }))
 }
 
 /**
@@ -327,7 +313,7 @@ export async function getSiteSettings() {
         originalPrice,
         shanesQuote,
         "caravan": caravan->{
-          _id, title, slug, price, status, condition, featured,
+          _id, title, slug, price, status, condition,
           "brand": brand->name,
           "mainImage": photos[0].asset->url,
           specs { sleeps, length, tareWeight }

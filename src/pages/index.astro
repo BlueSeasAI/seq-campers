@@ -3,14 +3,12 @@ import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
-import { getFeaturedCaravans, getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
+import { getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
 
-let featured = []
 let featuredVideos = []
 let settings = null
 try {
-  ;[featured, featuredVideos, settings] = await Promise.all([
-    getFeaturedCaravans(),
+  ;[featuredVideos, settings] = await Promise.all([
     getFeaturedVideos(3),
     getSiteSettings(),
   ])
@@ -46,9 +44,9 @@ if (!featuredVideos || featuredVideos.length === 0) {
   ]
 }
 
-// Shane's Pick - resolve from siteSettings, then fall back to first featured
-// caravan, then to a static placeholder so the section always renders. Maud
-// can override anytime in Sanity Studio > Site Settings > Shane's Pick.
+// Shane's Pick - resolve from siteSettings, fall back to a static placeholder
+// so the section always renders. Maud sets this anytime in
+// Sanity Studio > Site Settings > Shane's Pick.
 const PLACEHOLDER_SHANES_PICK_CARAVAN = {
   _id: 'placeholder-shanes-pick',
   title: 'Kimberley Karavan 2024',
@@ -66,19 +64,12 @@ const shanesPick = settings?.shanesPick?.caravan
       quote: settings.shanesPick.shanesQuote,
       isPlaceholder: false,
     }
-  : (featured[0]
-      ? {
-          caravan: featured[0],
-          originalPrice: null,
-          quote: 'One of the best examples we\'ve had through the lot. Full service history, immaculate condition - the kind of caravan I\'d happily hand the keys to a family member on.',
-          isPlaceholder: true,
-        }
-      : {
-          caravan: PLACEHOLDER_SHANES_PICK_CARAVAN,
-          originalPrice: null,
-          quote: 'Shane has not picked a featured caravan yet. Browse the full stock list to see what is currently available, or call us on (07) 5370 7933.',
-          isPlaceholder: true,
-        })
+  : {
+      caravan: PLACEHOLDER_SHANES_PICK_CARAVAN,
+      originalPrice: null,
+      quote: 'Shane has not picked a caravan yet. Browse the full stock list to see what is currently available, or call us on (07) 5370 7933.',
+      isPlaceholder: true,
+    }
 
 // Placeholder testimonials - Maud to replace with real customer quotes.
 // Format intentionally specific (full name + suburb + caravan + star rating)

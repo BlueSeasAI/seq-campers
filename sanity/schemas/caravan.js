@@ -101,7 +101,7 @@ export default {
       name: 'stockType',
       title: 'New or Used',
       type: 'string',
-      description: 'Which page this caravan appears on. NEW caravans show on /new (with configurator entry). USED caravans show on /stock (with B-roll video tiles).',
+      description: 'Select which page this caravan appears on. NEW caravans show on /new (with configurator entry). USED caravans show on /stock.',
       options: {
         list: [
           { title: 'NEW - factory build', value: 'new' },
@@ -115,9 +115,9 @@ export default {
 
     {
       name: 'brollVideoUrl',
-      title: 'B-roll YouTube video (for USED caravans)',
+      title: 'B-roll YouTube video',
       type: 'url',
-      description: 'Walk-around video tile shown on the /stock listings page. Paste the full YouTube URL. Auto-plays muted with no controls - the tile clicks through to the spec page.',
+      description: 'The short looping video shown in the small tile for this caravan on /new (if NEW) or /stock (if USED) - before the visitor clicks into the full listing. Keep it SHORT (15-30 seconds is ideal). Paste the full YouTube URL. Auto-plays muted with no controls. Click the tile - opens the full spec page.',
     },
 
     {
@@ -500,12 +500,6 @@ export default {
       ],
     },
 
-    {
-      name: 'featured',
-      title: 'Featured on homepage?',
-      type: 'boolean',
-      initialValue: false,
-    },
   ],
 
   // Controls how each caravan appears in the listing sidebar of the studio
