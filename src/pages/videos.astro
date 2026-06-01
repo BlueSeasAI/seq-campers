@@ -1,18 +1,22 @@
 ---
 import Site from '../layouts/Site.astro'
 import VideoCard from '../components/VideoCard.astro'
-import { getVideosByBrandFamily } from '../lib/sanity.js'
+import { getVideosPageSettings, flattenVideosPage } from '../lib/sanity.js'
 
-let groups = { kimberley: [], stockman: [], general: [] }
+// /videos uses the videosPageSettings singleton - 12 curated slots
+// (6 Kimberley + 6 Stockman). Maud edits each slot directly in
+// Sanity Studio (Pages & content -> Videos page) and the tile auto-
+// hides if the YouTube URL is left blank.
+let settings = null
 try {
-  groups = await getVideosByBrandFamily()
+  settings = await getVideosPageSettings()
 } catch (err) {
-  console.warn('Sanity unreachable on build - videos empty:', err.message)
+  console.warn('Sanity unreachable for videos page settings:', err.message)
 }
+const { kimberley: kimberleySlots, stockman: stockmanSlots } = flattenVideosPage(settings)
 
-// Placeholder videos for each brand tree - used until Maud adds real
-// videos with brandFamily set in Sanity Studio. They disappear automatically
-// once any real video is added to a tree.
+// Placeholders shown only when Maud has not configured any slots yet.
+// Disappear automatically as soon as she fills in one URL per tree.
 const PLACEHOLDER_VIDEO = 'https://www.youtube.com/watch?v=tozC7prVbOg'
 const kimberleyPlaceholders = [
   { _id: 'k1', title: 'Kimberley Karavan walk-around', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Inside and out of the Karavan - the original hybrid that started it all.', category: 'deep-dive', brandFamily: 'kimberley' },
@@ -28,12 +32,13 @@ const stockmanPlaceholders = [
   { _id: 's3', title: 'Stockman Pod Trailer walk-around', youtubeUrl: PLACEHOLDER_VIDEO, description: 'The compact pod for couples and weekend warriors.', category: 'deep-dive', brandFamily: 'stockman' },
   { _id: 's4', title: 'Setting up a Stockman in 90 seconds', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Arrival to kettle-on. Time-lapse of the easiest setup in the range.', category: 'setup', brandFamily: 'stockman' },
   { _id: 's5', title: 'Stockman Rover off-road test', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Sand, corrugations, river crossings. Real tracks, no studio.', category: 'on-the-road', brandFamily: 'stockman' },
+  { _id: 's6', title: 'Stockman Pod - couples weekender setup', youtubeUrl: PLACEHOLDER_VIDEO, description: 'Compact, agile, ready to go. Setup walk-through.', category: 'setup', brandFamily: 'stockman' },
 ]
 
-const kimberley = groups.kimberley?.length ? groups.kimberley : kimberleyPlaceholders
-const stockman = groups.stockman?.length ? groups.stockman : stockmanPlaceholders
-const general = groups.general || []
-const usingPlaceholders = !groups.kimberley?.length && !groups.stockman?.length
+const kimberley = kimberleySlots.length ? kimberleySlots : kimberleyPlaceholders
+const stockman = stockmanSlots.length ? stockmanSlots : stockmanPlaceholders
+const general = []
+const usingPlaceholders = !kimberleySlots.length && !stockmanSlots.length
 ---
 
 <Site
@@ -51,9 +56,9 @@ const usingPlaceholders = !groups.kimberley?.length && !groups.stockman?.length
   {usingPlaceholders && (
     <div class="container" style="margin-top:24px;">
       <div class="configurator-placeholder-note">
-        Sample video library shown for layout. Replace each placeholder by
-        adding real videos in Sanity Studio (Videos library → + Create new),
-        making sure to set the brand family to Kimberley or Stockman.
+        Sample video library shown for layout. Replace each placeholder in
+        Sanity Studio → Pages & content → Videos page (12 fixed slots).
+        Each slot has its own YouTube URL, title and description.
       </div>
     </div>
   )}

@@ -318,7 +318,11 @@ export async function getSiteSettings() {
           "mainImage": photos[0].asset->url,
           specs { sleeps, length, tareWeight }
         }
-      }
+      },
+      showSpecial { headline, endDate, ctaText, ctaUrl },
+      reserveCta { enabled, buttonText, stripeUrl, helperText },
+      aboutPageIntro,
+      showsIndexIntro
     }
   `)
   if (raw?.shanesPick?.caravan) {
@@ -326,7 +330,61 @@ export async function getSiteSettings() {
       current: safeSlug(raw.shanesPick.caravan.slug?.current) || safeSlug(raw.shanesPick.caravan.title),
     }
   }
+  // Auto-hide the show-special banner once its end date has passed. Comparison
+  // is done on the YYYY-MM-DD date string in UTC - good enough for a marketing
+  // banner; Maud can still hide it manually by clearing the headline.
+  if (raw?.showSpecial?.endDate) {
+    const today = new Date().toISOString().slice(0, 10)
+    if (raw.showSpecial.endDate < today) {
+      raw.showSpecial = null
+    }
+  }
   return raw
+}
+
+/**
+ * Videos page settings singleton - 12 curated slots (6 Kimberley + 6 Stockman).
+ * Returns null if the document does not exist yet.
+ */
+export async function getVideosPageSettings() {
+  return client.fetch(`
+    *[_id == "videosPageSettings"][0] {
+      kimberley1, kimberley2, kimberley3, kimberley4, kimberley5, kimberley6,
+      stockman1, stockman2, stockman3, stockman4, stockman5, stockman6
+    }
+  `)
+}
+
+/**
+ * Flatten the videosPageSettings singleton into two arrays of tile objects,
+ * filtering out any slot that has no YouTube URL set. Used by /videos to
+ * render the Kimberley and Stockman tiles in order.
+ *
+ * Each tile shape: { _id, title, youtubeUrl, description, brandFamily }
+ * to match the existing VideoCard component.
+ */
+export function flattenVideosPage(settings) {
+  if (!settings) return { kimberley: [], stockman: [] }
+  const pull = (prefix, family) => {
+    const out = []
+    for (let i = 1; i <= 6; i++) {
+      const s = settings[`${prefix}${i}`]
+      if (!s || !s.youtubeUrl) continue
+      out.push({
+        _id: `${prefix}${i}`,
+        title: s.title || `${family === 'kimberley' ? 'Kimberley' : 'Stockman'} video ${i}`,
+        youtubeUrl: s.youtubeUrl,
+        description: s.description || '',
+        brandFamily: family,
+        category: 'deep-dive',
+      })
+    }
+    return out
+  }
+  return {
+    kimberley: pull('kimberley', 'kimberley'),
+    stockman: pull('stockman', 'stockman'),
+  }
 }
 
 /**

@@ -2,7 +2,7 @@
 import Site from '../../layouts/Site.astro'
 import CaravanCard from '../../components/CaravanCard.astro'
 import TrustStrip from '../../components/TrustStrip.astro'
-import { getNewCaravans, getDistinctBrands } from '../../lib/sanity.js'
+import { getNewCaravans, getDistinctBrands, getSiteSettings } from '../../lib/sanity.js'
 import { quoteBrands } from '../../data/quote-brands.js'
 
 let caravans = []
@@ -10,6 +10,16 @@ try {
   caravans = await getNewCaravans()
 } catch (err) {
   console.warn('Sanity unreachable for /new:', err.message)
+}
+
+let reserveCta = null
+try {
+  const settings = await getSiteSettings()
+  if (settings?.reserveCta?.enabled && settings.reserveCta.stripeUrl) {
+    reserveCta = settings.reserveCta
+  }
+} catch (err) {
+  console.warn('Sanity unreachable for reserve CTA:', err.message)
 }
 
 const brands = [...new Set(caravans.map((c) => c.brand).filter(Boolean))].sort()
@@ -46,6 +56,24 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
           </a>
         ))}
       </div>
+
+      {reserveCta && (
+        <div class="reserve-cta-block">
+          <div class="reserve-cta-text">
+            <div class="page-eyebrow" style="color:#fff; opacity:0.85; margin-bottom:6px;">Lock your build slot</div>
+            <h3>Found the one? Hold it now.</h3>
+            <p>A small refundable deposit secures your factory build slot while we finalise your spec - so the slot doesn't get taken while you decide on options.</p>
+          </div>
+          <div class="reserve-cta-action">
+            <a href={reserveCta.stripeUrl} class="reserve-cta-btn" target="_blank" rel="noopener">
+              {reserveCta.buttonText || 'Reserve for $1,000'}
+            </a>
+            {reserveCta.helperText && (
+              <div class="reserve-cta-helper">{reserveCta.helperText}</div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   </section>
 
@@ -269,6 +297,80 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
       font-weight: 600;
       font-size: 0.92rem;
       margin-top: 6px;
+    }
+
+    /* Reserve $1,000 CTA - dark slab with prominent Stripe link. Sits
+       under the configurator tiles, only renders when Maud enables
+       it + sets a Stripe URL in Site Settings. */
+    .reserve-cta-block {
+      margin-top: 28px;
+      padding: 28px 32px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2A1608 0%, #0f0703 100%);
+      color: #fff;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+      box-shadow: 0 14px 36px rgba(42,22,8,0.18);
+    }
+    @media (max-width: 720px) {
+      .reserve-cta-block {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 24px 22px;
+      }
+    }
+    .reserve-cta-text h3 {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 8px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .reserve-cta-text p {
+      color: rgba(255,255,255,0.85);
+      margin: 0;
+      line-height: 1.55;
+      font-size: 0.98rem;
+    }
+    .reserve-cta-action {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    @media (max-width: 720px) {
+      .reserve-cta-action { align-items: center; }
+    }
+    .reserve-cta-btn {
+      display: inline-block;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #2BA85F 0%, #1F8049 100%);
+      color: #fff;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 8px 22px rgba(43, 168, 95, 0.30);
+      transition: transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .reserve-cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(43, 168, 95, 0.36);
+    }
+    .reserve-cta-helper {
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.72);
+      max-width: 260px;
+      text-align: right;
+    }
+    @media (max-width: 720px) {
+      .reserve-cta-helper { text-align: center; }
     }
   </style>
 </Site>

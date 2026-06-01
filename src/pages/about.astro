@@ -1,5 +1,22 @@
 ---
 import Site from '../layouts/Site.astro'
+import { getSiteSettings } from '../lib/sanity.js'
+
+let cmsIntro = null
+try {
+  const settings = await getSiteSettings()
+  if (settings?.aboutPageIntro && settings.aboutPageIntro.trim()) {
+    cmsIntro = settings.aboutPageIntro.trim()
+  }
+} catch (err) {
+  console.warn('Sanity unreachable for about page intro:', err.message)
+}
+
+// Split the Sanity intro into paragraphs on blank lines so Maud can write
+// a multi-paragraph block without us forcing all of it into one <p>.
+const cmsIntroParagraphs = cmsIntro
+  ? cmsIntro.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
+  : null
 ---
 
 <Site
@@ -14,22 +31,31 @@ import Site from '../layouts/Site.astro'
     </div>
   </div>
 
-  <!-- Intro narrative -->
+  <!-- Intro narrative. Maud can override the whole block via
+       Site Settings → Marketing intros → About page intro. -->
   <section class="section">
     <div class="container" style="max-width:780px;">
       <div style="color:var(--ink); line-height:1.8; font-size:1.05rem;">
-        <p style="margin-bottom:18px;">
-          Born from a genuine love of the open road and the great Australian outdoors, SEQ Campers has been the Sunshine Coast's go-to destination for off-road caravans and campers for over a decade. Founded by a passionate traveller who knows firsthand what it takes to explore this incredible country, we've built our reputation on honest advice, deep product knowledge and the kind of personalised service that keeps our customers coming back - and sending their mates our way.
-        </p>
-        <p style="margin-bottom:18px;">
-          We're proud authorised specialists in <strong>Kimberley Kampers</strong> and <strong>Stockman</strong> products, and we carry a carefully curated range of new and used off-road caravans and campers to suit every adventure style and budget.
-        </p>
-        <p style="margin-bottom:18px;">
-          Whether you're a first-timer trying to figure out where to start, or a seasoned grey nomad chasing your next upgrade, you'll find a team here that genuinely loves this stuff as much as you do.
-        </p>
-        <p>
-          Come in, have a chat, and let's get you out there - the Sunshine Coast is a great place to start dreaming, and we're here to help make it happen.
-        </p>
+        {cmsIntroParagraphs ? (
+          cmsIntroParagraphs.map((p, i) => (
+            <p style={`margin-bottom:${i === cmsIntroParagraphs.length - 1 ? '0' : '18px'};`}>{p}</p>
+          ))
+        ) : (
+          <>
+            <p style="margin-bottom:18px;">
+              Born from a genuine love of the open road and the great Australian outdoors, SEQ Campers has been the Sunshine Coast's go-to destination for off-road caravans and campers for over a decade. Founded by a passionate traveller who knows firsthand what it takes to explore this incredible country, we've built our reputation on honest advice, deep product knowledge and the kind of personalised service that keeps our customers coming back - and sending their mates our way.
+            </p>
+            <p style="margin-bottom:18px;">
+              We're proud authorised specialists in <strong>Kimberley Kampers</strong> and <strong>Stockman</strong> products, and we carry a carefully curated range of new and used off-road caravans and campers to suit every adventure style and budget.
+            </p>
+            <p style="margin-bottom:18px;">
+              Whether you're a first-timer trying to figure out where to start, or a seasoned grey nomad chasing your next upgrade, you'll find a team here that genuinely loves this stuff as much as you do.
+            </p>
+            <p>
+              Come in, have a chat, and let's get you out there - the Sunshine Coast is a great place to start dreaming, and we're here to help make it happen.
+            </p>
+          </>
+        )}
       </div>
     </div>
   </section>
