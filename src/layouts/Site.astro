@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css'
+import { getSiteSettings } from '../lib/sanity.js'
 
 const {
   title = 'Premium Off-Road Caravans',
@@ -17,6 +18,17 @@ const isActive = (path) => {
 // Home page gets a transparent header that overlays the hero video, like
 // skyerv.com. All other pages get the standard solid sticky header.
 const isHome = pathname === '/'
+
+// Site-wide "Get it before [date]" banner. Maud sets the headline in
+// Sanity Site Settings; if blank or the end date has passed the banner
+// is null and we render nothing.
+let showSpecial = null
+try {
+  const settings = await getSiteSettings()
+  if (settings?.showSpecial?.headline) showSpecial = settings.showSpecial
+} catch (err) {
+  console.warn('Sanity unreachable for show-special banner:', err.message)
+}
 
 // Build canonical + absolute OG image URLs from site base
 const siteBase = Astro.site ?? new URL('https://seqcampers.com.au')
@@ -151,10 +163,55 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       color: #6F1A0E;
       font-size: 0.92rem;
     }
+
+    /* Show Special banner - thin coloured strip across the very top of every
+       page, controlled by Sanity Site Settings. Stays in normal document flow
+       so it does not cover the header. Auto-hides when the end date passes. */
+    .show-special-banner {
+      background: linear-gradient(90deg, #C0341A 0%, #8B2410 100%);
+      color: #fff;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      padding: 9px 0;
+      text-align: center;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+    }
+    .show-special-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+    .show-special-headline { line-height: 1.35; }
+    .show-special-cta {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 700;
+    }
+    .show-special-cta:hover { text-decoration: none; }
+    @media (max-width: 560px) {
+      .show-special-banner { font-size: 0.85rem; padding: 8px 0; }
+      .show-special-inner { gap: 8px; }
+    }
   </style>
 </head>
 <body data-home={isHome ? 'true' : 'false'}>
-  <header class={`site-header ${isHome ? 'site-header-overlay' : ''}`}>
+  {showSpecial && (
+    <div class="show-special-banner" role="region" aria-label="Show special">
+      <div class="container show-special-inner">
+        <span class="show-special-headline">{showSpecial.headline}</span>
+        {showSpecial.ctaUrl && showSpecial.ctaText && (
+          <a href={showSpecial.ctaUrl} class="show-special-cta">{showSpecial.ctaText} →</a>
+        )}
+      </div>
+    </div>
+  )}
+
+  <header class={`site-header ${isHome ? 'site-header-overlay' : ''} ${showSpecial ? 'site-header-has-banner' : ''}`}>
     <div class="container">
       <a href="/" class="logo" aria-label="SEQ Campers home">
         <img src="/seq-logo-new.png" alt="SEQ Campers - Campers There & Back" width="600" height="338" />
@@ -177,7 +234,7 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         <a href="/stock" class={isActive('/stock') ? 'is-active' : ''}>Stock</a>
         <a href="/videos" class={isActive('/videos') ? 'is-active' : ''}>Videos</a>
         <a href="/service" class={isActive('/service') ? 'is-active' : ''}>Service</a>
-        <a href="/brisbane-show-2026" class={isActive('/brisbane-show-2026') ? 'is-active' : ''}>Brisbane Show</a>
+        <a href="/shows" class={isActive('/shows') || isActive('/brisbane-show-2026') ? 'is-active' : ''}>Shows</a>
         <a href="/brisbane-show-2026" class="nav-cta">Reserve a show slot</a>
       </nav>
     </div>

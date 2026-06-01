@@ -1,0 +1,336 @@
+---
+import Site from '../../layouts/Site.astro'
+import { getShow, getAllShowPaths, portableTextToHtml } from '../../lib/sanity.js'
+
+export async function getStaticPaths() {
+  const list = await getAllShowPaths()
+  return (list || []).map((s) => ({ params: { slug: s.slug } }))
+}
+
+const { slug } = Astro.params
+const show = await getShow(slug)
+if (!show) {
+  return Astro.redirect('/shows')
+}
+
+const QUOTE_BASE = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
+
+function qrUrl(targetUrl) {
+  const encoded = encodeURIComponent(targetUrl)
+  return `https://api.qrserver.com/v1/create-qr-code/?data=${encoded}&size=240x240&ecc=H&margin=0`
+}
+
+const calloutStyles = {
+  tip:       { bg: '#E8F5EC', border: '#6BB893', stripe: '#2BA85F', text: '#133D24' },
+  warning:   { bg: '#FFF5EC', border: '#F0CDA8', stripe: '#C0341A', text: '#5A3818' },
+  exclusive: { bg: 'linear-gradient(135deg, #FFF1CC 0%, #FFE08A 100%)', border: '#E5B53C', stripe: '#C0341A', text: '#3D2A05' },
+}
+
+const faqSchema = show.faqs?.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: show.faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    }
+  : null
+
+const eventSchema = show.startDate && show.endDate
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: show.title,
+      startDate: show.startDate,
+      endDate: show.endDate,
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      eventStatus: show.status === 'archived'
+        ? 'https://schema.org/EventCompleted'
+        : 'https://schema.org/EventScheduled',
+      location: {
+        '@type': 'Place',
+        name: show.venueName || 'TBC',
+      },
+      organizer: {
+        '@type': 'Organization',
+        name: 'SEQ Campers',
+        url: 'https://seqcampers.com.au',
+      },
+    }
+  : null
+
+const showWhyComeHtml = portableTextToHtml(show.whyComeBody)
+const showCantMakeItHtml = portableTextToHtml(show.cantMakeItBody)
+---
+
+<Site
+  title={show.title}
+  description={show.seoDescription || `${show.title} - ${show.datesLabel || ''} at ${show.venueName || ''}.`}
+>
+  {faqSchema && <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />}
+  {eventSchema && <script type="application/ld+json" slot="head" set:html={JSON.stringify(eventSchema)} />}
+
+  <div class="page-header">
+    <div class="container">
+      {show.heroEyebrow && <div class="page-eyebrow">{show.heroEyebrow}</div>}
+      <h1>{show.heroH1 || show.title}</h1>
+      {(show.datesLabel || show.venueName) && (
+        <p>
+          {show.datesLabel}
+          {show.datesLabel && show.venueName && ' · '}
+          {show.venueName}
+        </p>
+      )}
+    </div>
+  </div>
+
+  <!-- When / Where / Stand cards -->
+  <section class="section" style="padding-bottom:24px;">
+    <div class="container" style="max-width:980px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px;">
+        {show.datesLabel && (
+          <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
+            <div class="page-eyebrow" style="color:var(--rust);">When</div>
+            <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{show.datesLabel}</div>
+            {show.daysLabel && <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">{show.daysLabel}</div>}
+          </div>
+        )}
+        {show.venueName && (
+          <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
+            <div class="page-eyebrow" style="color:var(--rust);">Where</div>
+            <div style="font-family:'Inter Tight', sans-serif; font-size:1.15rem; font-weight:600; color:var(--ink);">{show.venueName}</div>
+            {show.venueAddress && <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">{show.venueAddress}</div>}
+          </div>
+        )}
+        {(show.standNumber || show.standArea) && (
+          <div style="background:#fff; border:1px solid var(--tan-border); border-radius:var(--radius); padding:22px;">
+            <div class="page-eyebrow" style="color:var(--rust);">Find us</div>
+            {show.standNumber && (
+              <div style="font-family:'Inter Tight', sans-serif; font-size:1.6rem; font-weight:800; color:var(--ink); letter-spacing:-0.01em;">{show.standNumber}</div>
+            )}
+            {show.standArea && <div style="margin-top:6px; color:var(--muted); font-size:0.88rem;">{show.standArea}</div>}
+          </div>
+        )}
+      </div>
+
+      {show.calloutBoxes && show.calloutBoxes.length > 0 && (
+        <div style="margin-top:18px; display:grid; gap:12px;">
+          {show.calloutBoxes.map((c) => {
+            const s = calloutStyles[c.style] || calloutStyles.tip
+            return (
+              <div style={`background:${s.bg}; border:1px solid ${s.border}; border-left:4px solid ${s.stripe}; border-radius:8px; padding:14px 18px; color:${s.text}; font-size:0.95rem; line-height:1.55;`}>
+                {c.badge && (
+                  <div style="display:inline-block; background:#C0341A; color:#fff; font-size:0.72rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; padding:4px 10px; border-radius:4px; margin-bottom:8px;">{c.badge}</div>
+                )}
+                {c.title && <strong>{c.title}{c.body ? ':' : ''}</strong>}
+                {c.title && c.body && ' '}
+                {c.body}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Caravans on the stand -->
+  {show.standHeading && show.standCaravans && show.standCaravans.length > 0 && (
+    <section class="section" style="padding-top:8px; padding-bottom:24px;">
+      <div class="container" style="max-width:980px;">
+        {show.standEyebrow && <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">{show.standEyebrow}</div>}
+        <h2 class="section-title" style="margin-bottom:18px;">{show.standHeading}</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px;">
+          {show.standCaravans.map((c) => (
+            <div style="background:#fff; border:1px solid var(--tan-border); border-radius:8px; padding:14px 16px;">
+              <div style="font-family:'Inter Tight', sans-serif; font-weight:600; color:var(--ink); font-size:1.02rem;">{c.name}</div>
+              {c.detail && <div style="color:var(--muted); font-size:0.85rem; margin-top:2px;">{c.detail}</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Show offer + value stack -->
+  {show.offerEnabled && (
+    <section class="section" style="padding-top:24px; padding-bottom:24px;">
+      <div class="container" style="max-width:980px;">
+        <div style="margin-bottom:18px;">
+          <div class="page-eyebrow" style="color:var(--rust);">Show inclusions</div>
+          {show.offerHeading && <h2 class="section-title" style="margin-top:6px;">{show.offerHeading}</h2>}
+          {show.offerIntro && <p style="color:var(--muted); margin-top:10px; line-height:1.6;">{show.offerIntro}</p>}
+        </div>
+
+        {(show.offerExpiry || show.vansRemaining || show.holdAmount) && (
+          <div class="show-offer-stats" style="margin-bottom:22px;">
+            {show.offerExpiry && (
+              <div class="show-offer-stat show-offer-stat-countdown">
+                <div class="show-offer-stat-label">Offer closes in</div>
+                <div class="show-offer-stat-value" data-countdown={show.offerExpiry}>--d --h --m --s</div>
+              </div>
+            )}
+            {show.vansRemaining != null && (
+              <div class="show-offer-stat show-offer-stat-scarcity">
+                <div class="show-offer-stat-label">Show vans available</div>
+                <div class="show-offer-stat-value">{show.vansRemaining} <span class="show-offer-stat-suffix">remaining</span></div>
+              </div>
+            )}
+            {show.holdAmount && (
+              <div class="show-offer-stat">
+                <div class="show-offer-stat-label">Reserve with</div>
+                <div class="show-offer-stat-value">${show.holdAmount} <span class="show-offer-stat-suffix">{show.holdHelperText || 'fully refundable'}</span></div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {show.inclusions && show.inclusions.length > 0 && (
+          <div class="value-stack">
+            {show.inclusions.map((item) => (
+              <div class="value-stack-row">
+                <div class="value-stack-tick" aria-hidden="true">✓</div>
+                <div class="value-stack-body">
+                  <div class="value-stack-label">{item.label}</div>
+                  {item.note && <div class="value-stack-note">{item.note}</div>}
+                </div>
+                <div class="value-stack-price">${(item.value || 0).toLocaleString('en-AU')}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {show.offerFinePrint && (
+          <p style="text-align:center; margin-top:14px; font-size:0.86rem; color:var(--muted);">{show.offerFinePrint}</p>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- Brand QR cards -->
+  {show.brandQrHeading && show.brandCards && show.brandCards.length > 0 && (
+    <section class="section" style="background:var(--sand-deep); padding-top:48px;">
+      <div class="container">
+        <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:8px;">
+          {show.brandQrEyebrow && <div class="page-eyebrow" style="color:var(--rust);">{show.brandQrEyebrow}</div>}
+          <h2 class="section-title">{show.brandQrHeading}</h2>
+        </div>
+        {show.brandQrIntro && (
+          <p style="text-align:center; max-width:680px; margin:0 auto 36px; color:var(--muted); line-height:1.65;">{show.brandQrIntro}</p>
+        )}
+
+        <div class="qr-grid">
+          {show.brandCards.map((b) => {
+            const quoteUrl = `${QUOTE_BASE}/quote/${b.quoteSlug}`
+            return (
+              <div class="qr-card">
+                <div class="qr-card-meta">
+                  <div class="qr-card-brand">{b.brand}</div>
+                  <h3 class="qr-card-name">{b.name}</h3>
+                  {b.tagline && <p class="qr-card-tag">{b.tagline}</p>}
+                  {b.showSpecial && (
+                    <div class="qr-card-special">
+                      <span class="page-eyebrow" style="color:var(--gold); margin:0; display:block; margin-bottom:4px;">Show special</span>
+                      {b.showSpecial}
+                    </div>
+                  )}
+                  <a href={`/quote/${b.quoteSlug}`} class="btn-primary qr-card-cta">Build your {b.brand} spec</a>
+                </div>
+                <div class="qr-card-qr">
+                  <img
+                    src={qrUrl(quoteUrl)}
+                    alt={`QR code to build your ${b.name} spec on your phone`}
+                    width="160"
+                    height="160"
+                    loading="lazy"
+                  />
+                  <div class="qr-card-qr-label">Scan with your phone</div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Narrative copy + private slot CTA -->
+  {(showWhyComeHtml || show.privateSlotCtaHeading || showCantMakeItHtml) && (
+    <section class="section">
+      <div class="container" style="max-width:840px;">
+        {show.whyComeHeading && showWhyComeHtml && (
+          <>
+            <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.5rem; font-weight:600; color:var(--ink); margin-bottom:14px;">{show.whyComeHeading}</h2>
+            <div class="prose" style="color:var(--muted); line-height:1.75;" set:html={showWhyComeHtml}></div>
+          </>
+        )}
+
+        {show.privateSlotCtaHeading && (
+          <div style="background:var(--ink); color:var(--sand); border-radius:var(--radius); padding:28px 32px; margin-top:32px;">
+            <div class="page-eyebrow" style="color:var(--gold);">Skip the queue</div>
+            <h3 style="color:var(--sand); font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; margin:8px 0 10px;">
+              {show.privateSlotCtaHeading}
+            </h3>
+            {show.privateSlotCtaBody && (
+              <p style="color:var(--gold); margin-bottom:18px; line-height:1.6;">{show.privateSlotCtaBody}</p>
+            )}
+            <a href="/contact" class="btn-primary">Reserve a show slot</a>
+          </div>
+        )}
+
+        {show.cantMakeItHeading && showCantMakeItHtml && (
+          <>
+            <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.5rem; font-weight:600; color:var(--ink); margin: 32px 0 14px;">{show.cantMakeItHeading}</h2>
+            <div class="prose" style="color:var(--muted); line-height:1.75;" set:html={showCantMakeItHtml}></div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+              <a href="/stock" class="btn-primary">View current stock</a>
+              <a href="/contact" class="btn-ghost" style="background:rgba(42,22,8,0.06); color:var(--ink); border-color:var(--tan-border);">Book a Sunshine Coast visit</a>
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- FAQ -->
+  {show.faqs && show.faqs.length > 0 && (
+    <section class="section" style="background:var(--sand-deep); padding-top:40px;">
+      <div class="container" style="max-width:840px;">
+        <section class="faq-section" aria-label={`${show.title} frequently asked questions`} style="margin:0;">
+          <div class="page-eyebrow" style="color:var(--rust);">FAQ</div>
+          <h2 class="faq-title">Common questions about the show</h2>
+          <div class="faq-list">
+            {show.faqs.map((f) => (
+              <details class="faq-item">
+                <summary>{f.q}</summary>
+                <div class="faq-answer">{f.a}</div>
+              </details>
+            ))}
+          </div>
+        </section>
+      </div>
+    </section>
+  )}
+
+  {show.offerEnabled && show.offerExpiry && (
+    <script is:inline define:vars={{ expiry: show.offerExpiry }}>
+      (function () {
+        const el = document.querySelector('[data-countdown]')
+        if (!el) return
+        const target = new Date(expiry).getTime()
+        function tick() {
+          const diff = target - Date.now()
+          if (diff <= 0) { el.textContent = 'Show offer closed'; return }
+          const d = Math.floor(diff / (1000 * 60 * 60 * 24))
+          const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+          const s = Math.floor((diff % (1000 * 60)) / 1000)
+          el.textContent = d + 'd ' + h + 'h ' + m + 'm ' + s + 's'
+        }
+        tick()
+        setInterval(tick, 1000)
+      })()
+    </script>
+  )}
+</Site>

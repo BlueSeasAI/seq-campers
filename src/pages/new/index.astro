@@ -1,8 +1,8 @@
 ---
 import Site from '../../layouts/Site.astro'
-import CaravanCard from '../../components/CaravanCard.astro'
+import BrollCard from '../../components/BrollCard.astro'
 import TrustStrip from '../../components/TrustStrip.astro'
-import { getNewCaravans, getDistinctBrands } from '../../lib/sanity.js'
+import { getNewCaravans, getSiteSettings } from '../../lib/sanity.js'
 import { quoteBrands } from '../../data/quote-brands.js'
 
 let caravans = []
@@ -10,6 +10,16 @@ try {
   caravans = await getNewCaravans()
 } catch (err) {
   console.warn('Sanity unreachable for /new:', err.message)
+}
+
+let reserveCta = null
+try {
+  const settings = await getSiteSettings()
+  if (settings?.reserveCta?.enabled && settings.reserveCta.stripeUrl) {
+    reserveCta = settings.reserveCta
+  }
+} catch (err) {
+  console.warn('Sanity unreachable for reserve CTA:', err.message)
 }
 
 const brands = [...new Set(caravans.map((c) => c.brand).filter(Boolean))].sort()
@@ -28,34 +38,13 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
 
   <TrustStrip />
 
-  <!-- Configurator entry tiles - the 7 brands -->
-  <section class="section" style="padding-top:32px; padding-bottom:32px;">
-    <div class="container">
-      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
-        <div class="page-eyebrow" style="color:var(--rust);">Build your spec</div>
-        <h2 class="section-title">Configure a new caravan in your time.</h2>
-      </div>
-      <div class="new-config-grid">
-        {quoteBrands.map((b) => (
-          <a href={`/quote/${b.slug}`} class="new-config-card">
-            <div class="new-config-brand">{b.brandFamily}</div>
-            <div class="new-config-name">{b.name.replace(b.brandFamily + ' ', '')}</div>
-            <div class="new-config-headline">{b.headline}</div>
-            <div class="new-config-price">{b.indicativePrice}</div>
-            <span class="new-config-cta">Build your spec →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
   {caravans.length > 0 && (
-    <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
+    <section class="section" style="padding-top:28px; padding-bottom:28px;">
       <div class="container">
         <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
-          <div class="page-eyebrow" style="color:var(--rust);">In stock</div>
-          <h2 class="section-title">New caravans available now.</h2>
-          <p style="color:var(--muted); margin-top:6px;">{caravans.length} new caravan{caravans.length !== 1 ? 's' : ''} ready or about to land.</p>
+          <div class="page-eyebrow" style="color:var(--rust);">Available now</div>
+          <h2 class="section-title">New caravans on the floor.</h2>
+          <p style="color:var(--muted); margin-top:6px;">{caravans.length} new caravan{caravans.length !== 1 ? 's' : ''} ready or about to land. Tap any tile to see the full spec.</p>
         </div>
 
         {brands.length > 1 && (
@@ -74,12 +63,54 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
           </form>
         )}
 
-        <div class="stock-grid" id="new-grid">
-          {caravans.map((c) => <CaravanCard caravan={c} showSpecs />)}
+        <div class="broll-grid" id="new-grid">
+          {caravans.map((c) => <BrollCard caravan={c} />)}
         </div>
       </div>
     </section>
   )}
+
+  <!-- Configurator entry tiles - the 7 brands -->
+  <section class="section" style={`padding-top:${caravans.length > 0 ? '24px' : '32px'}; padding-bottom:32px; ${caravans.length > 0 ? 'background:var(--sand-deep);' : ''}`}>
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
+        <div class="page-eyebrow" style="color:var(--rust);">Build your spec</div>
+        <h2 class="section-title">{caravans.length > 0 ? "Or configure a new one from scratch." : "Configure a new caravan in your time."}</h2>
+      </div>
+      <div class="new-config-grid">
+        {quoteBrands.map((b) => (
+          <a href={`/quote/${b.slug}`} class="new-config-card">
+            <div class="new-config-brand">{b.brandFamily}</div>
+            <div class="new-config-name">{b.name.replace(b.brandFamily + ' ', '')}</div>
+            <div class="new-config-headline">{b.headline}</div>
+            <div class="new-config-price">{b.indicativePrice}</div>
+            <span class="new-config-cta">Build your spec →</span>
+          </a>
+        ))}
+      </div>
+      <p style="margin-top:14px; font-size:0.82rem; color:var(--muted); line-height:1.55; text-align:center; max-width:780px; margin-left:auto; margin-right:auto;">
+        Indicative starting prices for the entry-level variant of each model. Ex-factory Ballina NSW, includes GST and $3,500 dealer delivery (subject to fuel surcharge). Excludes stamp duty and registration.
+      </p>
+
+      {reserveCta && (
+        <div class="reserve-cta-block">
+          <div class="reserve-cta-text">
+            <div class="page-eyebrow" style="color:#fff; opacity:0.85; margin-bottom:6px;">Lock your build slot</div>
+            <h3>Found the one? Hold it now.</h3>
+            <p>A small refundable deposit secures your factory build slot while we finalise your spec - so the slot doesn't get taken while you decide on options.</p>
+          </div>
+          <div class="reserve-cta-action">
+            <a href={reserveCta.stripeUrl} class="reserve-cta-btn" target="_blank" rel="noopener">
+              {reserveCta.buttonText || 'Reserve for $1,000'}
+            </a>
+            {reserveCta.helperText && (
+              <div class="reserve-cta-helper">{reserveCta.helperText}</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
 
   <!-- Brochure-download enquiry. Per Shane: based on the Kimberley site
        pattern. Structured questions only - no vague "what would you like
@@ -200,7 +231,7 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
     (function () {
       const form = document.getElementById('new-filters')
       if (!form) return
-      const cards = Array.from(document.querySelectorAll('#new-grid .caravan-card'))
+      const cards = Array.from(document.querySelectorAll('#new-grid .broll-card'))
       function applyFilters() {
         const brand = (form.brand?.value || '').trim()
         cards.forEach(function (c) {
@@ -214,6 +245,14 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
   </script>
 
   <style>
+    .broll-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+    @media (max-width: 640px) {
+      .broll-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
     .new-config-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -269,6 +308,80 @@ const description = `Browse new Kimberley Kampers and Stockman caravans at SEQ C
       font-weight: 600;
       font-size: 0.92rem;
       margin-top: 6px;
+    }
+
+    /* Reserve $1,000 CTA - dark slab with prominent Stripe link. Sits
+       under the configurator tiles, only renders when Maud enables
+       it + sets a Stripe URL in Site Settings. */
+    .reserve-cta-block {
+      margin-top: 28px;
+      padding: 28px 32px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2A1608 0%, #0f0703 100%);
+      color: #fff;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+      box-shadow: 0 14px 36px rgba(42,22,8,0.18);
+    }
+    @media (max-width: 720px) {
+      .reserve-cta-block {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 24px 22px;
+      }
+    }
+    .reserve-cta-text h3 {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 8px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .reserve-cta-text p {
+      color: rgba(255,255,255,0.85);
+      margin: 0;
+      line-height: 1.55;
+      font-size: 0.98rem;
+    }
+    .reserve-cta-action {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    @media (max-width: 720px) {
+      .reserve-cta-action { align-items: center; }
+    }
+    .reserve-cta-btn {
+      display: inline-block;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #2BA85F 0%, #1F8049 100%);
+      color: #fff;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 8px 22px rgba(43, 168, 95, 0.30);
+      transition: transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .reserve-cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(43, 168, 95, 0.36);
+    }
+    .reserve-cta-helper {
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.72);
+      max-width: 260px;
+      text-align: right;
+    }
+    @media (max-width: 720px) {
+      .reserve-cta-helper { text-align: center; }
     }
   </style>
 </Site>

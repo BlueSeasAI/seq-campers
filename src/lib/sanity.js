@@ -6,7 +6,13 @@ export const client = createClient({
   projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
   dataset: import.meta.env.PUBLIC_SANITY_DATASET,
   apiVersion: import.meta.env.PUBLIC_SANITY_API_VERSION,
-  useCdn: true,
+  // useCdn:false is correct for build-time queries. The Sanity CDN can serve
+  // stale data for up to ~60s after a publish. Netlify rebuilds triggered by
+  // the Sanity webhook fire within ~2s of publish - so a useCdn:true client
+  // would bake the pre-publish data into the static HTML, leaving the site
+  // stuck on the old version until the next build. ~100-200ms slower per
+  // query, but guaranteed fresh.
+  useCdn: false,
 })
 
 const builder = imageUrlBuilder(client)
@@ -254,54 +260,6 @@ export function youtubeEmbedUrl(url, opts = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Video library queries
-// ---------------------------------------------------------------------------
-
-export async function getAllVideos() {
-  return client.fetch(`
-    *[_type == "video"]
-    | order(brandFamily asc, category asc, order asc, _createdAt desc) {
-      _id, title, youtubeUrl, description, category, brandFamily, featured, order
-    }
-  `)
-}
-
-export async function getVideosByBrandFamily() {
-  const all = await getAllVideos()
-  const groups = { kimberley: [], stockman: [], general: [] }
-  all.forEach((v) => {
-    const key = v.brandFamily || 'general'
-    if (!groups[key]) groups[key] = []
-    groups[key].push(v)
-  })
-  return groups
-}
-
-export async function getFeaturedVideos(limit = 3) {
-  return client.fetch(
-    `
-    *[_type == "video" && featured == true]
-    | order(order asc, _createdAt desc)
-    [0...$limit] {
-      _id, title, youtubeUrl, description, category
-    }
-  `,
-    { limit }
-  )
-}
-
-export async function getVideosByCategory() {
-  const all = await getAllVideos()
-  const groups = {}
-  all.forEach((v) => {
-    const key = v.category || 'uncategorised'
-    if (!groups[key]) groups[key] = []
-    groups[key].push(v)
-  })
-  return groups
-}
-
-// ---------------------------------------------------------------------------
 // Site Settings singleton
 // ---------------------------------------------------------------------------
 
@@ -318,7 +276,13 @@ export async function getSiteSettings() {
           "mainImage": photos[0].asset->url,
           specs { sleeps, length, tareWeight }
         }
-      }
+      },
+      showSpecial { headline, endDate, ctaText, ctaUrl },
+      reserveCta { enabled, buttonText, stripeUrl, helperText },
+      homepageVideo1 { youtubeUrl, description },
+      homepageVideo2 { youtubeUrl, description },
+      homepageVideo3 { youtubeUrl, description },
+      showsIndexIntro
     }
   `)
   if (raw?.shanesPick?.caravan) {
@@ -326,7 +290,110 @@ export async function getSiteSettings() {
       current: safeSlug(raw.shanesPick.caravan.slug?.current) || safeSlug(raw.shanesPick.caravan.title),
     }
   }
+  // Auto-hide the show-special banner once its end date has passed. Comparison
+  // is done on the YYYY-MM-DD date string in UTC - good enough for a marketing
+  // banner; Maud can still hide it manually by clearing the headline.
+  if (raw?.showSpecial?.endDate) {
+    const today = new Date().toISOString().slice(0, 10)
+    if (raw.showSpecial.endDate < today) {
+      raw.showSpecial = null
+    }
+  }
   return raw
+}
+
+/**
+ * Videos page settings singleton - 12 curated slots (6 Kimberley + 6 Stockman).
+ * Returns null if the document does not exist yet.
+ */
+export async function getVideosPageSettings() {
+  return client.fetch(`
+    *[_id == "videosPageSettings"][0] {
+      kimberley1, kimberley2, kimberley3, kimberley4, kimberley5, kimberley6,
+      stockman1, stockman2, stockman3, stockman4, stockman5, stockman6
+    }
+  `)
+}
+
+/**
+ * Flatten the videosPageSettings singleton into two arrays of tile objects,
+ * filtering out any slot that has no YouTube URL set. Used by /videos to
+ * render the Kimberley and Stockman tiles in order.
+ *
+ * Each tile shape: { _id, title, youtubeUrl, description, brandFamily }
+ * to match the existing VideoCard component.
+ */
+export function flattenVideosPage(settings) {
+  if (!settings) return { kimberley: [], stockman: [] }
+  const pull = (prefix, family) => {
+    const out = []
+    for (let i = 1; i <= 6; i++) {
+      const s = settings[`${prefix}${i}`]
+      if (!s || !s.youtubeUrl) continue
+      out.push({
+        _id: `${prefix}${i}`,
+        title: s.title || `${family === 'kimberley' ? 'Kimberley' : 'Stockman'} video ${i}`,
+        youtubeUrl: s.youtubeUrl,
+        description: s.description || '',
+        brandFamily: family,
+        category: 'deep-dive',
+      })
+    }
+    return out
+  }
+  return {
+    kimberley: pull('kimberley', 'kimberley'),
+    stockman: pull('stockman', 'stockman'),
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shows
+// ---------------------------------------------------------------------------
+
+const SHOW_PROJECTION = `{
+  _id, title, "slug": slug.current, status,
+  startDate, endDate, datesLabel, daysLabel,
+  venueName, venueAddress, standNumber, standArea, podiumNumber,
+  heroEyebrow, heroH1, seoDescription,
+  calloutBoxes,
+  standEyebrow, standHeading, standCaravans,
+  offerEnabled, offerHeading, offerIntro, offerExpiry,
+  vansRemaining, holdAmount, holdHelperText, inclusions, offerFinePrint,
+  brandQrEyebrow, brandQrHeading, brandQrIntro, brandCards,
+  whyComeHeading, whyComeBody,
+  privateSlotCtaHeading, privateSlotCtaBody,
+  cantMakeItHeading, cantMakeItBody,
+  faqs
+}`
+
+/**
+ * Every show ordered with upcoming/active first, then archived. Used by /shows index.
+ */
+export async function getShows() {
+  return client.fetch(`
+    *[_type == "show"]
+    | order(
+        select(status == "active" => 0, status == "upcoming" => 1, 2),
+        startDate desc
+      )
+    ${SHOW_PROJECTION}
+  `)
+}
+
+/** Single show by slug. Returns null when not found. */
+export async function getShow(slug) {
+  return client.fetch(
+    `*[_type == "show" && slug.current == $slug][0] ${SHOW_PROJECTION}`,
+    { slug }
+  )
+}
+
+/** Slug list for /shows/[slug] dynamic route generation. */
+export async function getAllShowPaths() {
+  return client.fetch(`
+    *[_type == "show" && defined(slug.current)] { "slug": slug.current }
+  `)
 }
 
 /**

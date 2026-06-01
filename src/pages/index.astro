@@ -3,46 +3,34 @@ import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
-import { getFeaturedVideos, getSiteSettings, sanityImage, conditionLabel } from '../lib/sanity.js'
+import { getSiteSettings, sanityImage, conditionLabel, youtubeId } from '../lib/sanity.js'
 
-let featuredVideos = []
 let settings = null
 try {
-  ;[featuredVideos, settings] = await Promise.all([
-    getFeaturedVideos(3),
-    getSiteSettings(),
-  ])
+  settings = await getSiteSettings()
 } catch (err) {
   console.warn('Sanity unreachable on build:', err.message)
 }
 
-// Fallback videos pulled from the real SEQ Campers YouTube channel. Used until
-// Maud marks any video as Featured in Sanity Studio.
-if (!featuredVideos || featuredVideos.length === 0) {
-  featuredVideos = [
-    {
-      _id: 'p1',
-      title: 'The REAL Difference in Premium Caravans',
-      youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg',
-      description: 'Shane unpacks what actually separates a premium off-road caravan from the rest - and why it matters once you hit the corrugations.',
-      category: 'deep-dive',
-    },
-    {
-      _id: 'p2',
-      title: 'Caravan Setup Guide - Camp Ready in Minutes',
-      youtubeUrl: 'https://www.youtube.com/watch?v=xYf81xUZtNE',
-      description: 'A simple, repeatable walkthrough so your first night on the road is spent with the kettle on, not the manual out.',
-      category: 'setup',
-    },
-    {
-      _id: 'p3',
-      title: 'The #1 Cause of Caravan Electrical Failures',
-      youtubeUrl: 'https://www.youtube.com/shorts/WwgapQt3xO4',
-      description: 'Quick one - the single most common electrical issue we see in the workshop, and how to avoid it.',
-      category: 'deep-dive',
-    },
-  ]
+// Pathway tile defaults - used when Maud hasn't filled a slot in Site
+// Settings → Home page videos (Watch / Visit / Adventure).
+const PATHWAY_DEFAULTS = [
+  { videoId: 'tozC7prVbOg', sub: 'Our video library - every model, Kimberley and Stockman.' },
+  { videoId: 'xYf81xUZtNE', sub: 'Pre-loved and new display vans available now.' },
+  { videoId: 'WwgapQt3xO4', sub: 'From our driveway to your driveway. Camping support.' },
+]
+
+function resolvePathway(idx) {
+  const slot = settings?.[`homepageVideo${idx + 1}`]
+  const fallback = PATHWAY_DEFAULTS[idx]
+  const videoId = (slot?.youtubeUrl && youtubeId(slot.youtubeUrl)) || fallback.videoId
+  const sub = (slot?.description && slot.description.trim()) || fallback.sub
+  return { videoId, sub }
 }
+
+const pathwayWatch = resolvePathway(0)
+const pathwayVisit = resolvePathway(1)
+const pathwayAdventure = resolvePathway(2)
 
 // Shane's Pick - resolve from siteSettings, fall back to a static placeholder
 // so the section always renders. Maud sets this anytime in
@@ -220,42 +208,42 @@ const faqSchema = {
       </div>
 
       <div class="pathway-tile-grid">
-        <a href="/videos" class="pathway-tile pathway-tile-watch" data-video-id="tozC7prVbOg">
+        <a href="/videos" class="pathway-tile pathway-tile-watch" data-video-id={pathwayWatch.videoId}>
           <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/tozC7prVbOg/hqdefault.jpg" alt="" loading="lazy" />
+            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayWatch.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
             <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
             <div class="pathway-tile-block" aria-hidden="true"></div>
             <div class="pathway-tile-overlay" aria-hidden="true"></div>
           </div>
           <div class="pathway-tile-inner">
             <div class="pathway-tile-label">1. Watch</div>
-            <div class="pathway-tile-sub">Our video library - every model, Kimberley and Stockman.</div>
+            <div class="pathway-tile-sub">{pathwayWatch.sub}</div>
           </div>
         </a>
 
-        <a href="/stock" class="pathway-tile pathway-tile-visit" data-video-id="xYf81xUZtNE">
+        <a href="/stock" class="pathway-tile pathway-tile-visit" data-video-id={pathwayVisit.videoId}>
           <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/xYf81xUZtNE/hqdefault.jpg" alt="" loading="lazy" />
+            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayVisit.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
             <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
             <div class="pathway-tile-block" aria-hidden="true"></div>
             <div class="pathway-tile-overlay" aria-hidden="true"></div>
           </div>
           <div class="pathway-tile-inner">
             <div class="pathway-tile-label">2. Visit</div>
-            <div class="pathway-tile-sub">Pre-loved and new display vans available now.</div>
+            <div class="pathway-tile-sub">{pathwayVisit.sub}</div>
           </div>
         </a>
 
-        <a href="/service" class="pathway-tile pathway-tile-adventure" data-video-id="WwgapQt3xO4">
+        <a href="/service" class="pathway-tile pathway-tile-adventure" data-video-id={pathwayAdventure.videoId}>
           <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src="https://img.youtube.com/vi/WwgapQt3xO4/hqdefault.jpg" alt="" loading="lazy" />
+            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayAdventure.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
             <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
             <div class="pathway-tile-block" aria-hidden="true"></div>
             <div class="pathway-tile-overlay" aria-hidden="true"></div>
           </div>
           <div class="pathway-tile-inner">
             <div class="pathway-tile-label">3. Adventure</div>
-            <div class="pathway-tile-sub">From our driveway to your driveway. Camping support.</div>
+            <div class="pathway-tile-sub">{pathwayAdventure.sub}</div>
           </div>
         </a>
       </div>
