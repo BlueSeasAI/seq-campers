@@ -14,34 +14,15 @@ try {
   console.warn('Sanity unreachable for /shows:', err.message)
 }
 
-// Hardcoded entry for the 2026 Brisbane show - it lives at its own existing
-// URL /brisbane-show-2026 (not migrated to a Sanity Show doc). Shown as a
-// card on this page so visitors always see Brisbane alongside any future
-// Sanity-managed shows. Remove this block once Brisbane is archived past
-// its end date in 2026 and a Sanity Show doc takes over for 2027.
-const BRISBANE_2026 = {
-  _id: 'brisbane-2026',
-  title: 'Brisbane Caravan Show 2026',
-  href: '/brisbane-show-2026',
-  status: 'active', // becomes 'archived' after 7 June 2026
-  startDate: '2026-06-03',
-  endDate: '2026-06-07',
-  datesLabel: '3 - 7 June 2026',
-  venueName: 'Brisbane Showgrounds, Bowen Hills',
-  standNumber: '#2693',
-  standArea: 'Main Oval',
-  blurb: 'See us at the Brisbane Caravan, Camping & Touring Supershow - 5 days of Kimberley Kampers and Stockman caravans on stand #2693.',
-}
-
-// Status of the Brisbane card depends on today's date - simple cutoff.
-// We do not import any per-build time helpers - Astro pre-renders this at
-// build time, so today reflects the build day.
-const today = new Date().toISOString().slice(0, 10)
-if (today > BRISBANE_2026.endDate) BRISBANE_2026.status = 'archived'
+// Brisbane 2026 lives as a Sanity Show document (seeded via
+// sanity/scripts/seed-brisbane-show.js) - the hardcoded fallback card
+// was removed once that doc landed. The legacy /brisbane-show-2026
+// URL stays as a hardcoded page so printed QR codes / Facebook posts
+// keep working, but it does not appear on this /shows index.
 
 const statusOrder = { active: 0, upcoming: 1, archived: 2 }
-const allCards = [
-  ...shows.map((s) => ({
+const allCards = shows
+  .map((s) => ({
     _id: s._id,
     title: s.title,
     href: s.slug ? `/shows/${s.slug}` : '#',
@@ -53,14 +34,13 @@ const allCards = [
     standNumber: s.standNumber,
     standArea: s.standArea,
     blurb: s.heroH1 || s.seoDescription || '',
-  })),
-  BRISBANE_2026,
-].sort((a, b) => {
-  const sa = statusOrder[a.status] ?? 9
-  const sb = statusOrder[b.status] ?? 9
-  if (sa !== sb) return sa - sb
-  return (b.startDate || '').localeCompare(a.startDate || '')
-})
+  }))
+  .sort((a, b) => {
+    const sa = statusOrder[a.status] ?? 9
+    const sb = statusOrder[b.status] ?? 9
+    if (sa !== sb) return sa - sb
+    return (b.startDate || '').localeCompare(a.startDate || '')
+  })
 
 const activeAndUpcoming = allCards.filter((c) => c.status !== 'archived')
 const archived = allCards.filter((c) => c.status === 'archived')
