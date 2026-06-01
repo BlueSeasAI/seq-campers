@@ -113,12 +113,16 @@ const firstVariantId = brand.variants[0]?.id
               <span>Options (<span data-summary-count>0</span>)</span>
               <strong data-summary-options>+$0</strong>
             </div>
+            <div class="qb-summary-options-line">
+              <span>Dealer delivery <small style="color:var(--muted); font-size:0.78rem;">(subj. to fuel surcharge)</small></span>
+              <strong data-summary-delivery>+$3,500</strong>
+            </div>
             <div class="qb-summary-total">
               <span>Indicative total</span>
               <strong data-summary-total>$0</strong>
             </div>
             <p class="qb-summary-fineprint">
-              Indicative only. Final quote confirmed by SEQ Campers within one business day. Excludes dealer delivery ($3,500) + stamp duty + registration.
+              Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory Ballina NSW, incl. GST. Excludes stamp duty + registration.
             </p>
             <a href="#qb-details" class="btn-primary qb-summary-cta">Continue to your details ↓</a>
           </div>
@@ -277,6 +281,10 @@ const firstVariantId = brand.variants[0]?.id
         })
       }
 
+      // Dealer delivery fee from Maud's source pages - flat $3,500 across the
+      // factory range, subject to fuel surcharge confirmed at quote time.
+      const DEALER_DELIVERY = 3500
+
       function renderSummary() {
         const v = variantData[currentVariant]
         $('[data-summary-variant]').textContent = v.name
@@ -293,12 +301,15 @@ const firstVariantId = brand.variants[0]?.id
         })
         $('[data-summary-count]').textContent = count
         $('[data-summary-options]').textContent = fmtSigned(optionsTotal)
-        $('[data-summary-total]').textContent = fmt(v.basePrice + optionsTotal)
+        const grandTotal = v.basePrice + optionsTotal + DEALER_DELIVERY
+        $('[data-summary-total]').textContent = fmt(grandTotal)
 
-        // Update hidden form fields
+        // Update hidden form fields - email submission carries the dealer-
+        // delivery-inclusive figure so the office reply matches what the
+        // visitor saw on screen.
         $('[data-hidden-variant-name]').value = v.name
         $('[data-hidden-variant-base]').value = v.basePrice
-        $('[data-hidden-total]').value = v.basePrice + optionsTotal
+        $('[data-hidden-total]').value = grandTotal
         const selectedOptList = $$('.qb-opt')
           .filter((el) => selected.has(el.dataset.optId))
           .map((el) => {
