@@ -6,7 +6,13 @@ export const client = createClient({
   projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
   dataset: import.meta.env.PUBLIC_SANITY_DATASET,
   apiVersion: import.meta.env.PUBLIC_SANITY_API_VERSION,
-  useCdn: true,
+  // useCdn:false is correct for build-time queries. The Sanity CDN can serve
+  // stale data for up to ~60s after a publish. Netlify rebuilds triggered by
+  // the Sanity webhook fire within ~2s of publish - so a useCdn:true client
+  // would bake the pre-publish data into the static HTML, leaving the site
+  // stuck on the old version until the next build. ~100-200ms slower per
+  // query, but guaranteed fresh.
+  useCdn: false,
 })
 
 const builder = imageUrlBuilder(client)
