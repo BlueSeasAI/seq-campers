@@ -10,14 +10,46 @@
  * Idempotent: uses createOrReplace with a fixed _id, so re-running this
  * script overwrites the doc instead of creating duplicates.
  *
- * Run from the sanity/ folder:
+ * AUTH: requires an API token with Editor or Admin permissions. The CLI
+ * session token (--with-user-token) is sometimes rejected on
+ * createOrReplace even for project admins, so this script uses an
+ * explicit token from the SANITY_AUTH_TOKEN env var.
  *
- *   npx sanity@latest exec ./scripts/seed-brisbane-show.js --with-user-token
+ * Create a token at:
+ *   https://www.sanity.io/manage/project/ttam87n8/api -> Tokens -> Add API token
+ *   Name: "Local seed script"  Permissions: Editor
+ *
+ * Then from the sanity/ folder:
+ *
+ *   $env:SANITY_AUTH_TOKEN = "paste-token-here"
+ *   npx sanity@latest exec ./scripts/seed-brisbane-show.js
+ *
+ * Delete the token in the dashboard after - it is not needed long-term.
  */
 
-import { getCliClient } from 'sanity/cli'
+import { createClient } from '@sanity/client'
 
-const client = getCliClient({ apiVersion: '2024-04-01' })
+const token = process.env.SANITY_AUTH_TOKEN
+if (!token) {
+  console.error('')
+  console.error('ERROR: SANITY_AUTH_TOKEN environment variable not set.')
+  console.error('')
+  console.error('1. Create an API token (Editor permission) here:')
+  console.error('   https://www.sanity.io/manage/project/ttam87n8/api')
+  console.error('2. In PowerShell:')
+  console.error('   $env:SANITY_AUTH_TOKEN = "paste-token-here"')
+  console.error('3. Then re-run this command.')
+  console.error('')
+  process.exit(1)
+}
+
+const client = createClient({
+  projectId: 'ttam87n8',
+  dataset: 'production',
+  apiVersion: '2024-04-01',
+  token,
+  useCdn: false,
+})
 
 // Deterministic _id so re-running the script overwrites the same doc.
 const DOC_ID = 'show-brisbane-2026'
