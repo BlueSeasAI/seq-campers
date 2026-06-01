@@ -2,7 +2,7 @@ import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import {
   TagIcon, ClockIcon, PauseIcon, CheckmarkCircleIcon, OlistIcon,
-  PlayIcon, CogIcon, EditIcon, FilterIcon,
+  PlayIcon, CogIcon, EditIcon, FilterIcon, CalendarIcon,
 } from '@sanity/icons'
 // Video doc schema removed 1 June 2026. /videos page now reads from
 // videosPageSettings (12 fixed slots), home page videos from siteSettings.
@@ -103,6 +103,17 @@ export default defineConfig({
                 S.list()
                   .title('Pages & content')
                   .items([
+                    S.listItem()
+                      .title('Shows (caravan shows + events)')
+                      .icon(CalendarIcon)
+                      .schemaType('show')
+                      .child(
+                        S.documentList()
+                          .title('Shows')
+                          .schemaType('show')
+                          .filter('_type == "show"')
+                          .defaultOrdering([{ field: 'startDate', direction: 'desc' }])
+                      ),
                     S.listItem()
                       .title('Videos page (12 fixed slots)')
                       .icon(PlayIcon)

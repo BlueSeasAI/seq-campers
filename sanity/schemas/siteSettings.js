@@ -22,9 +22,10 @@ export default {
 
   groups: [
     { name: 'home', title: 'Home page', default: true },
-    { name: 'homeVideos', title: 'Home page videos (3 slots)' },
+    { name: 'homeVideos', title: 'Home page videos (Watch / Visit / Adventure)' },
     { name: 'banner', title: 'Show Special banner' },
     { name: 'reserve', title: 'Reserve $1,000 CTA' },
+    { name: 'shows', title: 'Shows page intro' },
   ],
 
   fields: [
@@ -164,42 +165,58 @@ export default {
       ],
     },
 
-    // ─── HOME PAGE VIDEOS (3 slots) ─────────────────────────────
+    // ─── HOME PAGE PATHWAY VIDEOS (Watch / Visit / Adventure) ───
+    // These 3 slots drive the looping B-roll videos behind the home
+    // page pathway tiles. The pathway labels ("1. Watch", "2. Visit",
+    // "3. Adventure") and link targets (/videos, /stock, /service)
+    // are page structure - they stay in code. Maud controls only the
+    // video URL and the one-line sub text under each label.
     {
       name: 'homepageVideo1',
-      title: 'Home page video - slot 1',
+      title: '1. Watch - pathway video (links to /videos)',
       type: 'object',
       group: 'homeVideos',
       options: { columns: 1, collapsible: true, collapsed: false },
+      description: 'The looping video behind the WATCH pathway tile on the home page. Leave URL blank to fall back to the default.',
       fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
-        { name: 'title', title: 'Tile title', type: 'string', validation: (Rule) => Rule.max(120) },
-        { name: 'description', title: 'Short description', type: 'string', description: 'One sentence shown under the title.', validation: (Rule) => Rule.max(220) },
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link, e.g. https://www.youtube.com/watch?v=abc123' },
+        { name: 'description', title: 'Sub text (one line)', type: 'string', description: 'The short line shown under "1. Watch". Leave blank to keep the default copy.', validation: (Rule) => Rule.max(220) },
       ],
     },
     {
       name: 'homepageVideo2',
-      title: 'Home page video - slot 2',
+      title: '2. Visit - pathway video (links to /stock)',
       type: 'object',
       group: 'homeVideos',
       options: { columns: 1, collapsible: true, collapsed: true },
+      description: 'The looping video behind the VISIT pathway tile on the home page. Leave URL blank to fall back to the default.',
       fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
-        { name: 'title', title: 'Tile title', type: 'string', validation: (Rule) => Rule.max(120) },
-        { name: 'description', title: 'Short description', type: 'string', description: 'One sentence shown under the title.', validation: (Rule) => Rule.max(220) },
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link.' },
+        { name: 'description', title: 'Sub text (one line)', type: 'string', description: 'The short line shown under "2. Visit". Leave blank to keep the default copy.', validation: (Rule) => Rule.max(220) },
       ],
     },
     {
       name: 'homepageVideo3',
-      title: 'Home page video - slot 3',
+      title: '3. Adventure - pathway video (links to /service)',
       type: 'object',
       group: 'homeVideos',
       options: { columns: 1, collapsible: true, collapsed: true },
+      description: 'The looping video behind the ADVENTURE pathway tile on the home page. Leave URL blank to fall back to the default.',
       fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
-        { name: 'title', title: 'Tile title', type: 'string', validation: (Rule) => Rule.max(120) },
-        { name: 'description', title: 'Short description', type: 'string', description: 'One sentence shown under the title.', validation: (Rule) => Rule.max(220) },
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link.' },
+        { name: 'description', title: 'Sub text (one line)', type: 'string', description: 'The short line shown under "3. Adventure". Leave blank to keep the default copy.', validation: (Rule) => Rule.max(220) },
       ],
+    },
+
+    // ─── SHOWS PAGE INTRO ─────────────────────────────────────────
+    {
+      name: 'showsIndexIntro',
+      title: 'Shows page - intro paragraph',
+      type: 'text',
+      group: 'shows',
+      rows: 4,
+      description: 'The intro paragraph shown above the list of upcoming shows on /shows. Plain text. Leave blank to fall back to the default hard-coded copy.',
+      validation: (Rule) => Rule.max(600),
     },
 
   ],

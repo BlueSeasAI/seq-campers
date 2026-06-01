@@ -1,0 +1,232 @@
+---
+import Site from '../../layouts/Site.astro'
+import { getShows, getSiteSettings } from '../../lib/sanity.js'
+
+let shows = []
+let intro = null
+try {
+  const [sList, settings] = await Promise.all([getShows(), getSiteSettings()])
+  shows = Array.isArray(sList) ? sList : []
+  if (settings?.showsIndexIntro && settings.showsIndexIntro.trim()) {
+    intro = settings.showsIndexIntro.trim()
+  }
+} catch (err) {
+  console.warn('Sanity unreachable for /shows:', err.message)
+}
+
+// Hardcoded entry for the 2026 Brisbane show - it lives at its own existing
+// URL /brisbane-show-2026 (not migrated to a Sanity Show doc). Shown as a
+// card on this page so visitors always see Brisbane alongside any future
+// Sanity-managed shows. Remove this block once Brisbane is archived past
+// its end date in 2026 and a Sanity Show doc takes over for 2027.
+const BRISBANE_2026 = {
+  _id: 'brisbane-2026',
+  title: 'Brisbane Caravan Show 2026',
+  href: '/brisbane-show-2026',
+  status: 'active', // becomes 'archived' after 7 June 2026
+  startDate: '2026-06-03',
+  endDate: '2026-06-07',
+  datesLabel: '3 - 7 June 2026',
+  venueName: 'Brisbane Showgrounds, Bowen Hills',
+  standNumber: '#2693',
+  standArea: 'Main Oval',
+  blurb: 'See us at the Brisbane Caravan, Camping & Touring Supershow - 5 days of Kimberley Kampers and Stockman caravans on stand #2693.',
+}
+
+// Status of the Brisbane card depends on today's date - simple cutoff.
+// We do not import any per-build time helpers - Astro pre-renders this at
+// build time, so today reflects the build day.
+const today = new Date().toISOString().slice(0, 10)
+if (today > BRISBANE_2026.endDate) BRISBANE_2026.status = 'archived'
+
+const statusOrder = { active: 0, upcoming: 1, archived: 2 }
+const allCards = [
+  ...shows.map((s) => ({
+    _id: s._id,
+    title: s.title,
+    href: s.slug ? `/shows/${s.slug}` : '#',
+    status: s.status,
+    startDate: s.startDate,
+    endDate: s.endDate,
+    datesLabel: s.datesLabel,
+    venueName: s.venueName,
+    standNumber: s.standNumber,
+    standArea: s.standArea,
+    blurb: s.heroH1 || s.seoDescription || '',
+  })),
+  BRISBANE_2026,
+].sort((a, b) => {
+  const sa = statusOrder[a.status] ?? 9
+  const sb = statusOrder[b.status] ?? 9
+  if (sa !== sb) return sa - sb
+  return (b.startDate || '').localeCompare(a.startDate || '')
+})
+
+const activeAndUpcoming = allCards.filter((c) => c.status !== 'archived')
+const archived = allCards.filter((c) => c.status === 'archived')
+
+const description = intro
+  || 'Where to see SEQ Campers in person. Caravan shows, expos and events across Queensland.'
+---
+
+<Site title="Shows & events" description={description.slice(0, 200)}>
+  <div class="page-header">
+    <div class="container">
+      <div class="page-eyebrow">Shows &amp; events</div>
+      <h1>See us at the next show.</h1>
+      <p>The easiest way to walk through every caravan in our range and ask the awkward questions face-to-face.</p>
+    </div>
+  </div>
+
+  {intro && (
+    <section class="section" style="padding-top:24px; padding-bottom:0;">
+      <div class="container" style="max-width:780px;">
+        <p style="color:var(--ink); line-height:1.75; font-size:1.05rem;">{intro}</p>
+      </div>
+    </section>
+  )}
+
+  {activeAndUpcoming.length > 0 && (
+    <section class="section" style="padding-top:28px; padding-bottom:24px;">
+      <div class="container">
+        <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">On now &amp; upcoming</div>
+        <h2 class="section-title" style="margin-bottom:18px;">Where to find us next.</h2>
+
+        <div class="shows-grid">
+          {activeAndUpcoming.map((s) => (
+            <a href={s.href} class={`show-card show-card-${s.status}`}>
+              {s.status === 'active' && <div class="show-card-badge show-card-badge-active">On now</div>}
+              {s.status === 'upcoming' && <div class="show-card-badge show-card-badge-upcoming">Upcoming</div>}
+              <h3 class="show-card-title">{s.title}</h3>
+              <div class="show-card-dates">{s.datesLabel || ''}</div>
+              <div class="show-card-venue">{s.venueName || ''}</div>
+              {(s.standNumber || s.standArea) && (
+                <div class="show-card-stand">
+                  {s.standNumber && <strong>{s.standNumber}</strong>}
+                  {s.standNumber && s.standArea && ' · '}
+                  {s.standArea}
+                </div>
+              )}
+              {s.blurb && <p class="show-card-blurb">{s.blurb}</p>}
+              <span class="show-card-cta">See show details →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {archived.length > 0 && (
+    <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
+      <div class="container">
+        <div class="page-eyebrow" style="color:var(--muted); margin-bottom:8px;">Past shows</div>
+        <h2 class="section-title" style="margin-bottom:18px; color:var(--muted);">Where you've seen us before.</h2>
+        <div class="shows-grid shows-grid-archive">
+          {archived.map((s) => (
+            <a href={s.href} class="show-card show-card-archived">
+              <h3 class="show-card-title">{s.title}</h3>
+              <div class="show-card-dates">{s.datesLabel || ''}</div>
+              <div class="show-card-venue">{s.venueName || ''}</div>
+              <span class="show-card-cta">View archive →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="band-dark" style="margin-top:8px;">
+    <div class="container" style="text-align:center; max-width:680px; margin:0 auto;">
+      <h2 style="color:var(--sand); font-size:1.6rem; margin-bottom:10px;">Can't make a show?</h2>
+      <p style="color:var(--gold); margin-bottom:22px; line-height:1.6;">
+        Our Sunshine Coast showroom is open by appointment. Drive an hour north of Brisbane and you'll get our undivided attention - no show-floor crowd.
+      </p>
+      <a href="/contact" class="btn-primary">Book a Sunshine Coast visit</a>
+    </div>
+  </section>
+
+  <style>
+    .shows-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .show-card {
+      display: block;
+      background: #fff;
+      border: 1px solid var(--tan-border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .show-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(42,22,8,0.10);
+      border-color: var(--rust);
+    }
+    .show-card-active { border-color: #2BA85F; }
+    .show-card-active:hover { border-color: #1F8049; }
+    .show-card-archived {
+      background: rgba(255,255,255,0.6);
+      opacity: 0.85;
+    }
+    .show-card-badge {
+      position: absolute;
+      top: -10px;
+      left: 22px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .show-card-badge-active { background: linear-gradient(135deg, #2BA85F 0%, #1F8049 100%); }
+    .show-card-badge-upcoming { background: linear-gradient(135deg, #C0341A 0%, #8B2410 100%); }
+    .show-card-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 6px 0 8px;
+      line-height: 1.25;
+    }
+    .show-card-dates {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      color: var(--rust);
+      margin-bottom: 4px;
+    }
+    .show-card-venue {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+    .show-card-stand {
+      color: var(--ink);
+      font-size: 0.92rem;
+      margin-bottom: 10px;
+    }
+    .show-card-stand strong {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 700;
+    }
+    .show-card-blurb {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 10px 0 12px;
+    }
+    .show-card-cta {
+      display: inline-block;
+      color: var(--rust);
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+  </style>
+</Site>

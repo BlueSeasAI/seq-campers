@@ -273,9 +273,10 @@ export async function getSiteSettings() {
       },
       showSpecial { headline, endDate, ctaText, ctaUrl },
       reserveCta { enabled, buttonText, stripeUrl, helperText },
-      homepageVideo1 { youtubeUrl, title, description },
-      homepageVideo2 { youtubeUrl, title, description },
-      homepageVideo3 { youtubeUrl, title, description }
+      homepageVideo1 { youtubeUrl, description },
+      homepageVideo2 { youtubeUrl, description },
+      homepageVideo3 { youtubeUrl, description },
+      showsIndexIntro
     }
   `)
   if (raw?.shanesPick?.caravan) {
@@ -293,29 +294,6 @@ export async function getSiteSettings() {
     }
   }
   return raw
-}
-
-/**
- * Flatten the 3 home page video slots from siteSettings into an array of
- * tile objects, filtering out any slot that has no YouTube URL set. Each
- * tile shape: { _id, title, youtubeUrl, description, category } to match
- * the VideoCard component.
- */
-export function flattenHomepageVideos(settings) {
-  if (!settings) return []
-  const out = []
-  for (let i = 1; i <= 3; i++) {
-    const s = settings[`homepageVideo${i}`]
-    if (!s || !s.youtubeUrl) continue
-    out.push({
-      _id: `homepageVideo${i}`,
-      title: s.title || `Featured video ${i}`,
-      youtubeUrl: s.youtubeUrl,
-      description: s.description || '',
-      category: 'deep-dive',
-    })
-  }
-  return out
 }
 
 /**
@@ -361,6 +339,55 @@ export function flattenVideosPage(settings) {
     kimberley: pull('kimberley', 'kimberley'),
     stockman: pull('stockman', 'stockman'),
   }
+}
+
+// ---------------------------------------------------------------------------
+// Shows
+// ---------------------------------------------------------------------------
+
+const SHOW_PROJECTION = `{
+  _id, title, "slug": slug.current, status,
+  startDate, endDate, datesLabel, daysLabel,
+  venueName, venueAddress, standNumber, standArea, podiumNumber,
+  heroEyebrow, heroH1, seoDescription,
+  calloutBoxes,
+  standEyebrow, standHeading, standCaravans,
+  offerEnabled, offerHeading, offerIntro, offerExpiry,
+  vansRemaining, holdAmount, holdHelperText, inclusions, offerFinePrint,
+  brandQrEyebrow, brandQrHeading, brandQrIntro, brandCards,
+  whyComeHeading, whyComeBody,
+  privateSlotCtaHeading, privateSlotCtaBody,
+  cantMakeItHeading, cantMakeItBody,
+  faqs
+}`
+
+/**
+ * Every show ordered with upcoming/active first, then archived. Used by /shows index.
+ */
+export async function getShows() {
+  return client.fetch(`
+    *[_type == "show"]
+    | order(
+        select(status == "active" => 0, status == "upcoming" => 1, 2),
+        startDate desc
+      )
+    ${SHOW_PROJECTION}
+  `)
+}
+
+/** Single show by slug. Returns null when not found. */
+export async function getShow(slug) {
+  return client.fetch(
+    `*[_type == "show" && slug.current == $slug][0] ${SHOW_PROJECTION}`,
+    { slug }
+  )
+}
+
+/** Slug list for /shows/[slug] dynamic route generation. */
+export async function getAllShowPaths() {
+  return client.fetch(`
+    *[_type == "show" && defined(slug.current)] { "slug": slug.current }
+  `)
 }
 
 /**
