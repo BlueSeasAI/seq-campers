@@ -162,9 +162,9 @@ const doc = {
   brandCards: [
     { _type: 'brandCard', _key: key('q'), name: 'Stockman Rover', brand: 'Stockman', quoteSlug: 'rover', tagline: 'The all-rounder. Off-grid ready, family friendly, 90 second setup.', showSpecial: '$2,500 of free accessories included - show only' },
     { _type: 'brandCard', _key: key('q'), name: 'Stockman Trekka', brand: 'Stockman', quoteSlug: 'trekka', tagline: 'The serious off-road camper trailer. Tough, light, made for tracks.', showSpecial: '$5,000 of free accessories included - show only' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Karavan', brand: 'Kimberley', quoteSlug: 'karavan', tagline: 'The iconic Australian-made off-road caravan. 30 years of refinement.', showSpecial: '$3,000 accessory credit (Kimberley factory promotion)' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kube', brand: 'Kimberley', quoteSlug: 'kube', tagline: 'Compact, capable, premium off-grid living. Couples and small families.', showSpecial: 'Show package - lock in 2026 pricing before July rises' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiswagen', brand: 'Kimberley', quoteSlug: 'kruiswagen', tagline: 'The expedition motorhome. Self-contained, anywhere, any track.', showSpecial: 'Show special - ask Shane on the stand' },
+    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Karavan', brand: 'Kimberley', quoteSlug: 'karavan', tagline: 'The iconic Australian-made off-road caravan. 30 years of refinement.', showSpecial: '50% off 2nd battery - save $3,911 (show only)' },
+    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kube', brand: 'Kimberley', quoteSlug: 'kube', tagline: 'Compact, capable, premium off-grid living. Couples and small families.', showSpecial: '50% off 2nd battery - save $1,750 (show only)' },
+    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiswagen', brand: 'Kimberley', quoteSlug: 'kruiswagen', tagline: 'The expedition motorhome. Self-contained, anywhere, any track.', showSpecial: 'Double up solar free OR free portable solar ($549), plus 50% off 2nd battery ($3,911) - show only' },
   ],
 
   // ─── Narrative copy ─────────────────────────────────────
