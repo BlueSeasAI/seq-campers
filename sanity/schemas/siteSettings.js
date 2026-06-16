@@ -27,6 +27,7 @@ export default {
     { name: 'banner', title: 'Show Special banner' },
     { name: 'reserve', title: 'Reserve $1,000 CTA' },
     { name: 'shows', title: 'Shows page intro' },
+    { name: 'serviceVideos', title: 'Service page videos (6 slots + workshop weekly)' },
   ],
 
   fields: [
@@ -277,6 +278,43 @@ export default {
       fields: [
         { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link, e.g. https://www.youtube.com/watch?v=abc123. Leave blank to hide the video block.' },
         { name: 'caption', title: 'Caption under the video (optional)', type: 'string', description: 'One-line caption shown below the video. e.g. "Highlights from the Brisbane Show 2026".', validation: (Rule) => Rule.max(140) },
+      ],
+    },
+
+    // ─── SERVICE PAGE VIDEO TILES (6 slots) + WORKSHOP WEEKLY ─────
+    // 6 small 16:9 video tiles on /service in a 3x2 grid - replaces the
+    // old "Meet the team" placeholder. Maud edits each slot directly.
+    // Below that the workshop-weekly slot is a single video that gets
+    // refreshed each week showing what's happening in the workshop.
+    ...[
+      { n: 1, t: 'Service tile 1 (Row 1 left)' },
+      { n: 2, t: 'Service tile 2 (Row 1 middle)' },
+      { n: 3, t: 'Service tile 3 (Row 1 right)' },
+      { n: 4, t: 'Service tile 4 (Row 2 left)' },
+      { n: 5, t: 'Service tile 5 (Row 2 middle)' },
+      { n: 6, t: 'Service tile 6 (Row 2 right)' },
+    ].map(({ n, t }) => ({
+      name: `servicePageVideo${n}`,
+      title: t,
+      type: 'object',
+      group: 'serviceVideos',
+      options: { columns: 1, collapsible: true, collapsed: true },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
+        { name: 'label', title: 'Caption under the tile', type: 'string', description: 'Short caption shown under the tile. e.g. "Meet Grant in the workshop".', validation: (Rule) => Rule.max(80) },
+      ],
+    })),
+
+    {
+      name: 'serviceWorkshopWeekly',
+      title: 'Service page - This week in the workshop',
+      type: 'object',
+      group: 'serviceVideos',
+      description: 'A short video showing what is happening in the workshop. Refresh weekly. Leave the URL blank to hide the block.',
+      options: { columns: 1 },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide the block.' },
+        { name: 'caption', title: 'Caption under the video', type: 'string', description: 'One-line caption. e.g. "Mike fitting a lithium upgrade on a 2023 Karavan."', validation: (Rule) => Rule.max(160) },
       ],
     },
 

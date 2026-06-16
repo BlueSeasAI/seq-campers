@@ -1,10 +1,11 @@
 ---
 import '../styles/global.css'
 import { getSiteSettings } from '../lib/sanity.js'
+import TrustStrip from '../components/TrustStrip.astro'
 
 const {
   title = 'Premium Off-Road Caravans',
-  description = "Queensland's home for premium off-road caravans. Kimberley Kampers, Stockman, and more.",
+  description = "The Sunshine Coast's home for premium off-road caravans. Authorised Kimberley Campers and Stockman Products dealer. Hand-picked, hand-inspected, ready to tow.",
   ogImage,
   ogType = 'website',
   noindex = false,
@@ -361,12 +362,16 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
     <slot />
   </main>
 
+  {!isHome && (
+    <TrustStrip variant="bottom" />
+  )}
+
   <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <h4>SEQ Campers</h4>
-          <p class="footer-brand">Premium off-road caravans on the Sunshine Coast. Kimberley Kampers and Stockman, hand-picked and inspected by the SEQ team.</p>
+          <h4>SEQ Campers - Sunshine Coast</h4>
+          <p class="footer-brand">Premium off-road caravans on the Sunshine Coast, Queensland. Authorised Kimberley Campers and Stockman Products dealer. Hand-picked and inspected by the SEQ team.</p>
           <address class="footer-address">
             3B/6 Bonanza Court<br />
             Marcoola QLD 4564<br />

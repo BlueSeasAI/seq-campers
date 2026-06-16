@@ -1,6 +1,6 @@
 ---
 import Site from '../layouts/Site.astro'
-import { getSiteSettings } from '../lib/sanity.js'
+import { getSiteSettings, youtubeId } from '../lib/sanity.js'
 
 let settings = {}
 try { settings = await getSiteSettings() ?? {} } catch (err) {
@@ -14,45 +14,124 @@ const services = [
   },
   {
     title: 'Warranty work',
-    body: 'Authorised warranty service for Kimberley Kampers and Stockman Products.',
+    body: 'Authorised warranty service for Kimberley Campers and Stockman Products.',
   },
   {
     title: 'Custom modifications',
     body: 'Solar upgrades, lithium swap-outs, awnings, bike racks, storage. Set your rig up your way.',
   },
 ]
+
+// 6 service-page video tiles - 3x2 grid. Each tile is Sanity-driven via
+// settings.servicePageVideo1..6. If a slot is empty we fall back to a sensible
+// default so the page never looks broken. Maud can update each slot directly
+// in Sanity Studio (Site Settings -> Service page videos).
+const DEFAULT_TEAM_VIDEO = 'https://youtu.be/cbJPJQeNHSQ'
+
+const serviceTileDefaults = [
+  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Meet Shane - owner since 2019' },
+  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Meet Maud - co-owner & operations' },
+  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Meet the workshop crew' },
+  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Inside the Marcoola workshop' },
+  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'How we pre-trip check a van' },
+  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Behind the scenes - SEQ Campers' },
+]
+
+const serviceTiles = serviceTileDefaults.map((def, i) => {
+  const slot = settings?.[`servicePageVideo${i + 1}`] || {}
+  return {
+    youtubeUrl: slot.youtubeUrl || def.youtubeUrl,
+    label: slot.label || def.label,
+  }
+}).filter((t) => !!t.youtubeUrl)
+
+// Workshop-weekly video - single tile shown below the team grid, refreshed
+// weekly. Sanity-driven via settings.serviceWorkshopWeekly. Hidden if blank.
+const workshopWeekly = settings?.serviceWorkshopWeekly?.youtubeUrl
+  ? settings.serviceWorkshopWeekly
+  : { youtubeUrl: DEFAULT_TEAM_VIDEO, caption: 'Placeholder - Maud refreshes this weekly with the latest workshop clip.' }
 ---
 
 <Site
-  title="Workshop & Service"
-  description="SEQ Campers' on-site workshop services off-road campers and caravans on the Sunshine Coast. Scheduled service, warranty work, custom modifications."
+  title="Workshop & Service - Sunshine Coast"
+  description="SEQ Campers' on-site workshop services off-road campers and caravans on the Sunshine Coast. Scheduled service, warranty work, custom modifications - all in Marcoola."
 >
-  <div class="page-header">
+  <div class="page-header page-header-tight">
     <div class="container">
-      <div class="page-eyebrow">Adventure - camping support</div>
-      <h1>From our driveway to your driveway.</h1>
-      <p>Camping support - let's make sure we can help you.</p>
+      <h1>From our Sunshine Coast workshop to your driveway.</h1>
+      <p>Camping support, scheduled service and custom modifications - all under one roof in Marcoola.</p>
     </div>
   </div>
 
-  <!-- Meet the team video placeholder (real video coming from Anna's footage) -->
-  <section class="section" style="padding-bottom:24px;">
-    <div class="container" style="max-width:980px;">
+  <!-- Meet the team - 3x2 grid of 16:9 video tiles (Sanity-driven) -->
+  <section class="section" style="padding-top:32px; padding-bottom:24px;">
+    <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
         <div class="page-eyebrow" style="color:var(--rust);">Meet the team</div>
         <h2 class="section-title">The people looking after your van</h2>
       </div>
-      <div class="meet-the-team-video">
-        <div class="meet-the-team-placeholder" aria-label="Meet the team video coming soon">
-          <div class="meet-the-team-icon" aria-hidden="true">▶</div>
-          <div class="meet-the-team-text">
-            <strong>Meet the team video</strong>
-            <span>Grant, Mike and the SEQ workshop crew. Video lands here once Anna's footage is uploaded.</span>
-          </div>
-        </div>
+      <div class="service-video-grid">
+        {serviceTiles.map((tile) => {
+          const vid = youtubeId(tile.youtubeUrl)
+          return (
+            <div class="service-video-tile">
+              <div class="service-video-media">
+                {vid && (
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+                    title={tile.label}
+                    frameborder="0"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen="false"
+                    tabindex="-1"
+                    inert
+                    loading="lazy"
+                  ></iframe>
+                )}
+                <div class="service-video-block" aria-hidden="true"></div>
+              </div>
+              {tile.label && <div class="service-video-label">{tile.label}</div>}
+            </div>
+          )
+        })}
       </div>
     </div>
   </section>
+
+  <!-- This week in the workshop -->
+  {workshopWeekly?.youtubeUrl && (
+    <section class="section" style="padding-top:24px; padding-bottom:32px;">
+      <div class="container" style="max-width:920px;">
+        <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
+          <div class="page-eyebrow" style="color:var(--rust);">This week in the workshop</div>
+          <h2 class="section-title">What we're working on right now</h2>
+        </div>
+        <div class="workshop-weekly-tile">
+          <div class="workshop-weekly-media">
+            {(() => {
+              const vid = youtubeId(workshopWeekly.youtubeUrl)
+              return vid ? (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+                  title="This week in the workshop"
+                  frameborder="0"
+                  allow="autoplay; encrypted-media"
+                  allowfullscreen="false"
+                  tabindex="-1"
+                  inert
+                  loading="lazy"
+                ></iframe>
+              ) : null
+            })()}
+            <div class="workshop-weekly-block" aria-hidden="true"></div>
+          </div>
+          {workshopWeekly.caption && (
+            <p class="workshop-weekly-caption">{workshopWeekly.caption}</p>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
 
   <section class="section" style="padding-top:24px; padding-bottom:24px;">
     <div class="container">
@@ -131,4 +210,81 @@ const services = [
       </form>
     </div>
   </section>
+
+  <style>
+    .service-video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 880px) { .service-video-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .service-video-grid { grid-template-columns: 1fr; } }
+    .service-video-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .service-video-media {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #1a1a1c;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--tan-border, #DCCBA8);
+    }
+    .service-video-media iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .service-video-block {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: transparent;
+      pointer-events: auto;
+    }
+    .service-video-label {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      color: var(--ink, #2A1608);
+      font-size: 0.98rem;
+      line-height: 1.3;
+    }
+
+    .workshop-weekly-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .workshop-weekly-media {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #1a1a1c;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--tan-border, #DCCBA8);
+    }
+    .workshop-weekly-media iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .workshop-weekly-block {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: transparent;
+      pointer-events: auto;
+    }
+    .workshop-weekly-caption {
+      color: var(--muted, #8B6A40);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+  </style>
 </Site>

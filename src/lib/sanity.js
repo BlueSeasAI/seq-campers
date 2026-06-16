@@ -292,7 +292,14 @@ export async function getSiteSettings() {
       newPageTile7 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
       newPageTile8 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
       showsIndexIntro,
-      showsCompilationVideo { youtubeUrl, caption }
+      showsCompilationVideo { youtubeUrl, caption },
+      servicePageVideo1 { youtubeUrl, label },
+      servicePageVideo2 { youtubeUrl, label },
+      servicePageVideo3 { youtubeUrl, label },
+      servicePageVideo4 { youtubeUrl, label },
+      servicePageVideo5 { youtubeUrl, label },
+      servicePageVideo6 { youtubeUrl, label },
+      serviceWorkshopWeekly { youtubeUrl, caption }
     }
   `)
   if (raw?.shanesPick?.caravan) {

@@ -42,14 +42,13 @@ const usingPlaceholders = !kimberleySlots.length && !stockmanSlots.length
 ---
 
 <Site
-  title="Watch - the SEQ video library"
-  description="Browse the SEQ Campers video library. Kimberley Kampers and Stockman walk-arounds, setup tutorials, deep-dives and off-road testing - all in one place."
+  title="Watch - off-road model videos"
+  description="Browse the SEQ Campers off-road video library on the Sunshine Coast. Kimberley Campers Kingdom + Stockman Products Convoy - walk-arounds, setup tutorials, deep-dives and real off-road testing."
 >
-  <div class="page-header">
+  <div class="page-header page-header-tight">
     <div class="container">
-      <div class="page-eyebrow">Watch</div>
-      <h1>Every model on video.</h1>
-      <p>Two trees. Pick a brand and dive in - walk-arounds, setup, deep-dives and real off-road testing.</p>
+      <h1>Learn more about our off-road models.</h1>
+      <p>Two collections. Pick a brand and dive in - walk-arounds, setup, deep-dives and real off-road testing.</p>
     </div>
   </div>
 
@@ -59,28 +58,26 @@ const usingPlaceholders = !kimberleySlots.length && !stockmanSlots.length
     <div class="container">
       <div class="watch-tree-tiles">
         <a href="#kimberley-tree" class="watch-tree-tile watch-tree-kimberley">
-          <div class="watch-tree-eyebrow">Brand 1</div>
-          <h2>Kimberley Kampers</h2>
+          <h2>Kimberley Campers</h2>
           <p>30+ years Australian-built. Karavan, Kube, Kruiswagen, Kruiser T &amp; S.</p>
-          <span class="watch-tree-cta">See Kimberley videos ↓</span>
+          <span class="watch-tree-cta">See the Kimberley Kingdom ↓</span>
         </a>
         <a href="#stockman-tree" class="watch-tree-tile watch-tree-stockman">
-          <div class="watch-tree-eyebrow">Brand 2</div>
-          <h2>Stockman</h2>
-          <p>Built tough, ready for the track. Trekka, Rover, Pod Trailer.</p>
-          <span class="watch-tree-cta">See Stockman videos ↓</span>
+          <h2>Stockman Products</h2>
+          <p>Built tough, ready for the track. Trekka, Rover, Pod.</p>
+          <span class="watch-tree-cta">See the Stockman Convoy ↓</span>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Kimberley tree -->
+  <!-- Kimberley Kingdom -->
   <section id="kimberley-tree" class="section" style="padding-top:24px;">
     <div class="container">
       <div class="section-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
-        <div class="page-eyebrow" style="color:var(--rust);">Kimberley Kampers</div>
-        <h2 class="section-title">The Kimberley tree</h2>
-        <p style="color:var(--muted); margin-top:6px;">{kimberley.length} video{kimberley.length !== 1 ? 's' : ''} across the Kimberley range.</p>
+        <div class="page-eyebrow" style="color:var(--rust);">Kimberley Campers</div>
+        <h2 class="section-title">The Kimberley Kingdom</h2>
+        <p style="color:var(--muted); margin-top:6px;">{kimberley.length} video{kimberley.length !== 1 ? 's' : ''} across the Kimberley Campers range.</p>
       </div>
       <div class="video-grid" style="margin-top:18px;">
         {kimberley.map((v) => <VideoCard video={v} showCategory={false} />)}
@@ -88,13 +85,13 @@ const usingPlaceholders = !kimberleySlots.length && !stockmanSlots.length
     </div>
   </section>
 
-  <!-- Stockman tree -->
+  <!-- Stockman Convoy -->
   <section id="stockman-tree" class="section" style="background:var(--sand-deep); padding-top:32px;">
     <div class="container">
       <div class="section-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
-        <div class="page-eyebrow" style="color:var(--rust);">Stockman</div>
-        <h2 class="section-title">The Stockman tree</h2>
-        <p style="color:var(--muted); margin-top:6px;">{stockman.length} video{stockman.length !== 1 ? 's' : ''} across the Stockman range.</p>
+        <div class="page-eyebrow" style="color:var(--rust);">Stockman Products</div>
+        <h2 class="section-title">The Stockman Convoy</h2>
+        <p style="color:var(--muted); margin-top:6px;">{stockman.length} video{stockman.length !== 1 ? 's' : ''} across the Stockman Products range.</p>
       </div>
       <div class="video-grid" style="margin-top:18px;">
         {stockman.map((v) => <VideoCard video={v} showCategory={false} />)}

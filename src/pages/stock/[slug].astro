@@ -113,9 +113,9 @@ const faqPageSchema = {
 // Authorised Dealer mini-badge - only show for Kimberley or Stockman stock
 const brandLower = (caravan.brand ?? '').toLowerCase()
 const authorisedDealerLabel = brandLower.includes('kimberley')
-  ? 'Authorised Kimberley Kampers Dealer'
+  ? 'Authorised Kimberley Campers Dealer'
   : brandLower.includes('stockman')
-    ? 'Authorised Stockman Dealer'
+    ? 'Authorised Stockman Products Dealer'
     : null
 
 // Per-listing enquiry form data. Each listing posts to Netlify Forms via the
