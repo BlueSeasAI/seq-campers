@@ -60,12 +60,14 @@ const shanesPick = settings?.shanesPick?.caravan
       caravan: settings.shanesPick.caravan,
       originalPrice: settings.shanesPick.originalPrice,
       quote: settings.shanesPick.shanesQuote,
+      status: settings.shanesPick.status || 'hidden',
       isPlaceholder: false,
     }
   : {
       caravan: PLACEHOLDER_SHANES_PICK_CARAVAN,
       originalPrice: null,
       quote: 'Shane has not picked a caravan yet. Browse the full stock list to see what is currently available, or call us on (07) 5370 7933.',
+      status: 'hidden',
       isPlaceholder: true,
     }
 
@@ -310,7 +312,15 @@ const faqSchema = {
         <div class="section-header">
           <div>
             <div class="page-eyebrow" style="color:var(--rust);">Sale of the week</div>
-            <h2 class="section-title">Shane's Pick</h2>
+            <h2 class="section-title">
+              Shane's Pick
+              {shanesPick.status === 'available-now' && (
+                <span class="shanes-pick-status shanes-pick-status-available" aria-label="Available now">Available now</span>
+              )}
+              {shanesPick.status === 'coming-soon' && (
+                <span class="shanes-pick-status shanes-pick-status-soon" aria-label="Coming soon">Coming soon</span>
+              )}
+            </h2>
           </div>
           <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="section-link">View this listing →</a>
         </div>
@@ -511,6 +521,32 @@ const faqSchema = {
         height: 85vh;
         min-height: 47.81vw;
       }
+    }
+
+    /* Shane's Pick status pill - sits next to the Shane's Pick heading.
+       "Coming soon" = orange amber. "Available now" = green. Maud picks
+       which one shows in Sanity Studio. Per Bart 8 Jun. */
+    .shanes-pick-status {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 12px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1;
+    }
+    .shanes-pick-status-available {
+      background: linear-gradient(135deg, #2BA85F 0%, #1F8049 100%);
+      box-shadow: 0 4px 14px rgba(43, 168, 95, 0.30);
+    }
+    .shanes-pick-status-soon {
+      background: linear-gradient(135deg, #E58A2A 0%, #B45D10 100%);
+      box-shadow: 0 4px 14px rgba(229, 138, 42, 0.30);
     }
   </style>
 

@@ -1,14 +1,23 @@
 ---
 import Site from '../../layouts/Site.astro'
-import { getShows, getSiteSettings } from '../../lib/sanity.js'
+import { getShows, getSiteSettings, youtubeId } from '../../lib/sanity.js'
 
 let shows = []
 let intro = null
+let compilationVideo = null
 try {
   const [sList, settings] = await Promise.all([getShows(), getSiteSettings()])
   shows = Array.isArray(sList) ? sList : []
   if (settings?.showsIndexIntro && settings.showsIndexIntro.trim()) {
     intro = settings.showsIndexIntro.trim()
+  }
+  const compilationUrl = settings?.showsCompilationVideo?.youtubeUrl
+  const compilationId = compilationUrl ? youtubeId(compilationUrl) : null
+  if (compilationId) {
+    compilationVideo = {
+      id: compilationId,
+      caption: settings.showsCompilationVideo?.caption || '',
+    }
   }
 } catch (err) {
   console.warn('Sanity unreachable for /shows:', err.message)
@@ -50,13 +59,34 @@ const description = intro
 ---
 
 <Site title="Shows & events" description={description.slice(0, 200)}>
-  <div class="page-header">
+  <div class="page-header page-header-tight">
     <div class="container">
-      <div class="page-eyebrow">Shows &amp; events</div>
       <h1>See us at the next show.</h1>
-      <p>The easiest way to walk through every caravan in our range and ask all the questions face-to-face.</p>
+      <p>The easiest way to walk through every caravan in our range and ask all the questions face-to-face. Sunshine Coast based, we travel to shows across Queensland.</p>
     </div>
   </div>
+
+  {compilationVideo && (
+    <section class="section" style="padding-top:24px; padding-bottom:8px;">
+      <div class="container" style="max-width:880px;">
+        <div class="shows-compilation">
+          <div class="shows-compilation-media">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${compilationVideo.id}?autoplay=1&mute=1&loop=1&playlist=${compilationVideo.id}&controls=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1`}
+              title="Shows compilation"
+              frameborder="0"
+              allow="autoplay; encrypted-media; fullscreen"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+          {compilationVideo.caption && (
+            <p class="shows-compilation-caption">{compilationVideo.caption}</p>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
 
   {intro && (
     <section class="section" style="padding-top:24px; padding-bottom:0;">
@@ -126,6 +156,42 @@ const description = intro
   </section>
 
   <style>
+    /* Shows compilation video block - sits at the top of /shows when Maud
+       has set siteSettings.showsCompilationVideo. 16:9 responsive iframe
+       with a small caption below. Per Bart 8 Jun. */
+    .shows-compilation {
+      margin: 0;
+    }
+    .shows-compilation-media {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #1a1a1c;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 36px rgba(42, 22, 8, 0.16);
+    }
+    .shows-compilation-media iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .shows-compilation-caption {
+      margin: 12px 0 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Tighten the brown page-header banner. Used on every page except
+       homepage. Per Bart 8 Jun. */
+    :global(.page-header.page-header-tight) {
+      padding-top: 32px;
+      padding-bottom: 32px;
+    }
+
     .shows-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

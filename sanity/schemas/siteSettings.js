@@ -257,7 +257,7 @@ export default {
       ],
     },
 
-    // ─── SHOWS PAGE INTRO ─────────────────────────────────────────
+    // ─── SHOWS PAGE INTRO + COMPILATION VIDEO ─────────────────────
     {
       name: 'showsIndexIntro',
       title: 'Shows page - intro paragraph',
@@ -266,6 +266,18 @@ export default {
       rows: 4,
       description: 'The intro paragraph shown above the list of upcoming shows on /shows. Plain text. Leave blank to fall back to the default hard-coded copy.',
       validation: (Rule) => Rule.max(600),
+    },
+    {
+      name: 'showsCompilationVideo',
+      title: 'Shows page - compilation video (top of page)',
+      type: 'object',
+      group: 'shows',
+      description: 'A YouTube video shown prominently at the top of /shows. Use it for a "highlights from past shows" compilation. Leave the URL blank to hide the video block.',
+      options: { columns: 1 },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link, e.g. https://www.youtube.com/watch?v=abc123. Leave blank to hide the video block.' },
+        { name: 'caption', title: 'Caption under the video (optional)', type: 'string', description: 'One-line caption shown below the video. e.g. "Highlights from the Brisbane Show 2026".', validation: (Rule) => Rule.max(140) },
+      ],
     },
 
   ],

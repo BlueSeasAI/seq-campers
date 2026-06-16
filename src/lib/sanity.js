@@ -270,6 +270,7 @@ export async function getSiteSettings() {
       "shanesPick": shanesPick {
         originalPrice,
         shanesQuote,
+        status,
         "caravan": caravan->{
           _id, title, slug, price, status, condition,
           "brand": brand->name,
@@ -282,7 +283,16 @@ export async function getSiteSettings() {
       homepageVideo1 { youtubeUrl, description },
       homepageVideo2 { youtubeUrl, description },
       homepageVideo3 { youtubeUrl, description },
-      showsIndexIntro
+      newPageTile1 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      newPageTile2 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      newPageTile3 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      newPageTile4 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      newPageTile5 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      newPageTile6 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      newPageTile7 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      newPageTile8 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
+      showsIndexIntro,
+      showsCompilationVideo { youtubeUrl, caption }
     }
   `)
   if (raw?.shanesPick?.caravan) {

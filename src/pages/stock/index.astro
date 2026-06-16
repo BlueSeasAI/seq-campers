@@ -1,7 +1,6 @@
 ---
 import Site from '../../layouts/Site.astro'
 import BrollCard from '../../components/BrollCard.astro'
-import TrustStrip from '../../components/TrustStrip.astro'
 import { getUsedCaravans } from '../../lib/sanity.js'
 
 let caravans = []
@@ -11,33 +10,37 @@ try {
   console.warn('Sanity unreachable for /stock:', err.message)
 }
 
-// Per Shane: every used van is a B-roll video tile. We're waiting on the
-// real B-roll URLs - in the meantime top up to 15 tiles using SEQ's
-// existing channel videos as placeholders so the page shows what it WILL
-// look like once Maud fills in brollVideoUrl for each van.
+// Per Shane: every used van is a B-roll video tile. We top up to 15 tiles
+// with placeholder videos when there are fewer real listings, so the page
+// shape stays consistent. Real listings fill these slots as Maud adds the
+// brollVideoUrl to each van.
 const PLACEHOLDER_VIDEOS = [
   'tozC7prVbOg', 'xYf81xUZtNE', 'WwgapQt3xO4',
 ]
 const PLACEHOLDER_BRANDS = [
-  { brand: 'Kimberley Kampers', model: 'Karavan' },
-  { brand: 'Kimberley Kampers', model: 'Kube' },
-  { brand: 'Kimberley Kampers', model: 'Kruiser T' },
-  { brand: 'Kimberley Kampers', model: 'Kruiser S' },
-  { brand: 'Stockman', model: 'Trekka' },
-  { brand: 'Stockman', model: 'Rover' },
-  { brand: 'Stockman', model: 'Pod Trailer' },
+  { brand: 'Kimberley Campers', model: 'Karavan' },
+  { brand: 'Kimberley Campers', model: 'Kube' },
+  { brand: 'Kimberley Campers', model: 'Kruiser T' },
+  { brand: 'Kimberley Campers', model: 'Kruiser S' },
+  { brand: 'Stockman Products', model: 'Trekka' },
+  { brand: 'Stockman Products', model: 'Rover' },
+  { brand: 'Stockman Products', model: 'Pod' },
 ]
 function makePlaceholder(i) {
   const vidId = PLACEHOLDER_VIDEOS[i % PLACEHOLDER_VIDEOS.length]
   const b = PLACEHOLDER_BRANDS[i % PLACEHOLDER_BRANDS.length]
   const year = 2018 + (i % 8)
   const stockNo = String(6000 + i * 11).padStart(4, '0')
+  // Synthetic price so placeholders mix into the descending sort sensibly
+  // (descend across the 7 placeholder brands - Karavan most expensive).
+  const placeholderPrices = [145000, 95000, 220000, 175000, 65000, 60000, 35000]
   return {
     _id: `placeholder-${i}`,
     title: `${b.brand} ${b.model} ${year}`,
     slug: { current: 'placeholder' },
     brand: b.brand,
     brollVideoUrl: `https://www.youtube.com/watch?v=${vidId}`,
+    price: placeholderPrices[i % placeholderPrices.length],
     specs: { year },
     compliance: { stockNumber: stockNo },
     _isPlaceholder: true,
@@ -45,25 +48,24 @@ function makePlaceholder(i) {
 }
 const TARGET_TILES = 15
 const placeholdersNeeded = Math.max(0, TARGET_TILES - caravans.length)
-const tiles = [
+let tiles = [
   ...caravans,
   ...Array.from({ length: placeholdersNeeded }, (_, i) => makePlaceholder(i)),
 ]
 
-const brands = [...new Set(tiles.map((c) => c.brand).filter(Boolean))].sort()
-const description = `Browse ${caravans.length} hand-picked used off-road caravan${caravans.length === 1 ? '' : 's'} for sale at SEQ Campers in Queensland. Walk-around video for every van.`
+// Sort tiles by price descending (most expensive first) per Bart 8 Jun.
+tiles = tiles.sort((a, b) => (b.price || 0) - (a.price || 0))
+
+const description = `Browse ${caravans.length} hand-picked off-road caravans ready to tow away at SEQ Campers on the Sunshine Coast, Queensland. Walk-around video for every van.`
 ---
 
-<Site title="Used Stock" description={description}>
-  <div class="page-header">
+<Site title="Off-road vans ready to tow" description={description}>
+  <div class="page-header page-header-tight">
     <div class="container">
-      <div class="page-eyebrow">Stock</div>
-      <h1>Used caravans, every one on video.</h1>
+      <h1>Off-road vans ready to tow.</h1>
       <p id="result-count">{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} ready to tow away.</p>
     </div>
   </div>
-
-  <TrustStrip />
 
   <div class="container" style="padding-top:24px; padding-bottom:48px;">
     {tiles.length === 0 ? (
@@ -72,74 +74,12 @@ const description = `Browse ${caravans.length} hand-picked used off-road caravan
         <p>We're rebuilding the used stock library right now. Check back shortly, or call (07) 5370 7933 to ask what's about to land.</p>
       </div>
     ) : (
-      <>
-        {brands.length > 1 && (
-          <form class="filter-bar" id="stock-filters" aria-label="Filter stock">
-            <div class="filter-field">
-              <label class="filter-label" for="filter-brand">Brand</label>
-              <select id="filter-brand" name="brand">
-                <option value="">All brands</option>
-                {brands.map((b) => <option value={b}>{b}</option>)}
-              </select>
-            </div>
-            <div class="filter-field">
-              <label class="filter-label">&nbsp;</label>
-              <button type="reset" class="filter-reset">Reset filters</button>
-            </div>
-          </form>
-        )}
-
-        {placeholdersNeeded > 0 && (
-          <div style="background:#FFF5EC; border:1px solid #F0CDA8; border-left:4px solid var(--rust); border-radius:8px; padding:12px 16px; margin: 0 0 18px; color:#5A3818; font-size:0.88rem; line-height:1.5;">
-            <strong>Heads up:</strong> {placeholdersNeeded} of these {tiles.length} tiles are placeholder videos until Maud fills in the walk-around video URL for each used caravan in Sanity.
-          </div>
-        )}
-
-        <div class="broll-grid" id="stock-grid">
-          {tiles.map((c) => <BrollCard caravan={c} />)}
-        </div>
-
-        <div class="filter-empty" id="filter-empty-state" style="display:none;">
-          <p>No caravans match these filters. Try clearing a filter.</p>
-        </div>
-      </>
+      <div class="broll-grid" id="stock-grid">
+        {tiles.map((c) => <BrollCard caravan={c} />)}
+      </div>
     )}
   </div>
 
-  <script is:inline>
-    (function () {
-      const form = document.getElementById('stock-filters')
-      if (!form) return
-      const cards = Array.from(document.querySelectorAll('#stock-grid .broll-card'))
-      const countEl = document.getElementById('result-count')
-      const emptyState = document.getElementById('filter-empty-state')
-      const grid = document.getElementById('stock-grid')
-      const total = cards.length
-
-      function applyFilters() {
-        const brand = (form.brand?.value || '').trim()
-        let visible = 0
-        cards.forEach(function (c) {
-          const cBrand = c.dataset.brand || ''
-          const match = !brand || cBrand === brand
-          c.style.display = match ? '' : 'none'
-          if (match) visible++
-        })
-        if (countEl) {
-          countEl.textContent =
-            visible === total
-              ? total + ' caravan' + (total !== 1 ? 's' : '') + ' ready to tow away.'
-              : visible + ' of ' + total + ' caravan' + (total !== 1 ? 's' : '')
-        }
-        if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none'
-        if (grid) grid.style.display = visible === 0 ? 'none' : ''
-      }
-
-      applyFilters()
-      form.addEventListener('input', applyFilters)
-      form.addEventListener('reset', () => setTimeout(applyFilters, 0))
-    })()
-  </script>
 
   <style>
     .broll-grid {
@@ -149,6 +89,11 @@ const description = `Browse ${caravans.length} hand-picked used off-road caravan
     }
     @media (max-width: 640px) {
       .broll-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+    /* Tighten the brown page-header banner site-wide. Per Bart 8 Jun. */
+    :global(.page-header.page-header-tight) {
+      padding-top: 32px;
+      padding-bottom: 32px;
     }
   </style>
 </Site>
