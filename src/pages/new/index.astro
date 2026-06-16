@@ -60,7 +60,7 @@ function resolveTile(idx) {
 
 const tiles = NEW_TILE_DEFAULTS.map((_, i) => resolveTile(i))
 
-const description = `Browse new Kimberley Kampers and Stockman Products off-road caravans at SEQ Campers on the Sunshine Coast. Build your spec, lock in pricing, and order direct from the factory.`
+const description = `New off-road caravans, off-grid hybrids and 4x4 camper vans built for Australian conditions. Configure a Kimberley Karavan, Kube, Kruiswagen or Kruiser, or a Stockman Trekka, Rover or Pod Trailer - direct from the factory through SEQ Campers on the Sunshine Coast.`
 ---
 
 <Site title="New off-road caravans" description={description}>
@@ -107,8 +107,9 @@ const description = `Browse new Kimberley Kampers and Stockman Products off-road
   <section class="section" style={`padding-top:${caravans.length > 0 ? '24px' : '32px'}; padding-bottom:32px; ${caravans.length > 0 ? 'background:var(--sand-deep);' : ''}`}>
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
-        <div class="page-eyebrow" style="color:var(--rust);">The full range</div>
+        <div class="page-eyebrow" style="color:var(--rust);">SEQ your match</div>
         <h2 class="section-title">{caravans.length > 0 ? 'Or pick a model and build from scratch.' : 'Pick a model and build your spec.'}</h2>
+        <p style="color:var(--muted); font-size:0.95rem; margin-top:4px; max-width:560px; margin-left:auto; margin-right:auto;">Seven off-road models. One match for you.</p>
       </div>
 
       <div class="new-tile-grid">
@@ -485,6 +486,5 @@ const description = `Browse new Kimberley Kampers and Stockman Products off-road
   </style>
 
   <YoutubeSubscribeBar variant="bar" headline="See the rigs in action before you visit" sub="Walk-arounds and on-the-track footage. Subscribe to see new model deep-dives first." />
-
   <ReserveCta variant="band" />
 </Site>

@@ -27,7 +27,7 @@ export default {
     { name: 'banner', title: 'Show Special banner' },
     { name: 'reserve', title: 'Reserve $1,000 CTA' },
     { name: 'shows', title: 'Shows page intro' },
-    { name: 'serviceVideos', title: 'Service page videos (6 slots + workshop weekly)' },
+    { name: 'serviceVideos', title: 'Service page videos (3 slots + workshop weekly)' },
     { name: 'quoteVideos', title: 'Build-your-spec page videos (one per model)' },
   ],
 
@@ -282,18 +282,20 @@ export default {
       ],
     },
 
-    // ─── SERVICE PAGE VIDEO TILES (6 slots) + WORKSHOP WEEKLY ─────
-    // 6 small 16:9 video tiles on /service in a 3x2 grid - replaces the
-    // old "Meet the team" placeholder. Maud edits each slot directly.
+    // ─── SERVICE PAGE VIDEO TILES (3 slots) + WORKSHOP WEEKLY ─────
+    // 3 small 16:9 video tiles on /service in a single row - the "Meet
+    // the team" section. Maud edits each slot directly. Slots 4-6 stay in
+    // the schema as hidden carryovers (won't render on the front end but
+    // existing data is not deleted) - per Bart 16 Jun: "just three, one row".
     // Below that the workshop-weekly slot is a single video that gets
     // refreshed each week showing what's happening in the workshop.
     ...[
-      { n: 1, t: 'Service tile 1 (Row 1 left)' },
-      { n: 2, t: 'Service tile 2 (Row 1 middle)' },
-      { n: 3, t: 'Service tile 3 (Row 1 right)' },
-      { n: 4, t: 'Service tile 4 (Row 2 left)' },
-      { n: 5, t: 'Service tile 5 (Row 2 middle)' },
-      { n: 6, t: 'Service tile 6 (Row 2 right)' },
+      { n: 1, t: 'Meet the team - tile 1' },
+      { n: 2, t: 'Meet the team - tile 2' },
+      { n: 3, t: 'Meet the team - tile 3' },
+      { n: 4, t: '[Unused] Service tile 4' },
+      { n: 5, t: '[Unused] Service tile 5' },
+      { n: 6, t: '[Unused] Service tile 6' },
     ].map(({ n, t }) => ({
       name: `servicePageVideo${n}`,
       title: t,

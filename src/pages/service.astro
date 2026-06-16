@@ -30,13 +30,11 @@ const services = [
 // in Sanity Studio (Site Settings -> Service page videos).
 const DEFAULT_TEAM_VIDEO = 'https://youtu.be/cbJPJQeNHSQ'
 
+// Single row of 3 tiles only per Bart 16 Jun ("we just want three, one row").
 const serviceTileDefaults = [
   { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Meet Shane - owner since 2019' },
   { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Meet Maud - co-owner & operations' },
   { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Meet the workshop crew' },
-  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Inside the Marcoola workshop' },
-  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'How we pre-trip check a van' },
-  { youtubeUrl: DEFAULT_TEAM_VIDEO, label: 'Behind the scenes - SEQ Campers' },
 ]
 
 const serviceTiles = serviceTileDefaults.map((def, i) => {
@@ -56,7 +54,7 @@ const workshopWeekly = settings?.serviceWorkshopWeekly?.youtubeUrl
 
 <Site
   title="Workshop & Service - Sunshine Coast"
-  description="SEQ Campers' on-site workshop services off-road campers and caravans on the Sunshine Coast. Scheduled service, warranty work, custom modifications - all in Marcoola."
+  description="SEQ Campers on-site workshop services off-road caravans, off-grid hybrids and 4x4 camper vans on the Sunshine Coast. Scheduled service, authorised Kimberley Kampers and Stockman Products warranty work, custom modifications - all in Marcoola, Queensland."
 >
   <div class="page-header page-header-tight">
     <div class="container">
@@ -291,6 +289,5 @@ const workshopWeekly = settings?.serviceWorkshopWeekly?.youtubeUrl
   </style>
 
   <YoutubeSubscribeBar variant="bar" headline="Watch the workshop in action" sub="Weekly clips from Marcoola. Subscribe to see what's on the bench right now." />
-
   <ReserveCta variant="band" />
 </Site>

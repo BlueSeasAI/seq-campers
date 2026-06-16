@@ -21,10 +21,22 @@ const firstVariantId = brand.variants[0]?.id
 // Bart 8 Jun - "/quote/rover is ex-Melbourne, not Ballina".
 const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ballina NSW'
 
-// Per-model intro video (Sanity-driven, optional). Maud sets in Site
-// Settings -> "Build-your-spec page videos". Field naming matches the
-// slug with hyphens converted to underscores.
-let introVideo = null
+// Per-model intro video. Always rendered - Sanity URL wins when set,
+// otherwise we fall back to a sensible per-model default (same YouTube IDs
+// used as the tile defaults on /new). Bart 16 Jun: "video placeholder
+// must come BEFORE they choose their model on every build page".
+const VIDEO_DEFAULTS = {
+  'kruiswagen': { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'kruiser-t':  { id: 'xYf81xUZtNE', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'kruiser-s':  { id: 'xYf81xUZtNE', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'karavan':    { id: 'WwgapQt3xO4', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'kube':       { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'trekka':     { id: 'xYf81xUZtNE', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'rover':      { id: 'WwgapQt3xO4', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'pod':        { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+}
+
+let introVideo = VIDEO_DEFAULTS[brand.slug] || { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon.' }
 try {
   const settings = await getSiteSettings() || {}
   const slotKey = `quoteVideo_${brand.slug.replace(/-/g, '_')}`
@@ -57,28 +69,31 @@ try {
     </section>
   )}
 
-  <!-- Intro video block - Sanity-driven per model. Shown above the configurator. -->
-  {introVideo && (
-    <section class="section" style="padding-top:24px; padding-bottom:8px;">
-      <div class="container" style="max-width:920px;">
-        <div class="quote-intro-video">
-          <div class="quote-intro-media">
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${introVideo.id}?autoplay=1&mute=1&loop=1&playlist=${introVideo.id}&controls=1&modestbranding=1&rel=0&playsinline=1`}
-              title={`${brand.name} walk-around`}
-              frameborder="0"
-              allow="autoplay; encrypted-media"
-              allowfullscreen
-              loading="lazy"
-            ></iframe>
-          </div>
-          {introVideo.caption && (
-            <p class="quote-intro-caption">{introVideo.caption}</p>
-          )}
+  <!-- Intro video block - always rendered (Sanity URL when set, sensible
+       per-model default otherwise). Shown above the configurator per
+       Bart 16 Jun: "video placeholder must come first, before they choose
+       their model". Template applies to every model on /quote/{slug}. -->
+  <section class="section" style="padding-top:32px; padding-bottom:8px;">
+    <div class="container" style="max-width:920px;">
+      <div class="quote-intro-video">
+        <div class="quote-intro-media">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${introVideo.id}?autoplay=1&mute=1&loop=1&playlist=${introVideo.id}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+            title={`${brand.name} walk-around`}
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen="false"
+            tabindex="-1"
+            inert
+            loading="lazy"
+          ></iframe>
         </div>
+        {introVideo.caption && (
+          <p class="quote-intro-caption">{introVideo.caption}</p>
+        )}
       </div>
-    </section>
-  )}
+    </div>
+  </section>
 
   <!-- Configurator wrapper - gets blurred until the lead-capture overlay
        is dismissed. data-locked starts as "true" and is flipped to "false"

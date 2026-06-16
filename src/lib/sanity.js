@@ -152,7 +152,7 @@ export async function getCaravan(slug) {
   return client.fetch(
     `
     *[_id == $id][0] {
-      _id, title, price, status, condition, description, features,
+      _id, title, price, status, condition, description, features, topFeatures,
       "brand": brand->name,
       "photos": photos[].asset->url,
       "videos": videos[],

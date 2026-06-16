@@ -2,7 +2,8 @@
 //
 // Caravans reference a brand. Defining brand as its own document
 // lets the receptionist pick from a dropdown rather than retyping
-// "Kimberley" 14 times.
+// "Kimberley Kampers" 14 times. Canonical brand names match the
+// website: "Kimberley Kampers" and "Stockman Products".
 
 export default {
   name: 'brand',

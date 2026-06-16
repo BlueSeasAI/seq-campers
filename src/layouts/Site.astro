@@ -219,6 +219,59 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       opacity: 0 !important;
       pointer-events: none !important;
     }
+
+    /* Hide YouTube iframe's initial play-button overlay that flashes for
+       1-2 seconds before autoplay engages. We cover every video container
+       with a sandy/poster overlay that fades out after the buffer window.
+       Per Bart 16 Jun - "those play controls flashing on load look tacky".
+
+       The fade animation runs once per page load + lives ABOVE the video
+       so any browser-injected UI is hidden underneath until it's safely
+       past the load flicker.
+
+       Hero is the most prominent so gets the longest cover (2.4s total).
+       Tile videos get a shorter cover (1.6s total). */
+    .hero-video-block::before,
+    .pathway-tile-block::before,
+    .broll-block::before,
+    .new-tile-block::before,
+    .service-video-block::before,
+    .workshop-weekly-block::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: var(--sand, #F4EDE0);
+      pointer-events: none;
+      animation: video-cover-fade-out 1.6s 0.5s ease-out forwards;
+    }
+    /* Hero gets the poster image instead of a flat sand colour and a longer
+       cover window because it loads the largest video. */
+    .hero-video-block::before {
+      background: #1a1a1c url('/hero-poster.jpg') center/cover no-repeat;
+      animation: video-cover-fade-out 2.4s 1.2s ease-out forwards;
+    }
+    /* /quote intro and /shows compilation video containers don't have a
+       block element child. We use ::after on the media container itself. */
+    .quote-intro-media,
+    .shows-compilation-media {
+      position: relative;
+    }
+    .quote-intro-media::after,
+    .shows-compilation-media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      background: var(--sand, #F4EDE0);
+      pointer-events: none;
+      animation: video-cover-fade-out 1.6s 0.5s ease-out forwards;
+    }
+    @keyframes video-cover-fade-out {
+      0%   { opacity: 1; visibility: visible; }
+      99%  { opacity: 0; visibility: visible; }
+      100% { opacity: 0; visibility: hidden; }
+    }
   </style>
 
   <!-- Site-wide media-session blockade. Chrome's "Global Media Controls"
@@ -478,17 +531,6 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         </div>
 
         <div class="footer-col">
-          <h4>Browse</h4>
-          <ul>
-            <li><a href="/stock">Stock</a></li>
-            <li><a href="/videos">Videos</a></li>
-            <li><a href="/service">Service & workshop</a></li>
-            <li><a href="/whats-happening">What's happening</a></li>
-            <li><a href="/brisbane-show-2026">Brisbane Show 2026</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
           <h4>About SEQ</h4>
           <ul>
             <li><a href="/about">About us</a></li>
@@ -498,18 +540,14 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
             <li><a href="/privacy">Privacy</a></li>
             <li><a href="/terms">Terms</a></li>
             <li><a href="https://www.youtube.com/@seqcampers9450?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a></li>
-            <li><a href="/reserve">Reserve your slot</a></li>
           </ul>
         </div>
       </div>
 
-      <div class="footer-bottom">
+      <div class="footer-bottom footer-bottom-clean">
         <div>&copy; {new Date().getFullYear()} SEQ Campers. Queensland, Australia.</div>
-        <div class="footer-links">
-          <a href="/about">About</a>
-          <a href="/contact">Contact</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
+        <div class="footer-built-by">
+          Built by <a href="https://blueseas.ai" target="_blank" rel="noopener">Blue Seas AI</a>
         </div>
       </div>
     </div>

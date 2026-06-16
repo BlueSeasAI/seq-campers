@@ -14,7 +14,7 @@ const { variant = 'primary', label = 'Reserve your slot' } = Astro.props
 ---
 
 {variant === 'band' && (
-  <section class="band-dark reserve-band">
+  <section class="reserve-band-v2">
     <div class="container reserve-band-inner">
       <div class="reserve-band-text">
         <h2 class="reserve-band-h2">Come and see one in person on the Sunshine Coast.</h2>
@@ -34,13 +34,21 @@ const { variant = 'primary', label = 'Reserve your slot' } = Astro.props
 )}
 
 <style>
-  /* Reserve band - much thinner than the default .band-dark per Bart 16 Jun.
-     Horizontal layout (text left, button right) on desktop so we don't waste
-     vertical space. Stacks on mobile. Top margin to give breathing room
-     between the YouTube subscribe bar and this band. */
-  :global(.band-dark.reserve-band) {
-    padding: 20px 0 !important;
-    margin-top: 56px;
+  /* Reserve band v2 - rust-coloured CTA strip that sits FLUSH against the
+     dark footer beneath it. Per Bart 16 Jun: change the colour + remove
+     the slither of white between band and footer. The rust colour makes
+     this its own distinct CTA section (not part of the footer) while the
+     0 bottom margin means no gap. Visitor sees: cream content -> rust
+     CTA strip -> dark footer with NO wasted space between any of them. */
+  .reserve-band-v2 {
+    background: linear-gradient(135deg, #C0341A 0%, #8B2410 100%);
+    padding: 18px 0;
+    margin: 56px 0 0;
+    border: 0;
+  }
+  /* Force the next element (footer) flush against this band. */
+  :global(.reserve-band-v2 + .site-footer) {
+    margin-top: 0 !important;
   }
   .reserve-band-inner {
     display: flex;
@@ -54,12 +62,12 @@ const { variant = 'primary', label = 'Reserve your slot' } = Astro.props
     font-family: 'Inter Tight', sans-serif;
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--sand);
+    color: #fff;
     margin: 0 0 4px;
     line-height: 1.3;
   }
   .reserve-band-sub {
-    color: var(--gold);
+    color: rgba(255,255,255,0.88);
     font-size: 0.92rem;
     margin: 0;
     line-height: 1.4;
@@ -68,14 +76,16 @@ const { variant = 'primary', label = 'Reserve your slot' } = Astro.props
     .reserve-band-inner { flex-direction: column; text-align: center; gap: 14px; }
     .reserve-band-text { min-width: 0; }
   }
+  /* Button sits on the rust band so we invert it - cream background, rust text. */
   .reserve-btn {
-    background: var(--rust, #C0341A);
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(192,52,26,0.35);
+    background: #fff;
+    color: var(--rust, #C0341A) !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
     white-space: nowrap;
+    font-weight: 700;
   }
   .reserve-btn:hover {
-    background: #A52910;
+    background: var(--sand, #F4EDE0);
     transform: translateY(-1px);
   }
 </style>

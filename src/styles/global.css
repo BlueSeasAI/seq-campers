@@ -109,6 +109,23 @@ a { color: inherit; }
 }
 .site-header-overlay.is-scrolled nav a:hover { color: var(--ink); }
 .site-header-overlay.is-scrolled nav a.is-active { color: var(--ink); border-bottom-color: var(--rust); }
+/* Reserve button stays rust+white in every header state - the generic
+   "scrolled nav a -> muted gold" rule above was bleeding through and
+   turning the Reserve button text gold-on-red (unreadable). Per Bart 16 Jun. */
+.site-header-overlay.is-scrolled .nav-cta,
+.site-header-overlay .nav-cta,
+.site-header .nav-cta {
+  background: var(--rust) !important;
+  color: #fff !important;
+  border-bottom: none !important;
+  text-shadow: none !important;
+}
+.site-header-overlay.is-scrolled .nav-cta:hover,
+.site-header-overlay .nav-cta:hover,
+.site-header .nav-cta:hover {
+  background: var(--rust-dark) !important;
+  color: #fff !important;
+}
 .site-header-overlay.is-scrolled .nav-toggle-bar {
   background: var(--ink);
   box-shadow: none;
@@ -1044,6 +1061,79 @@ a:focus-visible, button:focus-visible {
 .spec-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .spec-value { font-weight: 600; font-size: 0.95rem; color: var(--ink); }
 
+/* "Can you tow it?" prominent stat blocks per Shane (16 Jun Fireflies):
+   "people really want to know water and sizes, sizes and weights, get to
+   the numbers - they're just like, well, I can't tow it". Big numbers, no
+   noise. 2x2 grid on the listing sidebar. */
+.spec-item-key {
+  background: #fff;
+  border: 1px solid var(--tan-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  gap: 4px;
+}
+.spec-item-key .spec-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--rust);
+}
+.spec-item-key .spec-value {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.spec-item-key .spec-unit {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 2px;
+}
+.spec-item-key .spec-hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* "Is this right for you?" top 5 features list - numbered, no horizontal
+   dividers. Per Shane (16 Jun): "what are the five benefits of this van?". */
+.top-features-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.top-features-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 0;
+}
+.top-features-list li + li {
+  border-top: 1px dashed var(--tan-border);
+}
+.top-features-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: #fff;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top-features-text {
+  flex: 1;
+  color: var(--ink);
+  line-height: 1.55;
+  font-size: 0.98rem;
+  padding-top: 3px;
+}
+
 .btn-enquire {
   display: block;
   width: 100%;
@@ -1424,6 +1514,7 @@ a:focus-visible, button:focus-visible {
   border: 1px solid var(--tan-border);
   border-radius: var(--radius);
   padding: 28px 32px;
+  margin-bottom: 40px;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 28px;
@@ -3268,10 +3359,9 @@ a:focus-visible, button:focus-visible {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr;
   gap: 36px;
-  padding-bottom: 28px;
-  border-bottom: 1px solid rgba(244, 237, 224, 0.10);
+  padding-bottom: 22px;
 }
 
 @media (max-width: 860px) {
@@ -3333,10 +3423,22 @@ a:focus-visible, button:focus-visible {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  padding-top: 22px;
+  padding-top: 4px;
   color: rgba(244, 237, 224, 0.45);
   font-size: 0.8rem;
 }
+
+/* Cleaned-up bottom row per Bart 16 Jun - copyright + Blue Seas AI credit
+   only. No duplicate About/Contact/Privacy/Terms links (already in the
+   "About SEQ" column) and no thin divider line above the row. */
+.footer-bottom.footer-bottom-clean { padding-top: 4px; }
+.footer-built-by { color: rgba(244, 237, 224, 0.55); }
+.footer-built-by a {
+  color: rgba(244, 237, 224, 0.75) !important;
+  font-weight: 600;
+  border-bottom: 1px dotted rgba(244, 237, 224, 0.35);
+}
+.footer-built-by a:hover { color: var(--gold) !important; border-bottom-color: var(--gold); }
 
 .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
 

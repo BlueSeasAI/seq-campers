@@ -16,7 +16,7 @@ export default {
       name: 'title',
       title: 'Caravan name',
       type: 'string',
-      description: 'Shown in the listing - e.g. "Stockman Trekka 2024"',
+      description: 'Shown in the listing - e.g. "Stockman Products Trekka 2024" or "Kimberley Kampers Karavan 2023"',
       validation: (Rule) => Rule.required().min(3),
     },
 
@@ -62,7 +62,7 @@ export default {
       title: 'Brand',
       type: 'reference',
       to: [{ type: 'brand' }],
-      description: 'Pick the manufacturer (Kimberley, Stockman, etc.)',
+      description: 'Pick the manufacturer (Kimberley Kampers, Stockman Products, etc.)',
       validation: (Rule) => Rule.required(),
     },
 
@@ -251,7 +251,28 @@ export default {
               .max(800)
               .warning('Most caravans have ball weights of 100-450kg - confirm if outside this range'),
         },
+        {
+          name: 'waterCapacityL',
+          title: 'Water capacity (L)',
+          type: 'number',
+          description: 'Total fresh-water tank capacity in litres. Off-road caravans typically carry 90-300L.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(20)
+              .max(1000)
+              .warning('Most caravans carry 90-300L - confirm if outside this range'),
+        },
       ],
+    },
+
+    {
+      name: 'topFeatures',
+      title: 'Top 5 features ("Is this right for you?")',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'The five biggest selling points of this caravan. Per Shane (16 Jun): "what are the five benefits of this van? Is this right for you?" Each one should be a short, specific benefit (e.g. "Tows behind a mid-size SUV - 1,800kg ATM"). Aim for 5 lines.',
+      validation: (Rule) => Rule.max(7).warning('Aim for exactly 5'),
     },
 
     {

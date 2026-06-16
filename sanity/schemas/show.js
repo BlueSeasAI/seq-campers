@@ -376,7 +376,7 @@ export default {
           name: 'brandCard',
           fields: [
             { name: 'name', title: 'Caravan name', type: 'string', validation: (Rule) => Rule.required().max(120) },
-            { name: 'brand', title: 'Brand family label', type: 'string', description: 'e.g. "Stockman" or "Kimberley".', validation: (Rule) => Rule.required().max(60) },
+            { name: 'brand', title: 'Brand family label', type: 'string', description: 'e.g. "Stockman Products" or "Kimberley Kampers" - use the public-facing brand name as shown on the website.', validation: (Rule) => Rule.required().max(60) },
             { name: 'quoteSlug', title: 'Quote builder slug', type: 'string', description: 'The /quote/{slug} URL ending, e.g. "rover" or "kruiser-s". Must already exist in /quote.', validation: (Rule) => Rule.required().regex(/^[a-z0-9-]+$/, { name: 'lowercase-hyphens-only' }) },
             { name: 'tagline', title: 'Tagline', type: 'string', validation: (Rule) => Rule.required().max(240) },
             { name: 'showSpecial', title: 'Show special line', type: 'string', description: 'e.g. "$2,500 of free accessories included - show only".', validation: (Rule) => Rule.max(200) },

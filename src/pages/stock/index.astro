@@ -58,14 +58,15 @@ let tiles = [
 // Sort tiles by price descending (most expensive first) per Bart 8 Jun.
 tiles = tiles.sort((a, b) => (b.price || 0) - (a.price || 0))
 
-const description = `Browse ${caravans.length} hand-picked off-road caravans ready to tow away at SEQ Campers on the Sunshine Coast, Queensland. Walk-around video for every van.`
+const description = `Used off-road caravans, off-grid hybrids and 4x4 camper vans ready to tow away from SEQ Campers on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman Products stock with walk-around video for every van. Affordable off-road caravan to luxury off-grid options.`
 ---
 
 <Site title="Off-road vans ready to tow" description={description}>
   <div class="page-header page-header-tight">
     <div class="container">
+      <div class="page-eyebrow" style="color:var(--gold);">SEQ and compare</div>
       <h1>Off-road vans ready to tow.</h1>
-      <p id="result-count">{caravans.length} caravan{caravans.length !== 1 ? 's' : ''} ready to tow away.</p>
+      <p id="result-count">Caravans ready to tow away. Every one hand-picked and walked through by Shane and the SEQ team.</p>
     </div>
   </div>
 
@@ -100,6 +101,5 @@ const description = `Browse ${caravans.length} hand-picked off-road caravans rea
   </style>
 
   <YoutubeSubscribeBar variant="bar" headline="Watch walk-arounds before you visit" sub="Every used van gets a YouTube walk-around. Subscribe to see new arrivals first." />
-
   <ReserveCta variant="band" />
 </Site>
