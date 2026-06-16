@@ -198,7 +198,92 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       .show-special-banner { font-size: 0.85rem; padding: 8px 0; }
       .show-special-inner { gap: 8px; }
     }
+    /* Site-wide kill switch for browser-native media controls on every
+       autoplay video (hero, pathway tiles, broll cards, /quote intro, /service
+       team grid, workshop weekly, /new tiles). Per Bart 16 Jun - "remove the
+       on-screen play controls" on every preloaded video site-wide. */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-panel,
+    video::-webkit-media-controls-play-button,
+    video::-webkit-media-controls-start-playback-button,
+    video::-webkit-media-controls-overlay-play-button,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-media-controls-current-time-display,
+    video::-webkit-media-controls-time-remaining-display,
+    video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-volume-slider,
+    video::-webkit-media-controls-mute-button,
+    video::-webkit-media-controls-fullscreen-button {
+      display: none !important;
+      -webkit-appearance: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   </style>
+
+  <!-- Site-wide media-session blockade. Chrome's "Global Media Controls"
+       attach Media Session handlers WHEN a video starts playing (not before),
+       so a one-shot clear races and loses. We clear repeatedly for the first
+       30 seconds + on every play/playing event + on tab focus/visibility
+       change. Applies to every page via the layout. -->
+  <script is:inline>
+    (function () {
+      function nuke() {
+        try {
+          if ('mediaSession' in navigator) {
+            ['play', 'pause', 'seekbackward', 'seekforward', 'previoustrack', 'nexttrack', 'stop', 'seekto', 'skipad'].forEach(function (action) {
+              try { navigator.mediaSession.setActionHandler(action, null) } catch (e) {}
+            })
+            try { navigator.mediaSession.metadata = null } catch (e) {}
+            try { navigator.mediaSession.playbackState = 'none' } catch (e) {}
+          }
+        } catch (e) { /* no-op */ }
+      }
+      nuke()
+      document.addEventListener('DOMContentLoaded', nuke)
+      window.addEventListener('load', nuke)
+
+      var ticks = 0
+      var iv = setInterval(function () {
+        nuke()
+        ticks++
+        if (ticks > 60) clearInterval(iv) // 30 seconds
+      }, 500)
+
+      function bindAllVideos() {
+        Array.prototype.forEach.call(document.querySelectorAll('video'), function (v) {
+          if (v.dataset.nukeBound === '1') return
+          v.dataset.nukeBound = '1'
+          v.removeAttribute('controls')
+          v.controls = false
+          try { v.disablePictureInPicture = true } catch (e) {}
+          ;['play', 'playing', 'pause', 'loadedmetadata', 'loadeddata', 'canplay'].forEach(function (ev) {
+            v.addEventListener(ev, function () { v.controls = false; nuke() })
+          })
+        })
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindAllVideos)
+      } else {
+        bindAllVideos()
+      }
+      // Re-scan after dynamic content (e.g. lazy-loaded sections) injects new <video>
+      function attachObserver() {
+        try {
+          if (!document.body) return
+          new MutationObserver(function () { bindAllVideos() }).observe(document.body, { childList: true, subtree: true })
+        } catch (e) { /* no-op */ }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachObserver)
+      } else {
+        attachObserver()
+      }
+
+      document.addEventListener('visibilitychange', nuke)
+      window.addEventListener('focus', nuke)
+    })()
+  </script>
 </head>
 <body data-home={isHome ? 'true' : 'false'}>
   {showSpecial && (
@@ -408,6 +493,8 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           <ul>
             <li><a href="/about">About us</a></li>
             <li><a href="/contact">Contact</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQs</a></li>
             <li><a href="/privacy">Privacy</a></li>
             <li><a href="/terms">Terms</a></li>
             <li><a href="https://www.youtube.com/@seqcampers9450?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a></li>

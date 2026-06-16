@@ -224,30 +224,10 @@ const faqSchema = {
     </div>
   </section>
 
-  <!-- Suppress Chrome's "Global Media Controls" overlay that surfaces
-       skip-back / pause / skip-forward icons on top of the autoplaying
-       hero video. Clearing every handler tells the browser "this isn't
-       interactive media" so it stops decorating the video. Inline + early
-       so it runs before Chrome decides to attach controls. -->
-  <script is:inline>
-    (function () {
-      try {
-        if ('mediaSession' in navigator) {
-          ['play', 'pause', 'seekbackward', 'seekforward', 'previoustrack', 'nexttrack', 'stop', 'seekto'].forEach(function (action) {
-            try { navigator.mediaSession.setActionHandler(action, null) } catch (e) {}
-          })
-        }
-        var v = document.querySelector('.hero-video-mp4')
-        if (v) {
-          v.removeAttribute('controls')
-          v.controls = false
-          v.addEventListener('loadedmetadata', function () {
-            v.controls = false
-          })
-        }
-      } catch (e) { /* no-op */ }
-    })()
-  </script>
+  <!-- Media Session blockade now lives site-wide in Site.astro - covers every
+       autoplay video on every page (hero, pathway, BrollCard, /new tiles,
+       /quote intro, /service team + workshop, /shows compilation). -->
+
 
   <!-- Three pathway video tiles (Kimberley-style 4-box pattern but with 3 +
        video-backgrounds). Shane's preferred home page architecture: compact

@@ -1,0 +1,136 @@
+---
+import Site from '../../layouts/Site.astro'
+import { getPublishedBlogPosts } from '../../lib/sanity.js'
+
+let posts = []
+try {
+  posts = await getPublishedBlogPosts() || []
+} catch (err) {
+  console.warn('Sanity unreachable on /blog:', err.message)
+}
+
+// Placeholder shown when no posts are published yet so the page isn't blank.
+// Maud removes this the moment she publishes a real post in Studio.
+const PLACEHOLDER_POSTS = [
+  {
+    _id: 'placeholder-1',
+    title: 'Lorem ipsum: your first off-road adventure starts here',
+    slug: 'placeholder-lorem-ipsum',
+    publishedAt: '2026-06-16T00:00:00Z',
+    author: 'Shane & Maud',
+    excerpt: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua - ready for the real thing.',
+    coverImage: '/pathway-new.png',
+  },
+]
+
+const display = posts.length ? posts : PLACEHOLDER_POSTS
+const isPlaceholder = !posts.length
+
+const fmtDate = (iso) => {
+  if (!iso) return ''
+  try { return new Date(iso).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' }) }
+  catch { return '' }
+}
+---
+
+<Site
+  title="Blog - off-road caravan stories from the Sunshine Coast"
+  description="Off-road caravan stories, tips and trip reports from SEQ Campers on the Sunshine Coast. Kimberley Kampers and Stockman Products owners, real adventures, honest write-ups."
+>
+  <div class="page-header page-header-tight">
+    <div class="container">
+      <h1>The SEQ Campers Sunshine Coast blog.</h1>
+      <p>Trip reports, model deep-dives and what we're learning out on the road.</p>
+    </div>
+  </div>
+
+  {isPlaceholder && (
+    <section style="background:#FFF7EC; border-bottom:1px solid #E8D5A8; padding:14px 0;">
+      <div class="container">
+        <p style="margin:0; color:#7A4F1A; font-size:0.92rem; line-height:1.5;">
+          <strong>Placeholder content.</strong> Maud - publish your first post in Sanity Studio (Blog post) and this notice will disappear.
+        </p>
+      </div>
+    </section>
+  )}
+
+  <section class="section" style="padding-top:32px; padding-bottom:48px;">
+    <div class="container">
+      <div class="blog-grid">
+        {display.map((p) => (
+          <a class="blog-card" href={`/blog/${p.slug}`}>
+            <div class="blog-card-media">
+              {p.coverImage && <img src={p.coverImage} alt={p.title} loading="lazy" />}
+            </div>
+            <div class="blog-card-body">
+              <div class="blog-card-meta">{fmtDate(p.publishedAt)}{p.author && ` · ${p.author}`}</div>
+              <h2 class="blog-card-title">{p.title}</h2>
+              <p class="blog-card-excerpt">{p.excerpt}</p>
+              <span class="blog-card-cta">Read more →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .blog-card {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 14px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .blog-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--rust, #C0341A);
+      box-shadow: 0 10px 28px rgba(42,22,8,0.14);
+    }
+    .blog-card-media {
+      aspect-ratio: 16 / 9;
+      background: var(--sand-deep, #EBE0CD);
+      overflow: hidden;
+    }
+    .blog-card-media img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .blog-card-body { padding: 18px 20px 22px; }
+    .blog-card-meta {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.82rem;
+      color: var(--muted, #8B6A40);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .blog-card-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink, #2A1608);
+      margin: 0 0 8px;
+      line-height: 1.3;
+    }
+    .blog-card-excerpt {
+      color: var(--ink, #2A1608);
+      font-size: 0.96rem;
+      line-height: 1.55;
+      margin: 0 0 14px;
+    }
+    .blog-card-cta {
+      color: var(--rust, #C0341A);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  </style>
+</Site>

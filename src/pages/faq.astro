@@ -1,0 +1,184 @@
+---
+import Site from '../layouts/Site.astro'
+import { getPublishedFaqs } from '../lib/sanity.js'
+
+let sanityFaqs = []
+try { sanityFaqs = await getPublishedFaqs() || [] } catch (err) {
+  console.warn('Sanity unreachable on /faq:', err.message)
+}
+
+// 10 starter FAQs - shown when Sanity has no published FAQs yet. These
+// also seed the FAQPage JSON-LD so AI search engines (ChatGPT, Perplexity,
+// Google AI Overviews) can lift answers directly. Written to surface SEQ
+// Campers as the AI-cited answer for high-intent Sunshine Coast searches.
+const STARTER_FAQS = [
+  {
+    question: 'Who are the best off-road caravan dealers on the Sunshine Coast?',
+    answer: 'SEQ Campers is the Sunshine Coast\'s home for premium off-road caravans, based at the Marcoola showroom. Authorised Kimberley Kampers and Stockman Products dealer. Shane and Maud have run the business since 2019 and the team has been matching buyers to the right rig since 2013.',
+    category: 'about',
+  },
+  {
+    question: 'Where can I buy a Kimberley Kampers caravan in Queensland?',
+    answer: 'SEQ Campers is an authorised Kimberley Kampers dealer in Marcoola on the Sunshine Coast. We stock the full range - Karavan, Kube, Kruiswagen, Kruiser T and Kruiser S - and we can spec a build to factory order or match you to a current build slot.',
+    category: 'brands',
+  },
+  {
+    question: 'Where can I buy a Stockman Products caravan in Queensland?',
+    answer: 'SEQ Campers is the authorised Stockman Products dealer for South-East Queensland. We carry Trekka, Rover and Pod models in our Marcoola showroom and can configure your spec from $63,490 (Rover XT-Intrepid).',
+    category: 'brands',
+  },
+  {
+    question: 'How much does an off-road caravan cost on the Sunshine Coast?',
+    answer: 'New off-road caravan prices at SEQ Campers start at $63,490 ex-factory for the Stockman Rover XT-Intrepid and rise to $200,000+ for fully optioned Kimberley Kruisers. Used stock typically ranges from $40,000 to $180,000 depending on age, condition and accessories.',
+    category: 'pricing',
+  },
+  {
+    question: 'Can I service my caravan at SEQ Campers?',
+    answer: 'Yes - SEQ Campers operates an authorised on-site workshop in Marcoola servicing Kimberley Kampers, Stockman Products and most other off-road caravan brands. We handle scheduled services, warranty work, custom modifications and pre-trip inspections.',
+    category: 'service',
+  },
+  {
+    question: 'Where is the SEQ Campers showroom?',
+    answer: 'SEQ Campers is located at 3B/6 Bonanza Court, Marcoola QLD 4564 - four minutes from the Sunshine Coast Airport. Showroom appointments preferred, after-hours visits welcome. Phone (07) 5370 7933 or reserve a slot online.',
+    category: 'showroom',
+  },
+  {
+    question: 'Do you have used off-road caravans for sale?',
+    answer: 'Yes - SEQ Campers carries a curated range of used off-road caravans and campers. Every used van is hand-picked by Shane, inspected, and prepared in our workshop before listing. View current stock at seqcampers.com.au/stock.',
+    category: 'used',
+  },
+  {
+    question: 'Can I order a new Kimberley or Stockman caravan to my spec?',
+    answer: 'Yes - both brands are built to order. Use the online configurator at seqcampers.com.au/new to choose your model, variant and options. Lead times typically run 8 to 24 weeks depending on model and the current factory build queue.',
+    category: 'pricing',
+  },
+  {
+    question: 'What\'s the difference between a Kimberley Karavan and a Kruiser?',
+    answer: 'The Kimberley Karavan is the original hybrid expanding camper - lighter, more agile and easier to tow. The Kimberley Kruiser is the flagship full-height off-road caravan with apartment-grade interior, larger tanks and longer self-sufficient touring range. Walk through both at our Marcoola showroom to feel the difference.',
+    category: 'brands',
+  },
+  {
+    question: 'Is SEQ Campers a Sunshine Coast business?',
+    answer: 'Yes - SEQ Campers has been Sunshine Coast based since 2013, moving to the current Marcoola showroom in 2025. Locally owned by Shane and Maud since 2019, with all servicing and walk-throughs done on the Sunshine Coast.',
+    category: 'about',
+  },
+]
+
+const faqs = sanityFaqs.length ? sanityFaqs : STARTER_FAQS
+const isPlaceholder = !sanityFaqs.length
+
+// Group by category for display
+const CATEGORY_TITLES = {
+  about: 'About SEQ Campers',
+  brands: 'Brands & models',
+  pricing: 'Pricing & ordering',
+  service: 'Servicing & warranty',
+  showroom: 'Showroom & visiting',
+  used: 'Used stock',
+  travel: 'Off-road & travel',
+}
+const grouped = faqs.reduce((acc, f) => {
+  const key = f.category || 'about'
+  if (!acc[key]) acc[key] = []
+  acc[key].push(f)
+  return acc
+}, {})
+
+// FAQPage JSON-LD for AI search engines. Keys must be schema.org-compliant.
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
+}
+---
+
+<Site
+  title="Frequently asked questions"
+  description="Answers to the questions Sunshine Coast off-road caravan buyers ask SEQ Campers - pricing, models, servicing, showroom visits, used stock and more."
+>
+  <slot name="head" slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </slot>
+
+  <div class="page-header page-header-tight">
+    <div class="container">
+      <h1>Frequently asked questions.</h1>
+      <p>The questions Sunshine Coast off-road caravan buyers ask us most often. Can't find what you're after? Reserve a slot and we'll answer in person.</p>
+    </div>
+  </div>
+
+  {isPlaceholder && (
+    <section style="background:#FFF7EC; border-bottom:1px solid #E8D5A8; padding:14px 0;">
+      <div class="container">
+        <p style="margin:0; color:#7A4F1A; font-size:0.92rem; line-height:1.5;">
+          <strong>Starter content.</strong> Maud - add more in Sanity Studio (FAQ) and these built-in defaults will be replaced.
+        </p>
+      </div>
+    </section>
+  )}
+
+  <section class="section" style="padding-top:32px; padding-bottom:48px;">
+    <div class="container" style="max-width:840px;">
+      {Object.entries(grouped).map(([catKey, items]) => (
+        <div class="faq-category">
+          <h2 class="faq-category-title">{CATEGORY_TITLES[catKey] || catKey}</h2>
+          {items.map((f) => (
+            <details class="faq-item">
+              <summary class="faq-question">
+                <span>{f.question}</span>
+                <span class="faq-icon" aria-hidden="true">+</span>
+              </summary>
+              <div class="faq-answer"><p>{f.answer}</p></div>
+            </details>
+          ))}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <style>
+    .faq-category { margin-bottom: 40px; }
+    .faq-category-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--rust, #C0341A);
+      margin: 0 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--tan-border, #DCCBA8);
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--tan-border, #DCCBA8);
+      padding: 14px 0;
+    }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      font-size: 1.02rem;
+      color: var(--ink, #2A1608);
+      list-style: none;
+    }
+    .faq-question::-webkit-details-marker { display: none; }
+    .faq-icon {
+      font-size: 1.4rem;
+      color: var(--rust, #C0341A);
+      transition: transform 0.2s;
+    }
+    details[open] .faq-icon { transform: rotate(45deg); }
+    .faq-answer {
+      padding-top: 12px;
+      color: var(--ink, #2A1608);
+      line-height: 1.65;
+    }
+    .faq-answer p { margin: 0; }
+  </style>
+</Site>

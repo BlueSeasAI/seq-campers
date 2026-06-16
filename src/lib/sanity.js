@@ -430,3 +430,62 @@ export async function getDistinctBrands() {
     | order(@ asc)
   `)
 }
+
+// ---------------------------------------------------------------------------
+// Blog
+// ---------------------------------------------------------------------------
+
+/**
+ * All published blog posts, newest first. Used on /blog index.
+ */
+export async function getPublishedBlogPosts() {
+  return client.fetch(`
+    *[_type == "blogPost" && isPublished == true && defined(slug.current)] | order(publishedAt desc) {
+      _id,
+      title,
+      "slug": slug.current,
+      publishedAt,
+      excerpt,
+      author,
+      "coverImage": coverImage.asset->url
+    }
+  `)
+}
+
+/**
+ * Single blog post by slug. Used on /blog/[slug].
+ */
+export async function getBlogPostBySlug(slug) {
+  return client.fetch(
+    `*[_type == "blogPost" && slug.current == $slug && isPublished == true][0] {
+      _id, title, "slug": slug.current, publishedAt, excerpt, author, body,
+      "coverImage": coverImage.asset->url
+    }`,
+    { slug }
+  )
+}
+
+/**
+ * All slugs of published posts - used by getStaticPaths on /blog/[slug].
+ */
+export async function getAllBlogSlugs() {
+  return client.fetch(
+    `*[_type == "blogPost" && isPublished == true && defined(slug.current)] { "slug": slug.current }`
+  )
+}
+
+// ---------------------------------------------------------------------------
+// FAQs
+// ---------------------------------------------------------------------------
+
+/**
+ * All published FAQs, grouped by category. Used on /faq AND for the
+ * FAQPage JSON-LD schema injected site-wide.
+ */
+export async function getPublishedFaqs() {
+  return client.fetch(`
+    *[_type == "faq" && isPublished == true] | order(category asc, order asc) {
+      _id, question, answer, category, order
+    }
+  `)
+}
