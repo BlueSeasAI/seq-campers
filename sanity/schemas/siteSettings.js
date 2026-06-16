@@ -23,6 +23,7 @@ export default {
   groups: [
     { name: 'home', title: 'Home page', default: true },
     { name: 'homeVideos', title: 'Home page videos (Watch / Visit / Adventure)' },
+    { name: 'newTiles', title: 'New page video tiles (8 slots)' },
     { name: 'banner', title: 'Show Special banner' },
     { name: 'reserve', title: 'Reserve $1,000 CTA' },
     { name: 'shows', title: 'Shows page intro' },
@@ -82,8 +83,56 @@ export default {
           rows: 3,
           description: 'A few sentences from Shane on why this one is special. Shown as the body copy.',
         },
+        {
+          name: 'status',
+          title: 'Status pill',
+          type: 'string',
+          description: 'Shown as a small pill near the Shane\'s Pick block on the home page. "Coming soon" = the van is being brought in but not yet on the floor. "Available now" = on the floor today. "Hidden" = no pill shown.',
+          options: {
+            list: [
+              { title: 'Hidden (no pill)', value: 'hidden' },
+              { title: 'Coming soon (orange)', value: 'coming-soon' },
+              { title: 'Available now (green)', value: 'available-now' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'hidden',
+        },
       ],
     },
+
+    // ─── NEW PAGE VIDEO TILES (8 fixed slots) ──────────────────────
+    // The 8 tiles on /new in 4 rows of 2. Order is fixed in code:
+    //   Row 1: tile1 (Kruiswagen) · tile2 (Kruiser)
+    //   Row 2: tile3 (Karavan)     · tile4 (Kube)
+    //   Row 3: tile5 (Trekka)      · tile6 (Rover)
+    //   Row 4: tile7 (Pod)         · tile8 (Accessories)
+    // Each slot has its own video URL + brand label + model label + price
+    // + CTA link override. Leave any field blank to fall back to the
+    // sensible default coded for that slot.
+    ...[
+      { n: 1, t: 'Tile 1: Kruiswagen (Row 1 left, Kimberley Campers)' },
+      { n: 2, t: 'Tile 2: Kruiser (Row 1 right, Kimberley Campers)' },
+      { n: 3, t: 'Tile 3: Karavan (Row 2 left, Kimberley Campers)' },
+      { n: 4, t: 'Tile 4: Kube (Row 2 right, Kimberley Campers)' },
+      { n: 5, t: 'Tile 5: Trekka (Row 3 left, Stockman Products)' },
+      { n: 6, t: 'Tile 6: Rover (Row 3 right, Stockman Products)' },
+      { n: 7, t: 'Tile 7: Pod (Row 4 left, Stockman Products)' },
+      { n: 8, t: 'Tile 8: Accessories (Row 4 right)' },
+    ].map(({ n, t }) => ({
+      name: `newPageTile${n}`,
+      title: t,
+      type: 'object',
+      group: 'newTiles',
+      options: { columns: 1, collapsible: true, collapsed: true },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to use the default placeholder.' },
+        { name: 'brandLabel', title: 'Brand label override', type: 'string', description: 'e.g. "Kimberley Campers" or "Stockman Products". Leave blank to use the default for this slot.' },
+        { name: 'modelLabel', title: 'Model label override', type: 'string', description: 'e.g. "Kruiswagen". Leave blank to use the default for this slot.' },
+        { name: 'priceLabel', title: 'Price label override', type: 'string', description: 'e.g. "From $203,350". Leave blank to use the default for this slot.' },
+        { name: 'ctaHref', title: 'Click-through URL override', type: 'string', description: 'Where the tile click takes the visitor. Leave blank to use the default for this slot (usually /quote/{slug}).' },
+      ],
+    })),
 
     // ─── SHOW SPECIAL BANNER (site-wide) ────────────────────────────
     {

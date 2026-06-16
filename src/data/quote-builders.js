@@ -814,7 +814,7 @@ export const quoteBuilders = [
     variants: [
       {
         id: 'xt-intrepid',
-        name: 'Rover 2 XT - Intrepid',
+        name: 'Rover 02 XT - Intrepid',
         basePrice: 59990,
         included: [
           'Hot-dip galvanised chassis',
@@ -828,7 +828,7 @@ export const quoteBuilders = [
       },
       {
         id: 'xt-ultra',
-        name: 'Rover 2 XT - Ultra',
+        name: 'Rover 02 XT - Ultra',
         basePrice: 74990,
         included: [
           'Everything in XT Intrepid, plus:',
@@ -841,49 +841,24 @@ export const quoteBuilders = [
           '240V system',
         ],
       },
-      {
-        id: 'super-lite-intrepid',
-        name: 'Rover 2 Super Lite - Intrepid',
-        basePrice: 59990,
-        included: [
-          'Aluminium chassis',
-          '7-leaf springs',
-          '10" electric drum brakes',
-          '120Ah lithium battery',
-          '100W solar',
-          'Joolca instant gas shower',
-        ],
-      },
-      {
-        id: 'super-lite-ultra',
-        name: 'Rover 2 Super Lite - Ultra',
-        basePrice: 74990,
-        included: [
-          'Everything in Super Lite Intrepid, plus:',
-          'REDARC RedVision system',
-          '300Ah lithium battery',
-          '400W solar',
-          'Reverse-cycle A/C',
-          'Diesel hot water shower',
-        ],
-      },
     ],
     categories: [
       {
         id: 'comfort-power',
         title: 'Comfort & Power Upgrades',
         options: [
-          { id: 'redvision', label: 'REDARC RedVision Power System', priceByVariant: { 'xt-intrepid': 3700, 'xt-ultra': 0, 'super-lite-intrepid': 3700, 'super-lite-ultra': 0 } },
-          { id: 'rooftop-ac', label: '240V Reverse-Cycle Air Conditioning', priceByVariant: { 'xt-intrepid': 3800, 'xt-ultra': 0, 'super-lite-intrepid': 3800, 'super-lite-ultra': 0 } },
-          { id: 'battery-300ah', label: 'Upgrade to 300Ah Lithium Battery', priceByVariant: { 'xt-intrepid': 1900, 'xt-ultra': 0, 'super-lite-intrepid': 1900, 'super-lite-ultra': 0 } },
+          { id: 'super-lite', label: 'Super Light chassis option (tick if interested - we will confirm pricing)', price: 0 },
+          { id: 'redvision', label: 'REDARC RedVision Power System', priceByVariant: { 'xt-intrepid': 3700, 'xt-ultra': 0 } },
+          { id: 'rooftop-ac', label: '240V Reverse-Cycle Air Conditioning', priceByVariant: { 'xt-intrepid': 3800, 'xt-ultra': 0 } },
+          { id: 'battery-300ah', label: 'Upgrade to 300Ah Lithium Battery', priceByVariant: { 'xt-intrepid': 1900, 'xt-ultra': 0 } },
           { id: 'shore-power', label: '240V Shore Power System', price: 1200 },
-          { id: 'inverter-12v', label: '2000W 12V Inverter (Intrepid only)', priceByVariant: { 'xt-intrepid': 1600, 'xt-ultra': null, 'super-lite-intrepid': 1600, 'super-lite-ultra': null } },
-          { id: 'inverter-redarc', label: '2000W REDARC Inverter (Ultra only)', priceByVariant: { 'xt-intrepid': null, 'xt-ultra': 2300, 'super-lite-intrepid': null, 'super-lite-ultra': 2300 } },
+          { id: 'inverter-12v', label: '2000W 12V Inverter (Intrepid only)', priceByVariant: { 'xt-intrepid': 1600, 'xt-ultra': null } },
+          { id: 'inverter-redarc', label: '2000W REDARC Inverter (Ultra only)', priceByVariant: { 'xt-intrepid': null, 'xt-ultra': 2300 } },
           { id: 'portable-solar', label: 'Portable 220W Solar Panels', price: 950 },
-          { id: 'diesel-shower', label: 'Diesel Hot Water Heater + Shower Kit', priceByVariant: { 'xt-intrepid': 4900, 'xt-ultra': 0, 'super-lite-intrepid': 4900, 'super-lite-ultra': 0 } },
+          { id: 'diesel-shower', label: 'Diesel Hot Water Heater + Shower Kit', priceByVariant: { 'xt-intrepid': 4900, 'xt-ultra': 0 } },
           { id: 'diesel-heater', label: 'Diesel Air Heater', price: 3150 },
           { id: 'kitchen-wall-roof', label: 'Kitchen Wall & Roof Kit', price: 900 },
-          { id: 'stone-guard', label: 'Stone Guard', priceByVariant: { 'xt-intrepid': 900, 'xt-ultra': 0, 'super-lite-intrepid': 900, 'super-lite-ultra': 900 } },
+          { id: 'stone-guard', label: 'Stone Guard', priceByVariant: { 'xt-intrepid': 900, 'xt-ultra': 0 } },
         ],
       },
       {

@@ -14,6 +14,11 @@ if (!brand) return Astro.redirect('/stock')
 const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.replace(/\/$/, '')
 const pageUrl = `${siteBase}/quote/${brand.slug}`
 const firstVariantId = brand.variants[0]?.id
+
+// Ex-factory location depends on the brand family. Kimberley Campers
+// builds in Ballina NSW. Stockman Products builds in Melbourne. Per
+// Bart 8 Jun - "/quote/rover is ex-Melbourne, not Ballina".
+const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ballina NSW'
 ---
 
 <Site
@@ -49,7 +54,7 @@ const firstVariantId = brand.variants[0]?.id
               <h3 class="qb-variant-name">{v.name}</h3>
               <div class="qb-variant-price">${v.basePrice.toLocaleString('en-AU')}</div>
             </div>
-            <p class="qb-variant-subtext">Ex-factory Ballina NSW, incl. GST. Excludes dealer delivery + on-road costs.</p>
+            <p class="qb-variant-subtext">Ex-factory {exFactoryLocation}, incl. GST. Excludes dealer delivery + on-road costs.</p>
             <ul class="qb-variant-included">
               {v.included.map((feature) => <li>{feature}</li>)}
             </ul>
@@ -122,7 +127,7 @@ const firstVariantId = brand.variants[0]?.id
               <strong data-summary-total>$0</strong>
             </div>
             <p class="qb-summary-fineprint">
-              Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory Ballina NSW, incl. GST. Excludes stamp duty + registration.
+              Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST. Excludes stamp duty + registration.
             </p>
             <a href="#qb-details" class="btn-primary qb-summary-cta">Continue to your details ↓</a>
           </div>
