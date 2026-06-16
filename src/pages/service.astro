@@ -1,5 +1,7 @@
 ---
 import Site from '../layouts/Site.astro'
+import ReserveCta from '../components/ReserveCta.astro'
+import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
 import { getSiteSettings, youtubeId } from '../lib/sanity.js'
 
 let settings = {}
@@ -287,4 +289,8 @@ const workshopWeekly = settings?.serviceWorkshopWeekly?.youtubeUrl
       text-align: center;
     }
   </style>
+
+  <YoutubeSubscribeBar variant="bar" headline="Watch the workshop in action" sub="Weekly clips from Marcoola. Subscribe to see what's on the bench right now." />
+
+  <ReserveCta variant="band" />
 </Site>

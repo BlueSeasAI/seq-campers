@@ -236,7 +236,7 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         <a href="/videos" class={isActive('/videos') ? 'is-active' : ''}>Videos</a>
         <a href="/service" class={isActive('/service') ? 'is-active' : ''}>Service</a>
         <a href="/shows" class={isActive('/shows') || isActive('/brisbane-show-2026') ? 'is-active' : ''}>Shows</a>
-        <a href="/brisbane-show-2026" class="nav-cta">Reserve a show slot</a>
+        <a href="/reserve" class={`nav-cta ${isActive('/reserve') ? 'is-active' : ''}`}>Reserve your slot</a>
       </nav>
     </div>
   </header>
@@ -410,7 +410,8 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
             <li><a href="/contact">Contact</a></li>
             <li><a href="/privacy">Privacy</a></li>
             <li><a href="/terms">Terms</a></li>
-            <li><a href="https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg" target="_blank" rel="noopener">YouTube channel</a></li>
+            <li><a href="https://www.youtube.com/@seqcampers9450?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a></li>
+            <li><a href="/reserve">Reserve your slot</a></li>
           </ul>
         </div>
       </div>

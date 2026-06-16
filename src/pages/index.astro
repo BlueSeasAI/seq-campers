@@ -3,6 +3,8 @@ import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
+import ReserveCta from '../components/ReserveCta.astro'
+import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
 import { getSiteSettings, sanityImage, conditionLabel, youtubeId } from '../lib/sanity.js'
 
 let settings = null
@@ -575,5 +577,9 @@ const faqSchema = {
       </div>
     </div>
   </section>
+
+  <YoutubeSubscribeBar variant="bar" />
+
+  <ReserveCta variant="band" />
 </Site>
 

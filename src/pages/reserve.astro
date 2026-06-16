@@ -1,0 +1,204 @@
+---
+import Site from '../layouts/Site.astro'
+---
+
+<Site
+  title="Reserve your slot - Sunshine Coast showroom"
+  description="Reserve a one-hour slot at the SEQ Campers Marcoola showroom on the Sunshine Coast. Shane or Maud will walk you through the rigs - no payment, no pressure."
+>
+  <div class="page-header page-header-tight">
+    <div class="container">
+      <h1>Reserve your slot.</h1>
+      <p>Lock in a one-hour walk-through at our Marcoola showroom on the Sunshine Coast. No payment. No pressure. Just Shane or Maud showing you the rigs in person.</p>
+    </div>
+  </div>
+
+  <section class="section" style="padding-top:32px; padding-bottom:48px;">
+    <div class="container reserve-grid">
+
+      <div class="reserve-form-wrap">
+        <form
+          class="reserve-form"
+          name="reserve-slot"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thanks/"
+        >
+          <input type="hidden" name="form-name" value="reserve-slot" />
+          <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+          <div class="form-row">
+            <label>
+              Your name
+              <input type="text" name="name" required autocomplete="name" placeholder="First and last" />
+            </label>
+            <label>
+              Phone
+              <input type="tel" name="phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
+            </label>
+          </div>
+
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+          </label>
+
+          <div class="form-row">
+            <label>
+              When can you visit?
+              <select name="visit_window" required>
+                <option value="">-- Pick a window --</option>
+                <option value="this-week">This week</option>
+                <option value="next-week">Next week</option>
+                <option value="within-month">Within a month</option>
+                <option value="just-browsing">Just browsing for now</option>
+              </select>
+            </label>
+            <label>
+              What are you after?
+              <select name="interest" required>
+                <option value="">-- Pick one --</option>
+                <option value="new-caravan">A new caravan</option>
+                <option value="used-caravan">A used caravan</option>
+                <option value="just-looking">Just looking at the range</option>
+                <option value="service-only">Workshop / service only</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Anything you'd like us to have ready when you arrive? (optional)
+            <textarea name="notes" rows="3" placeholder="Specific model, tow vehicle, budget range, trip plans..."></textarea>
+          </label>
+
+          <button type="submit" class="btn-primary reserve-submit">Reserve my slot →</button>
+
+          <p class="reserve-fineprint">
+            We'll call or text within one business day to lock in a time. No payment required. Cancel any time.
+          </p>
+        </form>
+      </div>
+
+      <aside class="reserve-side">
+        <div class="reserve-side-card">
+          <div class="page-eyebrow" style="color:var(--rust);">What happens next</div>
+          <ol class="reserve-steps">
+            <li><strong>You reserve a slot</strong> - just name, phone, and when you can visit.</li>
+            <li><strong>We call or text</strong> within one business day to confirm a time.</li>
+            <li><strong>You walk through the rigs</strong> in person at the Marcoola showroom with Shane or Maud.</li>
+          </ol>
+        </div>
+
+        <div class="reserve-side-card">
+          <div class="page-eyebrow" style="color:var(--rust);">Where we are</div>
+          <p style="margin:6px 0;"><strong>3B/6 Bonanza Court</strong></p>
+          <p style="margin:0; color:var(--muted);">Marcoola QLD 4564<br/>Sunshine Coast - 4 minutes from the airport.</p>
+          <p style="margin-top:14px;">
+            <a href="tel:0753707933" style="color:var(--rust); font-weight:600;">(07) 5370 7933</a>
+          </p>
+        </div>
+
+        <div class="reserve-side-card reserve-side-quote">
+          <p style="font-style:italic; color:var(--ink); margin:0;">
+            "Shane doesn't sell what he hasn't used. Every van on the floor has been tested and inspected. If we wouldn't take it out, you won't see it on the lot."
+          </p>
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+  <style>
+    .reserve-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 36px;
+      max-width: 1080px;
+    }
+    @media (max-width: 880px) { .reserve-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+    .reserve-form {
+      background: #fff;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 14px;
+      padding: 28px;
+    }
+    .reserve-form label {
+      display: block;
+      margin-bottom: 14px;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      color: var(--ink, #2A1608);
+      font-size: 0.92rem;
+    }
+    .reserve-form input,
+    .reserve-form select,
+    .reserve-form textarea {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 1rem;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 8px;
+      background: var(--sand, #F4EDE0);
+      color: var(--ink, #2A1608);
+    }
+    .reserve-form .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 560px) { .reserve-form .form-row { grid-template-columns: 1fr; } }
+    .reserve-submit {
+      margin-top: 8px;
+      width: 100%;
+      padding: 16px 24px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .reserve-fineprint {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--muted, #8B6A40);
+      font-size: 0.88rem;
+    }
+
+    .reserve-side { display: flex; flex-direction: column; gap: 18px; }
+    .reserve-side-card {
+      background: var(--sand-deep, #EBE0CD);
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 12px;
+      padding: 22px;
+    }
+    .reserve-steps {
+      list-style: none;
+      counter-reset: r;
+      padding: 0; margin: 12px 0 0;
+    }
+    .reserve-steps li {
+      counter-increment: r;
+      padding: 8px 0 8px 38px;
+      position: relative;
+      color: var(--ink, #2A1608);
+      line-height: 1.45;
+    }
+    .reserve-steps li::before {
+      content: counter(r);
+      position: absolute;
+      left: 0; top: 6px;
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--rust, #C0341A);
+      color: #fff;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .reserve-side-quote { background: var(--ink, #2A1608); color: var(--sand, #F4EDE0); }
+    .reserve-side-quote p { color: var(--sand, #F4EDE0) !important; }
+  </style>
+</Site>

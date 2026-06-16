@@ -1,6 +1,8 @@
 ---
 import Site from '../../layouts/Site.astro'
 import BrollCard from '../../components/BrollCard.astro'
+import ReserveCta from '../../components/ReserveCta.astro'
+import YoutubeSubscribeBar from '../../components/YoutubeSubscribeBar.astro'
 import { getUsedCaravans } from '../../lib/sanity.js'
 
 let caravans = []
@@ -96,4 +98,8 @@ const description = `Browse ${caravans.length} hand-picked off-road caravans rea
       padding-bottom: 32px;
     }
   </style>
+
+  <YoutubeSubscribeBar variant="bar" headline="Watch walk-arounds before you visit" sub="Every used van gets a YouTube walk-around. Subscribe to see new arrivals first." />
+
+  <ReserveCta variant="band" />
 </Site>

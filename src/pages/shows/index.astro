@@ -1,5 +1,6 @@
 ---
 import Site from '../../layouts/Site.astro'
+import YoutubeSubscribeBar from '../../components/YoutubeSubscribeBar.astro'
 import { getShows, getSiteSettings, youtubeId } from '../../lib/sanity.js'
 
 let shows = []
@@ -145,13 +146,15 @@ const description = intro
     </section>
   )}
 
+  <YoutubeSubscribeBar variant="bar" headline="Can't make a show? Catch up on YouTube." sub="Highlights, walk-arounds, post-show recaps. Subscribe so you don't miss the next one." />
+
   <section class="band-dark" style="margin-top:8px;">
     <div class="container" style="text-align:center; max-width:680px; margin:0 auto;">
       <h2 style="color:var(--sand); font-size:1.6rem; margin-bottom:10px;">Can't make a show?</h2>
       <p style="color:var(--gold); margin-bottom:22px; line-height:1.6;">
         Our Sunshine Coast showroom is open by appointment. Drive an hour north of Brisbane and you'll get our undivided attention - no show-floor crowd.
       </p>
-      <a href="/contact" class="btn-primary">Book a Sunshine Coast visit</a>
+      <a href="/reserve" class="btn-primary">Reserve your slot →</a>
     </div>
   </section>
 

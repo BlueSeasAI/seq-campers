@@ -1,0 +1,48 @@
+---
+/**
+ * Reserve Your Slot CTA - the primary call to action across the site.
+ *
+ * Tesla-style framing. The job of every page is to drive showroom visits.
+ * Used in:
+ *   - Inline buttons (variant="inline" or "primary")
+ *   - Dark band on most pages (variant="band")
+ *   - Sticky mobile nav (variant="sticky")
+ *
+ * Always links to /reserve - the dedicated, low-friction booking page.
+ */
+const { variant = 'primary', label = 'Reserve your slot' } = Astro.props
+---
+
+{variant === 'band' && (
+  <section class="band-dark reserve-band">
+    <div class="container" style="text-align:center; max-width:680px; margin:0 auto;">
+      <h2 style="color:var(--sand); font-size:1.7rem; margin-bottom:12px;">
+        Come and see one in person on the Sunshine Coast.
+      </h2>
+      <p style="color:var(--gold); margin-bottom:24px;">
+        Reserve a one-hour slot with Shane or Maud in Marcoola - no payment, no pressure.
+      </p>
+      <a href="/reserve" class="btn-primary reserve-btn">{label} →</a>
+    </div>
+  </section>
+)}
+
+{variant === 'inline' && (
+  <a href="/reserve" class="btn-primary reserve-btn">{label} →</a>
+)}
+
+{variant === 'ghost' && (
+  <a href="/reserve" class="btn-ghost reserve-btn-ghost">{label}</a>
+)}
+
+<style>
+  .reserve-btn {
+    background: var(--rust, #C0341A);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(192,52,26,0.35);
+  }
+  .reserve-btn:hover {
+    background: #A52910;
+    transform: translateY(-1px);
+  }
+</style>
