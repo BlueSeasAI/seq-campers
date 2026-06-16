@@ -4,8 +4,7 @@ import {
   TagIcon, ClockIcon, PauseIcon, CheckmarkCircleIcon, OlistIcon,
   PlayIcon, CogIcon, EditIcon, FilterIcon, CalendarIcon,
   DocumentTextIcon, HelpCircleIcon, HomeIcon, RocketIcon,
-  TruckIcon, CaseIcon, SearchIcon, UsersIcon, ImageIcon,
-  ComposeIcon, MenuIcon,
+  SearchIcon,
 } from '@sanity/icons'
 // Video doc schema removed 1 June 2026. /videos page now reads from
 // videosPageSettings (12 fixed slots), home page videos from siteSettings.
@@ -40,7 +39,7 @@ export default defineConfig({
             // ─── CARAVANS ─────────────────────────────────────────────
             S.listItem()
               .title('Caravans')
-              .icon(TruckIcon)
+              .icon(TagIcon)
               .child(
                 S.list()
                   .title('Caravans')
