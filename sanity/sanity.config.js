@@ -115,10 +115,10 @@ export default defineConfig({
               .icon(HomeIcon)
               .child(
                 S.editor()
-                  .id('siteSettings')
-                  .schemaType('siteSettings')
-                  .documentId('siteSettings')
-                  .title('Home page settings')
+                  .id('homePageSettings')
+                  .schemaType('homePageSettings')
+                  .documentId('homePageSettings')
+                  .title('Home page')
               ),
 
             S.listItem()
@@ -129,24 +129,24 @@ export default defineConfig({
                   .title('New caravans page')
                   .items([
                     S.listItem()
-                      .title('New page video tiles (8 slots)')
+                      .title('Tile videos (8 slots)')
                       .icon(PlayIcon)
                       .child(
                         S.editor()
-                          .id('siteSettings')
-                          .schemaType('siteSettings')
-                          .documentId('siteSettings')
+                          .id('newPageSettings')
+                          .schemaType('newPageSettings')
+                          .documentId('newPageSettings')
                           .title('New page tiles')
                       ),
                     S.listItem()
-                      .title('Build pages - intro videos (one per model)')
+                      .title('Build pages (intro videos per model)')
                       .icon(PlayIcon)
                       .child(
                         S.editor()
-                          .id('siteSettings')
-                          .schemaType('siteSettings')
-                          .documentId('siteSettings')
-                          .title('Build page videos')
+                          .id('quotePageSettings')
+                          .schemaType('quotePageSettings')
+                          .documentId('quotePageSettings')
+                          .title('Build pages - intro videos')
                       ),
                   ])
               ),
@@ -170,7 +170,7 @@ export default defineConfig({
                   .id('videosPageSettings')
                   .schemaType('videosPageSettings')
                   .documentId('videosPageSettings')
-                  .title('Videos page settings')
+                  .title('Videos page')
               ),
 
             S.listItem()
@@ -178,10 +178,10 @@ export default defineConfig({
               .icon(CogIcon)
               .child(
                 S.editor()
-                  .id('siteSettings')
-                  .schemaType('siteSettings')
-                  .documentId('siteSettings')
-                  .title('Service page settings')
+                  .id('servicePageSettings')
+                  .schemaType('servicePageSettings')
+                  .documentId('servicePageSettings')
+                  .title('Service & workshop page')
               ),
 
             S.listItem()
@@ -207,10 +207,10 @@ export default defineConfig({
                       .icon(EditIcon)
                       .child(
                         S.editor()
-                          .id('siteSettings')
-                          .schemaType('siteSettings')
-                          .documentId('siteSettings')
-                          .title('Shows page settings')
+                          .id('showsPageSettings')
+                          .schemaType('showsPageSettings')
+                          .documentId('showsPageSettings')
+                          .title('Shows page')
                       ),
                   ])
               ),
@@ -327,16 +327,16 @@ export default defineConfig({
 
             S.divider(),
 
-            // ─── GLOBAL SETTINGS ─────────────────────────────────────
+            // ─── SITE-WIDE SETTINGS (banner + Reserve Stripe CTA) ─────
             S.listItem()
-              .title('⚙️ Site Settings (advanced)')
+              .title('⚙️ Site-wide settings (banner + Reserve CTA)')
               .icon(CogIcon)
               .child(
                 S.editor()
                   .id('siteSettings')
                   .schemaType('siteSettings')
                   .documentId('siteSettings')
-                  .title('Site Settings (full)')
+                  .title('Site-wide settings')
               ),
           ]),
     }),

@@ -264,8 +264,16 @@ export function youtubeEmbedUrl(url, opts = {}) {
 // ---------------------------------------------------------------------------
 
 export async function getSiteSettings() {
-  const raw = await client.fetch(`
-    *[_id == "siteSettings"][0] {
+  // Per Bart 16 Jun: settings are now split across per-page singletons so
+  // Maud sees only relevant fields when she opens a page in Studio. Here
+  // we fetch them all in parallel and stitch them into the shape the rest
+  // of the site already consumes - so no template changes needed.
+  const [site, home, newPage, service, shows, quote] = await Promise.all([
+    client.fetch(`*[_id == "siteSettings"][0] {
+      showSpecial { headline, endDate, ctaText, ctaUrl },
+      reserveCta { enabled, buttonText, stripeUrl, helperText }
+    }`),
+    client.fetch(`*[_id == "homePageSettings"][0] {
       heroVideo,
       "shanesPick": shanesPick {
         originalPrice,
@@ -278,11 +286,11 @@ export async function getSiteSettings() {
           specs { sleeps, length, tareWeight }
         }
       },
-      showSpecial { headline, endDate, ctaText, ctaUrl },
-      reserveCta { enabled, buttonText, stripeUrl, helperText },
       homepageVideo1 { youtubeUrl, description },
       homepageVideo2 { youtubeUrl, description },
-      homepageVideo3 { youtubeUrl, description },
+      homepageVideo3 { youtubeUrl, description }
+    }`),
+    client.fetch(`*[_id == "newPageSettings"][0] {
       newPageTile1 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
       newPageTile2 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
       newPageTile3 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
@@ -290,16 +298,22 @@ export async function getSiteSettings() {
       newPageTile5 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
       newPageTile6 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
       newPageTile7 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile8 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      showsIndexIntro,
-      showsCompilationVideo { youtubeUrl, caption },
+      newPageTile8 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref }
+    }`),
+    client.fetch(`*[_id == "servicePageSettings"][0] {
       servicePageVideo1 { youtubeUrl, label },
       servicePageVideo2 { youtubeUrl, label },
       servicePageVideo3 { youtubeUrl, label },
       servicePageVideo4 { youtubeUrl, label },
       servicePageVideo5 { youtubeUrl, label },
       servicePageVideo6 { youtubeUrl, label },
-      serviceWorkshopWeekly { youtubeUrl, caption },
+      serviceWorkshopWeekly { youtubeUrl, caption }
+    }`),
+    client.fetch(`*[_id == "showsPageSettings"][0] {
+      showsIndexIntro,
+      showsCompilationVideo { youtubeUrl, caption }
+    }`),
+    client.fetch(`*[_id == "quotePageSettings"][0] {
       quoteVideo_kruiswagen { youtubeUrl, caption },
       quoteVideo_kruiser_t { youtubeUrl, caption },
       quoteVideo_kruiser_s { youtubeUrl, caption },
@@ -308,8 +322,9 @@ export async function getSiteSettings() {
       quoteVideo_trekka { youtubeUrl, caption },
       quoteVideo_rover { youtubeUrl, caption },
       quoteVideo_pod { youtubeUrl, caption }
-    }
-  `)
+    }`),
+  ])
+  const raw = { ...(site || {}), ...(home || {}), ...(newPage || {}), ...(service || {}), ...(shows || {}), ...(quote || {}) }
   if (raw?.shanesPick?.caravan) {
     raw.shanesPick.caravan.slug = {
       current: safeSlug(raw.shanesPick.caravan.slug?.current) || safeSlug(raw.shanesPick.caravan.title),
