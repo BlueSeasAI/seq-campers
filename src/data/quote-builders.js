@@ -815,7 +815,7 @@ export const quoteBuilders = [
       {
         id: 'xt-intrepid',
         name: 'Rover 02 XT - Intrepid',
-        basePrice: 59990,
+        basePrice: 63490,
         included: [
           'Hot-dip galvanised chassis',
           'Independent coil springs',
@@ -829,7 +829,7 @@ export const quoteBuilders = [
       {
         id: 'xt-ultra',
         name: 'Rover 02 XT - Ultra',
-        basePrice: 74990,
+        basePrice: 78490,
         included: [
           'Everything in XT Intrepid, plus:',
           'REDARC RedVision system',

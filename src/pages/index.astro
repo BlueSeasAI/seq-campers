@@ -27,7 +27,7 @@ const heroYouTubeId = settings?.heroVideo?.youtubeUrl
 // Pathway tile defaults - used when Maud hasn't filled a slot in Site
 // Settings → Home page videos (Watch / Visit / Adventure).
 const PATHWAY_DEFAULTS = [
-  { videoId: 'tozC7prVbOg', sub: 'Our video library - every model, Kimberley Campers and Stockman Products.' },
+  { videoId: 'tozC7prVbOg', sub: 'Our video library - every model, Kimberley Kampers and Stockman Products.' },
   { videoId: 'xYf81xUZtNE', sub: 'Pre-loved and new display vans available now.' },
   { videoId: 'WwgapQt3xO4', sub: 'From our driveway to your driveway. Camping support.' },
 ]
@@ -51,7 +51,7 @@ const PLACEHOLDER_SHANES_PICK_CARAVAN = {
   _id: 'placeholder-shanes-pick',
   title: 'Kimberley Karavan 2024',
   slug: { current: 'stock' },
-  brand: 'Kimberley Campers',
+  brand: 'Kimberley Kampers',
   price: 145000,
   condition: 'excellent',
   mainImage: null,
@@ -110,7 +110,7 @@ const localBusiness = {
   '@type': 'AutoDealer',
   '@id': 'https://seqcampers.com.au/#business',
   name: 'SEQ Campers',
-  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Campers and Stockman Products stock. Off-road camping experts since 2013.",
+  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman Products stock. Off-road camping experts since 2013.",
   url: 'https://seqcampers.com.au',
   telephone: '+61-7-5370-7933',
   email: 'office@seqcampers.com.au',
@@ -128,7 +128,7 @@ const localBusiness = {
     { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '08:30', closes: '12:30' },
   ],
   priceRange: '$$$',
-  knowsAbout: ['Kimberley Campers', 'Stockman Caravans', 'Off-road caravans', 'Caravan inspections', 'Sunshine Coast caravan dealer'],
+  knowsAbout: ['Kimberley Kampers', 'Stockman Caravans', 'Off-road caravans', 'Caravan inspections', 'Sunshine Coast caravan dealer'],
   sameAs: ['https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg'],
 }
 
@@ -142,7 +142,7 @@ const faqSchema = {
       name: 'What brands of caravan does SEQ Campers stock?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SEQ Campers specialises in premium off-road caravans from Kimberley Campers and Stockman Products. Every van on the lot is hand-picked, inspected, and prepared by Shane and the SEQ team before it goes on sale.',
+        text: 'SEQ Campers specialises in premium off-road caravans from Kimberley Kampers and Stockman Products. Every van on the lot is hand-picked, inspected, and prepared by Shane and the SEQ team before it goes on sale.',
       },
     },
     {
@@ -166,7 +166,7 @@ const faqSchema = {
       name: 'How long has SEQ Campers been operating?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: "SEQ Campers has been the Sunshine Coast home of premium off-road caravans since 2013, building on Kimberley Campers' 30-year Australian heritage. We also run a YouTube channel with more than 2,000 subscribers where Shane walks through every caravan in detail.",
+        text: "SEQ Campers has been the Sunshine Coast home of premium off-road caravans since 2013, building on Kimberley Kampers' 30-year Australian heritage. We also run a YouTube channel with more than 2,000 subscribers where Shane walks through every caravan in detail.",
       },
     },
     {
@@ -183,7 +183,7 @@ const faqSchema = {
 
 <Site
   title="Premium Off-Road Caravans"
-  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Campers and Stockman Products stock, hand-inspected by Shane. Off-road camping on the Sunshine Coast since 2013."
+  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Kampers and Stockman Products stock, hand-inspected by Shane. Off-road camping on the Sunshine Coast since 2013."
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />

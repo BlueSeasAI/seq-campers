@@ -34,10 +34,10 @@ const brands = [...new Set(caravans.map((c) => c.brand).filter(Boolean))].sort()
 // Site Settings -> "New page video tiles (8 slots)".
 // ---------------------------------------------------------------------------
 const NEW_TILE_DEFAULTS = [
-  { youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg', brandLabel: 'Kimberley Campers', modelLabel: 'Kruiswagen', priceLabel: 'From $203,350', ctaHref: '/quote/kruiswagen' },
-  { youtubeUrl: 'https://www.youtube.com/watch?v=xYf81xUZtNE', brandLabel: 'Kimberley Campers', modelLabel: 'Kruiser',    priceLabel: 'From $139,300', ctaHref: '/quote/kruiser-t' },
-  { youtubeUrl: 'https://www.youtube.com/watch?v=WwgapQt3xO4', brandLabel: 'Kimberley Campers', modelLabel: 'Karavan',    priceLabel: 'From $129,385', ctaHref: '/quote/karavan' },
-  { youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg', brandLabel: 'Kimberley Campers', modelLabel: 'Kube',       priceLabel: 'From $80,365',  ctaHref: '/quote/kube' },
+  { youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg', brandLabel: 'Kimberley Kampers', modelLabel: 'Kruiswagen', priceLabel: 'From $203,350', ctaHref: '/quote/kruiswagen' },
+  { youtubeUrl: 'https://www.youtube.com/watch?v=xYf81xUZtNE', brandLabel: 'Kimberley Kampers', modelLabel: 'Kruiser',    priceLabel: 'From $139,300', ctaHref: '/quote/kruiser-t' },
+  { youtubeUrl: 'https://www.youtube.com/watch?v=WwgapQt3xO4', brandLabel: 'Kimberley Kampers', modelLabel: 'Karavan',    priceLabel: 'From $129,385', ctaHref: '/quote/karavan' },
+  { youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg', brandLabel: 'Kimberley Kampers', modelLabel: 'Kube',       priceLabel: 'From $80,365',  ctaHref: '/quote/kube' },
   { youtubeUrl: 'https://www.youtube.com/watch?v=xYf81xUZtNE', brandLabel: 'Stockman Products', modelLabel: 'Trekka',     priceLabel: 'From $65,500',  ctaHref: '/quote/trekka' },
   { youtubeUrl: 'https://www.youtube.com/watch?v=WwgapQt3xO4', brandLabel: 'Stockman Products', modelLabel: 'Rover',      priceLabel: 'From $63,490',  ctaHref: '/quote/rover' },
   { youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg', brandLabel: 'Stockman Products', modelLabel: 'Pod',        priceLabel: 'Enquire',       ctaHref: '/contact' },
@@ -60,7 +60,7 @@ function resolveTile(idx) {
 
 const tiles = NEW_TILE_DEFAULTS.map((_, i) => resolveTile(i))
 
-const description = `Browse new Kimberley Campers and Stockman Products off-road caravans at SEQ Campers on the Sunshine Coast. Build your spec, lock in pricing, and order direct from the factory.`
+const description = `Browse new Kimberley Kampers and Stockman Products off-road caravans at SEQ Campers on the Sunshine Coast. Build your spec, lock in pricing, and order direct from the factory.`
 ---
 
 <Site title="New off-road caravans" description={description}>
@@ -141,7 +141,7 @@ const description = `Browse new Kimberley Campers and Stockman Products off-road
       </div>
 
       <p class="new-tile-fineprint">
-        Indicative starting prices for the entry-level variant. Kimberley Campers builds ex-factory Ballina NSW. Stockman Products builds ex-factory Melbourne. Includes GST and $3,500 dealer delivery (subject to fuel surcharge). Excludes stamp duty and registration.
+        Indicative starting prices for the entry-level variant. Kimberley Kampers builds ex-factory Ballina NSW. Stockman Products builds ex-factory Melbourne. Includes GST and $3,500 dealer delivery (subject to fuel surcharge). Excludes stamp duty and registration.
       </p>
 
       {reserveCta && (
@@ -224,11 +224,11 @@ const description = `Browse new Kimberley Campers and Stockman Products off-road
           Which brand or model interests you?
           <select name="brand_interest" required>
             <option value="">-- Pick one --</option>
-            <option value="kimberley-karavan">Kimberley Campers - Karavan</option>
-            <option value="kimberley-kube">Kimberley Campers - Kube</option>
-            <option value="kimberley-kruiswagen">Kimberley Campers - Kruiswagen</option>
-            <option value="kimberley-kruiser-t">Kimberley Campers - Kruiser T Class</option>
-            <option value="kimberley-kruiser-s">Kimberley Campers - Kruiser S Class</option>
+            <option value="kimberley-karavan">Kimberley Kampers - Karavan</option>
+            <option value="kimberley-kube">Kimberley Kampers - Kube</option>
+            <option value="kimberley-kruiswagen">Kimberley Kampers - Kruiswagen</option>
+            <option value="kimberley-kruiser-t">Kimberley Kampers - Kruiser T Class</option>
+            <option value="kimberley-kruiser-s">Kimberley Kampers - Kruiser S Class</option>
             <option value="stockman-trekka">Stockman Products - Trekka</option>
             <option value="stockman-rover">Stockman Products - Rover</option>
             <option value="stockman-pod">Stockman Products - Pod</option>

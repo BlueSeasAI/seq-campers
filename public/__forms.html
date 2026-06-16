@@ -82,5 +82,38 @@
     <input name="bot-field" />
   </form>
 
+  <!-- Quote builder v2 (16 Jun rebuild) - lead captured upfront via overlay,
+       full spec submitted at the commit step. Two separate forms so Bart can
+       distinguish "started building" leads from "completed spec" leads in
+       the Netlify Forms dashboard. -->
+  <form name="quote-builder-lead" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="first_name" />
+    <input type="text" name="last_name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="intent" />
+    <input type="text" name="brand_name" />
+    <input type="text" name="brand_slug" />
+    <input type="text" name="page_url" />
+    <input name="bot-field" />
+  </form>
+
+  <form name="quote-builder-v2" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="lead_first_name" />
+    <input type="text" name="lead_last_name" />
+    <input type="email" name="lead_email" />
+    <input type="tel" name="lead_phone" />
+    <input type="text" name="lead_intent" />
+    <input type="text" name="brand_name" />
+    <input type="text" name="brand_slug" />
+    <input type="text" name="page_url" />
+    <input type="text" name="variant_name" />
+    <input type="text" name="variant_base_price" />
+    <input type="text" name="selected_options" />
+    <input type="text" name="total_indicative_price" />
+    <textarea name="message"></textarea>
+    <input name="bot-field" />
+  </form>
+
 </body>
 </html>

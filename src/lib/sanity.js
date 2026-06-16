@@ -299,7 +299,15 @@ export async function getSiteSettings() {
       servicePageVideo4 { youtubeUrl, label },
       servicePageVideo5 { youtubeUrl, label },
       servicePageVideo6 { youtubeUrl, label },
-      serviceWorkshopWeekly { youtubeUrl, caption }
+      serviceWorkshopWeekly { youtubeUrl, caption },
+      quoteVideo_kruiswagen { youtubeUrl, caption },
+      quoteVideo_kruiser_t { youtubeUrl, caption },
+      quoteVideo_kruiser_s { youtubeUrl, caption },
+      quoteVideo_karavan { youtubeUrl, caption },
+      quoteVideo_kube { youtubeUrl, caption },
+      quoteVideo_trekka { youtubeUrl, caption },
+      quoteVideo_rover { youtubeUrl, caption },
+      quoteVideo_pod { youtubeUrl, caption }
     }
   `)
   if (raw?.shanesPick?.caravan) {

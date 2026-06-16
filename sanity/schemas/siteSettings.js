@@ -28,6 +28,7 @@ export default {
     { name: 'reserve', title: 'Reserve $1,000 CTA' },
     { name: 'shows', title: 'Shows page intro' },
     { name: 'serviceVideos', title: 'Service page videos (6 slots + workshop weekly)' },
+    { name: 'quoteVideos', title: 'Build-your-spec page videos (one per model)' },
   ],
 
   fields: [
@@ -112,10 +113,10 @@ export default {
     // + CTA link override. Leave any field blank to fall back to the
     // sensible default coded for that slot.
     ...[
-      { n: 1, t: 'Tile 1: Kruiswagen (Row 1 left, Kimberley Campers)' },
-      { n: 2, t: 'Tile 2: Kruiser (Row 1 right, Kimberley Campers)' },
-      { n: 3, t: 'Tile 3: Karavan (Row 2 left, Kimberley Campers)' },
-      { n: 4, t: 'Tile 4: Kube (Row 2 right, Kimberley Campers)' },
+      { n: 1, t: 'Tile 1: Kruiswagen (Row 1 left, Kimberley Kampers)' },
+      { n: 2, t: 'Tile 2: Kruiser (Row 1 right, Kimberley Kampers)' },
+      { n: 3, t: 'Tile 3: Karavan (Row 2 left, Kimberley Kampers)' },
+      { n: 4, t: 'Tile 4: Kube (Row 2 right, Kimberley Kampers)' },
       { n: 5, t: 'Tile 5: Trekka (Row 3 left, Stockman Products)' },
       { n: 6, t: 'Tile 6: Rover (Row 3 right, Stockman Products)' },
       { n: 7, t: 'Tile 7: Pod (Row 4 left, Stockman Products)' },
@@ -128,7 +129,7 @@ export default {
       options: { columns: 1, collapsible: true, collapsed: true },
       fields: [
         { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to use the default placeholder.' },
-        { name: 'brandLabel', title: 'Brand label override', type: 'string', description: 'e.g. "Kimberley Campers" or "Stockman Products". Leave blank to use the default for this slot.' },
+        { name: 'brandLabel', title: 'Brand label override', type: 'string', description: 'e.g. "Kimberley Kampers" or "Stockman Products". Leave blank to use the default for this slot.' },
         { name: 'modelLabel', title: 'Model label override', type: 'string', description: 'e.g. "Kruiswagen". Leave blank to use the default for this slot.' },
         { name: 'priceLabel', title: 'Price label override', type: 'string', description: 'e.g. "From $203,350". Leave blank to use the default for this slot.' },
         { name: 'ctaHref', title: 'Click-through URL override', type: 'string', description: 'Where the tile click takes the visitor. Leave blank to use the default for this slot (usually /quote/{slug}).' },
@@ -302,6 +303,31 @@ export default {
       fields: [
         { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
         { name: 'label', title: 'Caption under the tile', type: 'string', description: 'Short caption shown under the tile. e.g. "Meet Grant in the workshop".', validation: (Rule) => Rule.max(80) },
+      ],
+    })),
+
+    // ─── QUOTE PAGE VIDEOS (one per model) ─────────────────────────
+    // 16:9 video shown at the top of each /quote/{slug} page, above the
+    // configurator. One slot per model so Maud can drop a YouTube URL
+    // per van. Leave blank to hide the video block on that model page.
+    ...[
+      { slug: 'kruiswagen',  t: 'Kruiswagen build page - intro video' },
+      { slug: 'kruiser-t',   t: 'Kruiser T build page - intro video' },
+      { slug: 'kruiser-s',   t: 'Kruiser S build page - intro video' },
+      { slug: 'karavan',     t: 'Karavan build page - intro video' },
+      { slug: 'kube',        t: 'Kube build page - intro video' },
+      { slug: 'trekka',      t: 'Trekka build page - intro video' },
+      { slug: 'rover',       t: 'Rover build page - intro video' },
+      { slug: 'pod',         t: 'Pod build page - intro video' },
+    ].map(({ slug, t }) => ({
+      name: `quoteVideo_${slug.replace(/-/g, '_')}`,
+      title: t,
+      type: 'object',
+      group: 'quoteVideos',
+      options: { columns: 1, collapsible: true, collapsed: true },
+      fields: [
+        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide the video block on this build page.' },
+        { name: 'caption', title: 'Caption under the video', type: 'string', description: 'One-line caption shown under the video. Optional.', validation: (Rule) => Rule.max(160) },
       ],
     })),
 

@@ -1,6 +1,7 @@
 ---
 import Site from '../../layouts/Site.astro'
 import { quoteBuilders, getQuoteBuilder } from '../../data/quote-builders.js'
+import { getSiteSettings, youtubeId } from '../../lib/sanity.js'
 
 export async function getStaticPaths() {
   return quoteBuilders.map((b) => ({ params: { slug: b.slug } }))
@@ -15,19 +16,34 @@ const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).href.repla
 const pageUrl = `${siteBase}/quote/${brand.slug}`
 const firstVariantId = brand.variants[0]?.id
 
-// Ex-factory location depends on the brand family. Kimberley Campers
+// Ex-factory location depends on the brand family. Kimberley Kampers
 // builds in Ballina NSW. Stockman Products builds in Melbourne. Per
 // Bart 8 Jun - "/quote/rover is ex-Melbourne, not Ballina".
 const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ballina NSW'
+
+// Per-model intro video (Sanity-driven, optional). Maud sets in Site
+// Settings -> "Build-your-spec page videos". Field naming matches the
+// slug with hyphens converted to underscores.
+let introVideo = null
+try {
+  const settings = await getSiteSettings() || {}
+  const slotKey = `quoteVideo_${brand.slug.replace(/-/g, '_')}`
+  const slot = settings[slotKey]
+  if (slot?.youtubeUrl) {
+    const vid = youtubeId(slot.youtubeUrl)
+    if (vid) introVideo = { id: vid, caption: slot.caption || null }
+  }
+} catch (err) {
+  console.warn('Sanity unreachable for quote video:', err.message)
+}
 ---
 
 <Site
   title={`Build your ${brand.name}`}
-  description={`Configure your ${brand.name} and send your spec to SEQ Campers. Reply within one business day.`}
+  description={`Configure your ${brand.name} on the Sunshine Coast. Tell us who you are, build your spec, and we reply within one business day.`}
 >
-  <div class="page-header">
+  <div class="page-header page-header-tight">
     <div class="container">
-      <div class="page-eyebrow">{brand.brandFamily} · Build your spec</div>
       <h1>{brand.name}</h1>
       <p>{brand.intro}</p>
     </div>
@@ -41,202 +57,257 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
     </section>
   )}
 
-  <!-- Step 1: choose model -->
-  <section class="section" style="padding-top:32px; padding-bottom:24px;">
-    <div class="container" style="max-width:1100px;">
-      <div class="qb-step-eyebrow">Step 1 of 3</div>
-      <h2 class="qb-step-title">Choose your model</h2>
-      <div class="qb-variants" data-variants>
-        {brand.variants.map((v, i) => (
-          <label class={`qb-variant ${i === 0 ? 'qb-variant-selected' : ''}`} data-variant-id={v.id}>
-            <input type="radio" name="variant" value={v.id} checked={i === 0} class="qb-variant-radio" />
-            <div class="qb-variant-head">
-              <h3 class="qb-variant-name">{v.name}</h3>
-              <div class="qb-variant-price">${v.basePrice.toLocaleString('en-AU')}</div>
-            </div>
-            <p class="qb-variant-subtext">Ex-factory {exFactoryLocation}, incl. GST. Excludes dealer delivery + on-road costs.</p>
-            <ul class="qb-variant-included">
-              {v.included.map((feature) => <li>{feature}</li>)}
-            </ul>
-          </label>
-        ))}
+  <!-- Intro video block - Sanity-driven per model. Shown above the configurator. -->
+  {introVideo && (
+    <section class="section" style="padding-top:24px; padding-bottom:8px;">
+      <div class="container" style="max-width:920px;">
+        <div class="quote-intro-video">
+          <div class="quote-intro-media">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${introVideo.id}?autoplay=1&mute=1&loop=1&playlist=${introVideo.id}&controls=1&modestbranding=1&rel=0&playsinline=1`}
+              title={`${brand.name} walk-around`}
+              frameborder="0"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+          {introVideo.caption && (
+            <p class="quote-intro-caption">{introVideo.caption}</p>
+          )}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 
-  <!-- Step 2: options -->
-  <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
-    <div class="container" style="max-width:1100px;">
-      <div class="qb-step-eyebrow">Step 2 of 3</div>
-      <h2 class="qb-step-title">Add options & accessories</h2>
-      <p style="color:var(--muted); margin-bottom:18px; max-width:680px;">
-        Tick what you want. Open each section to expand. Items marked "Included" come with the variant you chose; "POA" means we'll confirm pricing on request.
-      </p>
+  <!-- Configurator wrapper - gets blurred until the lead-capture overlay
+       is dismissed. data-locked starts as "true" and is flipped to "false"
+       by the overlay submit handler in the inline script below. -->
+  <div class="qb-wrap" data-qb-wrap data-locked="true">
 
-      <div class="qb-options-grid">
-        <!-- Left: option categories -->
-        <div class="qb-options" data-options-root>
-          {brand.categories.map((cat) => (
-            <details class="qb-cat" open>
-              <summary class="qb-cat-summary">
-                <span>{cat.title}</span>
-                <span class="qb-cat-icon" aria-hidden="true">+</span>
-              </summary>
-              <div class="qb-cat-body">
-                {cat.options.map((opt) => {
-                  const pricePerVariant = brand.variants.reduce((acc, v) => {
-                    const p = opt.priceByVariant ? opt.priceByVariant[v.id] : opt.price
-                    acc[v.id] = p
-                    return acc
-                  }, {})
-                  return (
-                    <label class="qb-opt" data-opt-id={opt.id} data-price-by-variant={JSON.stringify(pricePerVariant)}>
-                      <input type="checkbox" class="qb-opt-check" />
-                      <div class="qb-opt-body">
-                        <div class="qb-opt-label">{opt.label}</div>
-                        {opt.note && <div class="qb-opt-note">{opt.note}</div>}
-                      </div>
-                      <div class="qb-opt-price" data-opt-price-display></div>
-                    </label>
-                  )
-                })}
+    <!-- Step 1: choose model -->
+    <section class="section" style="padding-top:32px; padding-bottom:24px;">
+      <div class="container" style="max-width:1100px;">
+        <div class="qb-step-eyebrow">Step 1 of 2</div>
+        <h2 class="qb-step-title">Choose your model</h2>
+        <div class="qb-variants" data-variants>
+          {brand.variants.map((v, i) => (
+            <label class={`qb-variant ${i === 0 ? 'qb-variant-selected' : ''}`} data-variant-id={v.id}>
+              <input type="radio" name="variant" value={v.id} checked={i === 0} class="qb-variant-radio" />
+              <div class="qb-variant-head">
+                <h3 class="qb-variant-name">{v.name}</h3>
+                <div class="qb-variant-price">${v.basePrice.toLocaleString('en-AU')}</div>
               </div>
-            </details>
+              <p class="qb-variant-subtext">Ex-factory {exFactoryLocation}, incl. GST. Excludes dealer delivery + on-road costs.</p>
+              <ul class="qb-variant-included">
+                {v.included.map((feature) => <li>{feature}</li>)}
+              </ul>
+            </label>
           ))}
         </div>
-
-        <!-- Right: sticky running total summary -->
-        <aside class="qb-summary" data-summary>
-          <div class="qb-summary-inner">
-            <div class="qb-summary-eyebrow">Your quote so far</div>
-            <div class="qb-summary-variant" data-summary-variant>Pick a model</div>
-            <div class="qb-summary-base">
-              <span>Base</span>
-              <strong data-summary-base>$0</strong>
-            </div>
-            <div class="qb-summary-options-line">
-              <span>Options (<span data-summary-count>0</span>)</span>
-              <strong data-summary-options>+$0</strong>
-            </div>
-            <div class="qb-summary-options-line">
-              <span>Dealer delivery <small style="color:var(--muted); font-size:0.78rem;">(subj. to fuel surcharge)</small></span>
-              <strong data-summary-delivery>+$3,500</strong>
-            </div>
-            <div class="qb-summary-total">
-              <span>Indicative total</span>
-              <strong data-summary-total>$0</strong>
-            </div>
-            <p class="qb-summary-fineprint">
-              Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST. Excludes stamp duty + registration.
-            </p>
-            <a href="#qb-details" class="btn-primary qb-summary-cta">Continue to your details ↓</a>
-          </div>
-        </aside>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Step 3: customer details + submit -->
-  <section id="qb-details" class="section" style="padding-top:32px; padding-bottom:48px;">
-    <div class="container" style="max-width:780px;">
-      <div class="qb-step-eyebrow">Step 3 of 3</div>
-      <h2 class="qb-step-title">Your details</h2>
-      <p style="color:var(--muted); margin-bottom:24px; max-width:600px;">
-        Reply within one business day. Direct from Shane or the team - no call centre.
+    <!-- Step 2: options + running total -->
+    <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
+      <div class="container" style="max-width:1100px;">
+        <div class="qb-step-eyebrow">Step 2 of 2</div>
+        <h2 class="qb-step-title">Add options & accessories</h2>
+        <p style="color:var(--muted); margin-bottom:18px; max-width:680px;">
+          Tick what you want. Open each section to expand. Items marked "Included" come with the variant you chose; "POA" means we'll confirm pricing on request.
+        </p>
+
+        <div class="qb-options-grid">
+          <div class="qb-options" data-options-root>
+            {brand.categories.map((cat) => (
+              <details class="qb-cat" open>
+                <summary class="qb-cat-summary">
+                  <span>{cat.title}</span>
+                  <span class="qb-cat-icon" aria-hidden="true">+</span>
+                </summary>
+                <div class="qb-cat-body">
+                  {cat.options.map((opt) => {
+                    const pricePerVariant = brand.variants.reduce((acc, v) => {
+                      const p = opt.priceByVariant ? opt.priceByVariant[v.id] : opt.price
+                      acc[v.id] = p
+                      return acc
+                    }, {})
+                    return (
+                      <label class="qb-opt" data-opt-id={opt.id} data-price-by-variant={JSON.stringify(pricePerVariant)}>
+                        <input type="checkbox" class="qb-opt-check" />
+                        <div class="qb-opt-body">
+                          <div class="qb-opt-label">{opt.label}</div>
+                          {opt.note && <div class="qb-opt-note">{opt.note}</div>}
+                        </div>
+                        <div class="qb-opt-price" data-opt-price-display></div>
+                      </label>
+                    )
+                  })}
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <aside class="qb-summary" data-summary>
+            <div class="qb-summary-inner">
+              <div class="qb-summary-eyebrow">Your quote so far</div>
+              <div class="qb-summary-variant" data-summary-variant>Pick a model</div>
+              <div class="qb-summary-base">
+                <span>Base</span>
+                <strong data-summary-base>$0</strong>
+              </div>
+              <div class="qb-summary-options-line">
+                <span>Options (<span data-summary-count>0</span>)</span>
+                <strong data-summary-options>+$0</strong>
+              </div>
+              <div class="qb-summary-options-line">
+                <span>Dealer delivery <small style="color:var(--muted); font-size:0.78rem;">(subj. to fuel surcharge)</small></span>
+                <strong data-summary-delivery>+$3,500</strong>
+              </div>
+              <div class="qb-summary-total">
+                <span>Indicative total</span>
+                <strong data-summary-total>$0</strong>
+              </div>
+              <p class="qb-summary-fineprint">
+                Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST. Excludes stamp duty + registration.
+              </p>
+              <a href="#qb-finish" class="btn-primary qb-summary-cta">Finish + send to me ↓</a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final commit step - no details form; we already have them from
+         the overlay. This step is just the submit action + share buttons. -->
+    <section id="qb-finish" class="section" style="padding-top:32px; padding-bottom:48px;">
+      <div class="container" style="max-width:780px;">
+        <div class="qb-step-eyebrow">Send it through</div>
+        <h2 class="qb-step-title">Lock in your spec</h2>
+        <p style="color:var(--muted); margin-bottom:24px; max-width:600px;">
+          We'll send the indicative quote to your email and Shane or the team will follow up within one business day. No call centre.
+        </p>
+
+        <form
+          class="enquiry-form"
+          name="quote-builder-v2"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thanks/"
+          data-qb-form
+        >
+          <input type="hidden" name="form-name" value="quote-builder-v2" />
+          <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+          <!-- All lead + spec context (populated by JS at submit time) -->
+          <input type="hidden" name="brand_name" value={brand.name} />
+          <input type="hidden" name="brand_slug" value={brand.slug} />
+          <input type="hidden" name="page_url" value={pageUrl} />
+          <input type="hidden" name="lead_first_name" data-hidden-first-name />
+          <input type="hidden" name="lead_last_name" data-hidden-last-name />
+          <input type="hidden" name="lead_email" data-hidden-email />
+          <input type="hidden" name="lead_phone" data-hidden-phone />
+          <input type="hidden" name="lead_intent" data-hidden-intent />
+          <input type="hidden" name="variant_name" data-hidden-variant-name />
+          <input type="hidden" name="variant_base_price" data-hidden-variant-base />
+          <input type="hidden" name="selected_options" data-hidden-options />
+          <input type="hidden" name="total_indicative_price" data-hidden-total />
+
+          <label>
+            Anything else you'd like us to know? (optional)
+            <textarea name="message" rows="3" placeholder="Timing, trade-in van, finance questions, anything else..."></textarea>
+          </label>
+
+          <div class="qb-actions">
+            <button type="submit" class="btn-primary qb-submit">Email me my quote →</button>
+            <button type="button" class="qb-share" data-qb-share-email>
+              <span aria-hidden="true">✉</span> Share by email
+            </button>
+            <button type="button" class="qb-share" data-qb-share>
+              <span aria-hidden="true">↗</span> Copy share link
+            </button>
+          </div>
+
+          <p class="qb-share-help" data-share-help hidden>
+            Share link copied to your clipboard. Paste it in a text, message or email to send this exact spec to your partner or family.
+          </p>
+        </form>
+      </div>
+    </section>
+
+  </div>
+  <!-- /qb-wrap -->
+
+  <!-- LEAD-CAPTURE OVERLAY (Tell us who you are first) -->
+  <div class="qb-lock" data-qb-lock>
+    <div class="qb-lock-scrim" aria-hidden="true"></div>
+    <div class="qb-lock-card" role="dialog" aria-modal="true" aria-labelledby="qb-lock-title">
+      <div class="qb-lock-eyebrow">First things first</div>
+      <h2 id="qb-lock-title" class="qb-lock-title">Hey - who are we building this for?</h2>
+      <p class="qb-lock-sub">
+        We'll save your build to your email so you can come back to it any time. Quick three-question hello so we can serve you properly when you arrive at our Sunshine Coast showroom.
       </p>
 
       <form
-        class="enquiry-form"
-        name="quote-builder"
+        class="qb-lock-form"
+        name="quote-builder-lead"
         method="POST"
         data-netlify="true"
         netlify-honeypot="bot-field"
         action="/thanks/"
-        data-qb-form
+        data-qb-lock-form
       >
-        <input type="hidden" name="form-name" value="quote-builder" />
-        <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
-
-        <!-- Brand + spec context (auto-populated by JS on submit) -->
+        <input type="hidden" name="form-name" value="quote-builder-lead" />
         <input type="hidden" name="brand_name" value={brand.name} />
         <input type="hidden" name="brand_slug" value={brand.slug} />
         <input type="hidden" name="page_url" value={pageUrl} />
-        <input type="hidden" name="variant_name" data-hidden-variant-name />
-        <input type="hidden" name="variant_base_price" data-hidden-variant-base />
-        <input type="hidden" name="selected_options" data-hidden-options />
-        <input type="hidden" name="total_indicative_price" data-hidden-total />
+        <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
 
         <div class="form-row">
           <label>
             First name
-            <input type="text" name="first_name" required autocomplete="given-name" />
+            <input type="text" name="first_name" required autocomplete="given-name" placeholder="First" />
           </label>
           <label>
             Last name
-            <input type="text" name="last_name" required autocomplete="family-name" />
+            <input type="text" name="last_name" required autocomplete="family-name" placeholder="Last" />
           </label>
         </div>
 
         <div class="form-row">
           <label>
             Email
-            <input type="email" name="customer_email" required autocomplete="email" />
+            <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
           </label>
           <label>
-            Phone
-            <input type="tel" name="customer_phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
-          </label>
-        </div>
-
-        <div class="form-row">
-          <label>
-            Suburb
-            <input type="text" name="suburb" autocomplete="address-level2" />
-          </label>
-          <label>
-            State
-            <select name="state">
-              <option value="">- Select -</option>
-              <option value="QLD">QLD</option>
-              <option value="NSW">NSW</option>
-              <option value="VIC">VIC</option>
-              <option value="SA">SA</option>
-              <option value="WA">WA</option>
-              <option value="TAS">TAS</option>
-              <option value="NT">NT</option>
-              <option value="ACT">ACT</option>
-            </select>
+            Mobile
+            <input type="tel" name="phone" required autocomplete="tel" placeholder="04xx xxx xxx" />
           </label>
         </div>
 
         <label>
-          Tow vehicle (if any)
-          <input type="text" name="tow_vehicle" placeholder="e.g. 200-Series LandCruiser, Ranger XLT" />
+          Where are you at?
+          <select name="intent" required>
+            <option value="">-- Pick one --</option>
+            <option value="just-browsing">Just browsing for now</option>
+            <option value="researching">Researching - 1 to 3 months out</option>
+            <option value="serious">Serious - looking to buy soon</option>
+            <option value="ready">Ready to lock something in</option>
+          </select>
         </label>
 
-        <label>
-          Anything else we should know?
-          <textarea name="message" rows="3" placeholder="Timing, trade-in van, finance questions, anything else..."></textarea>
-        </label>
+        <button type="submit" class="btn-primary qb-lock-submit">Start building →</button>
 
-        <div class="qb-actions">
-          <button type="submit" class="btn-primary qb-submit">Send my quote request</button>
-          <button type="button" class="qb-share" data-qb-share-email>
-            <span aria-hidden="true">✉</span> Share by email
-          </button>
-          <button type="button" class="qb-share" data-qb-share>
-            <span aria-hidden="true">↗</span> Copy share link
-          </button>
-        </div>
-
-        <p class="qb-share-help" data-share-help hidden>
-          Share link copied to your clipboard. Paste it in a text, message or email to send this exact spec to your partner or family.
+        <p class="qb-lock-fineprint">
+          We'll never spam you. Your build is saved to your email so you can pick up where you left off.
         </p>
       </form>
     </div>
-  </section>
+  </div>
 
-  <!-- Wizard JS: state, summary updates, share, submit serialisation -->
+  <!-- Configurator JS - lock overlay state, variant/option price updates,
+       share & submit serialisation, hidden-field population. -->
   <script is:inline define:vars={{ brandData: brand, firstVariantId, pageUrl }}>
     (function () {
       const variantData = {}
@@ -244,6 +315,7 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
 
       let currentVariant = firstVariantId
       const selected = new Set()
+      const lead = { first_name: '', last_name: '', email: '', phone: '', intent: '' }
 
       const $ = (sel) => document.querySelector(sel)
       const $$ = (sel) => Array.from(document.querySelectorAll(sel))
@@ -251,6 +323,71 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
       const fmt = (n) => '$' + Math.abs(n).toLocaleString('en-AU')
       const fmtSigned = (n) => (n < 0 ? '-' : '+') + fmt(n)
 
+      // ─── LOCK OVERLAY ─────────────────────────────────────────────
+      // Per Shane (16 Jun) - the configurator is blurred until the
+      // visitor identifies themselves. Once submitted we cache the lead
+      // in sessionStorage so they don't get gated again this session.
+      // Bypass paths: ?shared=1 or ?v= in URL (someone shared a spec).
+      const STORE_KEY = 'seq_lead_unlocked_v1'
+      const wrap = document.querySelector('[data-qb-wrap]')
+      const lock = document.querySelector('[data-qb-lock]')
+      const lockForm = document.querySelector('[data-qb-lock-form]')
+
+      const urlParams = new URLSearchParams(window.location.search)
+      const sharedView = urlParams.get('shared') === '1' || !!urlParams.get('v')
+      let unlocked = false
+
+      try {
+        const cached = JSON.parse(sessionStorage.getItem(STORE_KEY) || 'null')
+        if (cached && cached.email) {
+          Object.assign(lead, cached)
+          unlocked = true
+        }
+      } catch (err) { /* ignore */ }
+
+      function applyLockState() {
+        if (unlocked || sharedView) {
+          wrap.dataset.locked = 'false'
+          lock.style.display = 'none'
+        } else {
+          wrap.dataset.locked = 'true'
+          lock.style.display = 'flex'
+        }
+      }
+      applyLockState()
+
+      // Intercept the lock form submit - POST to Netlify, then unlock
+      // without navigating away. We submit the form via fetch so the
+      // visitor stays on the page and the build flow continues.
+      if (lockForm) {
+        lockForm.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          const fd = new FormData(lockForm)
+          lead.first_name = fd.get('first_name') || ''
+          lead.last_name = fd.get('last_name') || ''
+          lead.email = fd.get('email') || ''
+          lead.phone = fd.get('phone') || ''
+          lead.intent = fd.get('intent') || ''
+
+          // Cache for the rest of the session so they don't get gated again
+          try { sessionStorage.setItem(STORE_KEY, JSON.stringify(lead)) } catch (err) { /* ignore */ }
+
+          // Submit to Netlify Forms in the background. Convert FormData
+          // to URLSearchParams to match Netlify's expected encoding.
+          try {
+            const body = new URLSearchParams()
+            for (const [k, v] of fd.entries()) body.set(k, v)
+            await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
+          } catch (err) {
+            console.warn('Lead submit failed:', err)
+          }
+
+          unlocked = true
+          applyLockState()
+        })
+      }
+
+      // ─── PRICE LOGIC ──────────────────────────────────────────────
       function getOptionPrice(optEl, variantId) {
         const map = JSON.parse(optEl.dataset.priceByVariant || '{}')
         return map[variantId]
@@ -286,8 +423,6 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
         })
       }
 
-      // Dealer delivery fee from Maud's source pages - flat $3,500 across the
-      // factory range, subject to fuel surcharge confirmed at quote time.
       const DEALER_DELIVERY = 3500
 
       function renderSummary() {
@@ -309,12 +444,15 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
         const grandTotal = v.basePrice + optionsTotal + DEALER_DELIVERY
         $('[data-summary-total]').textContent = fmt(grandTotal)
 
-        // Update hidden form fields - email submission carries the dealer-
-        // delivery-inclusive figure so the office reply matches what the
-        // visitor saw on screen.
+        // Sync hidden fields on the final commit form
         $('[data-hidden-variant-name]').value = v.name
         $('[data-hidden-variant-base]').value = v.basePrice
         $('[data-hidden-total]').value = grandTotal
+        $('[data-hidden-first-name]').value = lead.first_name
+        $('[data-hidden-last-name]').value = lead.last_name
+        $('[data-hidden-email]').value = lead.email
+        $('[data-hidden-phone]').value = lead.phone
+        $('[data-hidden-intent]').value = lead.intent
         const selectedOptList = $$('.qb-opt')
           .filter((el) => selected.has(el.dataset.optId))
           .map((el) => {
@@ -342,7 +480,7 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
 
       // Option toggle
       $$('.qb-opt-check').forEach((cb) => {
-        cb.addEventListener('change', (e) => {
+        cb.addEventListener('change', () => {
           const optEl = cb.closest('.qb-opt')
           if (cb.checked) selected.add(optEl.dataset.optId)
           else selected.delete(optEl.dataset.optId)
@@ -350,12 +488,13 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
         })
       })
 
-      // Build share URL + text from current state. Used by both buttons.
+      // Share helpers
       function buildShare() {
         const params = new URLSearchParams()
         params.set('v', currentVariant)
         if (selected.size) params.set('o', Array.from(selected).join(','))
-        const shareUrl = pageUrl + (params.toString() ? '?' + params.toString() : '')
+        params.set('shared', '1')
+        const shareUrl = pageUrl + '?' + params.toString()
         const v = variantData[currentVariant]
         const total = $('[data-summary-total]').textContent
         const lines = []
@@ -376,7 +515,6 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
         return { shareUrl, shareText: lines.join('\n'), brandName: brandData.name, variantName: v.name }
       }
 
-      // Copy-link button: Web Share API on mobile, clipboard fallback elsewhere
       $('[data-qb-share]').addEventListener('click', async () => {
         const { shareUrl, shareText, brandName } = buildShare()
         if (navigator.share) {
@@ -390,21 +528,18 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
           $('[data-share-help]').hidden = false
           setTimeout(() => { $('[data-share-help]').hidden = true }, 6000)
         } catch (err) {
-          // Final fallback: open mailto
           window.location.href = 'mailto:?subject=' + encodeURIComponent(`${brandName} spec - SEQ Campers`) + '&body=' + encodeURIComponent(shareText)
         }
       })
 
-      // Share-by-email button: always opens the user's mail client with subject + body prefilled.
       $('[data-qb-share-email]').addEventListener('click', () => {
-        const { shareText, brandName, variantName } = buildShare()
+        const { shareText, variantName } = buildShare()
         const subject = `${variantName} spec - SEQ Campers`
         const mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(shareText)
         window.location.href = mailto
       })
 
-      // On load: parse URL params + apply
-      const urlParams = new URLSearchParams(window.location.search)
+      // Parse URL params (shared-spec view)
       const urlVariant = urlParams.get('v')
       if (urlVariant && variantData[urlVariant]) {
         currentVariant = urlVariant
@@ -428,4 +563,125 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
       renderSummary()
     })()
   </script>
+
+  <style>
+    /* Intro video block - shown above the configurator when Maud has set
+       siteSettings.quoteVideo_{slug}.youtubeUrl. 16:9 responsive. */
+    .quote-intro-video { margin: 0 auto; }
+    .quote-intro-media {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #1a1a1c;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--tan-border, #DCCBA8);
+    }
+    .quote-intro-media iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+    }
+    .quote-intro-caption {
+      margin-top: 10px;
+      text-align: center;
+      color: var(--muted, #8B6A40);
+      font-size: 0.95rem;
+    }
+
+    /* Configurator wrap - blurred while locked. */
+    .qb-wrap[data-locked="true"] {
+      filter: blur(6px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Lock overlay */
+    .qb-lock {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 80px 20px 40px;
+      overflow-y: auto;
+    }
+    .qb-lock-scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(42, 22, 8, 0.55);
+      backdrop-filter: blur(2px);
+    }
+    .qb-lock-card {
+      position: relative;
+      background: #fff;
+      border: 2px solid var(--rust, #C0341A);
+      border-radius: 16px;
+      padding: 32px 32px 28px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.30);
+    }
+    .qb-lock-eyebrow {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rust, #C0341A);
+      margin-bottom: 8px;
+    }
+    .qb-lock-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--ink, #2A1608);
+      margin: 0 0 10px;
+      line-height: 1.2;
+    }
+    .qb-lock-sub {
+      color: var(--muted, #8B6A40);
+      font-size: 0.98rem;
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+    .qb-lock-form label {
+      display: block;
+      margin-bottom: 12px;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      color: var(--ink, #2A1608);
+      font-size: 0.9rem;
+    }
+    .qb-lock-form input,
+    .qb-lock-form select {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 11px 13px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 8px;
+      background: var(--sand, #F4EDE0);
+      color: var(--ink, #2A1608);
+    }
+    .qb-lock-form .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 460px) { .qb-lock-form .form-row { grid-template-columns: 1fr; } }
+    .qb-lock-submit {
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 1.02rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .qb-lock-fineprint {
+      margin-top: 12px;
+      text-align: center;
+      color: var(--muted, #8B6A40);
+      font-size: 0.82rem;
+    }
+  </style>
 </Site>
