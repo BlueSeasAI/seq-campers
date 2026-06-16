@@ -12,6 +12,16 @@ try {
   console.warn('Sanity unreachable on build:', err.message)
 }
 
+// Hero video resolution: Sanity siteSettings.heroVideo.youtubeUrl wins when
+// set. Falls back to the self-hosted /hero-video.mp4 so the page still works
+// if the field is empty or Sanity is unreachable.
+// Per Bart 16 Jun: Kyle was pasting YouTube URLs into the field and they
+// were ignored because the hero used to be hardcoded MP4. This wires them
+// up properly.
+const heroYouTubeId = settings?.heroVideo?.youtubeUrl
+  ? youtubeId(settings.heroVideo.youtubeUrl)
+  : null
+
 // Pathway tile defaults - used when Maud hasn't filled a slot in Site
 // Settings → Home page videos (Watch / Visit / Adventure).
 const PATHWAY_DEFAULTS = [
@@ -179,19 +189,33 @@ const faqSchema = {
        (the controls that occasionally flicker in). -->
   <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
-      <video
-        class="hero-video-mp4"
-        src="/hero-video.mp4"
-        poster="/hero-poster.jpg"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="metadata"
-        disablepictureinpicture
-        controlslist="nodownload nofullscreen noremoteplayback"
-        tabindex="-1"
-      ></video>
+      {heroYouTubeId ? (
+        <iframe
+          class="hero-video-iframe"
+          src={`https://www.youtube-nocookie.com/embed/${heroYouTubeId}?autoplay=1&mute=1&loop=1&playlist=${heroYouTubeId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+          title="Home page hero video"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen="false"
+          tabindex="-1"
+          inert
+          loading="eager"
+        ></iframe>
+      ) : (
+        <video
+          class="hero-video-mp4"
+          src="/hero-video.mp4"
+          poster="/hero-poster.jpg"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          disablepictureinpicture
+          controlslist="nodownload nofullscreen noremoteplayback"
+          tabindex="-1"
+        ></video>
+      )}
       <div class="hero-video-block" aria-hidden="true"></div>
     </div>
   </section>
@@ -208,90 +232,34 @@ const faqSchema = {
       </div>
 
       <div class="pathway-tile-grid">
-        <a href="/videos" class="pathway-tile pathway-tile-watch" data-video-id={pathwayWatch.videoId}>
-          <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayWatch.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
-            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
-            <div class="pathway-tile-block" aria-hidden="true"></div>
-            <div class="pathway-tile-overlay" aria-hidden="true"></div>
-          </div>
-          <div class="pathway-tile-inner">
-            <div class="pathway-tile-label">1. Watch</div>
-            <div class="pathway-tile-sub">{pathwayWatch.sub}</div>
-          </div>
-        </a>
-
-        <a href="/stock" class="pathway-tile pathway-tile-visit" data-video-id={pathwayVisit.videoId}>
-          <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayVisit.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
-            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
-            <div class="pathway-tile-block" aria-hidden="true"></div>
-            <div class="pathway-tile-overlay" aria-hidden="true"></div>
-          </div>
-          <div class="pathway-tile-inner">
-            <div class="pathway-tile-label">2. Visit</div>
-            <div class="pathway-tile-sub">{pathwayVisit.sub}</div>
-          </div>
-        </a>
-
-        <a href="/service" class="pathway-tile pathway-tile-adventure" data-video-id={pathwayAdventure.videoId}>
-          <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayAdventure.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
-            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
-            <div class="pathway-tile-block" aria-hidden="true"></div>
-            <div class="pathway-tile-overlay" aria-hidden="true"></div>
-          </div>
-          <div class="pathway-tile-inner">
-            <div class="pathway-tile-label">3. Adventure</div>
-            <div class="pathway-tile-sub">{pathwayAdventure.sub}</div>
-          </div>
-        </a>
+        {[
+          { href: '/videos', label: '1. Watch', sub: pathwayWatch.sub, videoId: pathwayWatch.videoId, variant: 'watch' },
+          { href: '/stock', label: '2. Visit', sub: pathwayVisit.sub, videoId: pathwayVisit.videoId, variant: 'visit' },
+          { href: '/service', label: '3. Adventure', sub: pathwayAdventure.sub, videoId: pathwayAdventure.videoId, variant: 'adventure' },
+        ].map((p) => (
+          <a href={p.href} class={`pathway-tile pathway-tile-${p.variant}`}>
+            <div class="pathway-tile-media">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${p.videoId}?autoplay=1&mute=1&loop=1&playlist=${p.videoId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+                title={p.label}
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen="false"
+                tabindex="-1"
+                inert
+                loading="lazy"
+              ></iframe>
+              <div class="pathway-tile-block" aria-hidden="true"></div>
+            </div>
+            <div class="pathway-tile-meta">
+              <div class="pathway-tile-label">{p.label}</div>
+              <div class="pathway-tile-sub">{p.sub}</div>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   </section>
-
-  <script is:inline>
-    /* Pathway tiles: hover (or touch) swaps the poster for an autoplay iframe.
-       Mouse-leave / tap-out clears the iframe so other tiles never trigger
-       multiple videos at once. */
-    (function () {
-      const tiles = document.querySelectorAll('.pathway-tile')
-      tiles.forEach(function (tile) {
-        const videoId = tile.getAttribute('data-video-id')
-        if (!videoId) return
-        const wrap = tile.querySelector('.pathway-tile-iframe-wrap')
-        let iframe = null
-
-        function play() {
-          if (iframe) return
-          iframe = document.createElement('iframe')
-          iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId +
-            '?autoplay=1&mute=1&loop=1&playlist=' + videoId +
-            '&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0'
-          iframe.setAttribute('frameborder', '0')
-          iframe.setAttribute('allow', 'autoplay; encrypted-media')
-          iframe.setAttribute('tabindex', '-1')
-          iframe.setAttribute('inert', '')
-          wrap.appendChild(iframe)
-          tile.classList.add('is-playing')
-        }
-        function stop() {
-          if (!iframe) return
-          iframe.remove()
-          iframe = null
-          tile.classList.remove('is-playing')
-        }
-        tile.addEventListener('mouseenter', play)
-        tile.addEventListener('mouseleave', stop)
-        tile.addEventListener('focusin', play)
-        tile.addEventListener('focusout', stop)
-        /* Touch devices: tap once = preview, tap twice / link follow = navigate */
-        tile.addEventListener('touchstart', function (e) {
-          if (!iframe) { e.preventDefault(); play() }
-        }, { passive: false })
-      })
-    })()
-  </script>
 
   <TrustStrip />
 
@@ -375,6 +343,10 @@ const faqSchema = {
       padding-top: 32px;
       padding-bottom: 32px;
     }
+    /* Pathway tiles - landscape 16:9 cards matching the /stock BrollCard
+       pattern per Shane's request 16 Jun. Each tile auto-plays its YouTube
+       video muted and looping, with the label + sub rendered below the
+       video (not overlaid). */
     .pathway-tile-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -384,42 +356,27 @@ const faqSchema = {
       .pathway-tile-grid { grid-template-columns: 1fr; gap: 14px; }
     }
     .pathway-tile {
-      position: relative;
       display: block;
-      aspect-ratio: 4 / 5;
-      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 10px;
       overflow: hidden;
       text-decoration: none;
       color: inherit;
-      background: #1a1a1c;
-      transition: transform 0.25s, box-shadow 0.25s;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     }
     .pathway-tile:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 38px rgba(42, 22, 8, 0.22);
+      transform: translateY(-3px);
+      border-color: var(--rust, #C0341A);
+      box-shadow: 0 10px 28px rgba(42, 22, 8, 0.14);
     }
     .pathway-tile-media {
-      position: absolute;
-      inset: 0;
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #1a1a1c;
       overflow: hidden;
     }
-    .pathway-tile-poster {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: opacity 0.3s;
-    }
-    .pathway-tile.is-playing .pathway-tile-poster {
-      opacity: 0;
-    }
-    .pathway-tile-iframe-wrap {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-    .pathway-tile-iframe-wrap iframe {
+    .pathway-tile-media iframe {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -433,48 +390,31 @@ const faqSchema = {
     .pathway-tile-block {
       position: absolute;
       inset: 0;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .pathway-tile-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.78) 100%);
-      pointer-events: none;
-    }
-    .pathway-tile-inner {
-      position: absolute;
-      inset: 0;
       z-index: 5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      text-align: center;
-      padding: 24px 22px 26px;
-      color: #fff;
-      pointer-events: none;
+      background: transparent;
+      pointer-events: auto;
+    }
+    .pathway-tile-meta {
+      padding: 14px 16px 16px;
     }
     .pathway-tile-label {
       font-family: 'Inter Tight', sans-serif;
-      font-size: 1.8rem;
       font-weight: 800;
+      color: var(--ink, #2A1608);
+      font-size: 1.15rem;
+      line-height: 1.2;
       letter-spacing: -0.01em;
-      line-height: 1.1;
-      text-shadow: 0 2px 16px rgba(0,0,0,0.5);
     }
     .pathway-tile-sub {
-      margin-top: 6px;
-      font-size: 0.92rem;
+      margin-top: 4px;
+      color: var(--muted, #8B6A40);
+      font-size: 0.9rem;
       line-height: 1.5;
-      color: rgba(255,255,255,0.92);
-      max-width: 280px;
-      text-shadow: 0 1px 10px rgba(0,0,0,0.45);
     }
 
-    /* Hero video section: full viewport height. Self-hosted MP4 fills the
-       hero in both dimensions via object-fit cover. */
+    /* Hero video section: full viewport height. Renders either a YouTube
+       iframe (when Sanity heroVideo.youtubeUrl is set) or a self-hosted
+       MP4 fallback (/hero-video.mp4) via object-fit cover. */
     :global(.hero-video.hero-video-clean) {
       padding: 0 !important;
       min-height: 100vh !important;
@@ -490,10 +430,29 @@ const faqSchema = {
       border: 0;
       pointer-events: none;
     }
+    /* YouTube iframe needs a wider-than-100% trick so the 16:9 video covers
+       the full viewport-height hero box without letterboxing. */
+    :global(.hero-video-iframe) {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 177.78vh;
+      height: 100vh;
+      min-width: 100vw;
+      min-height: 56.25vw;
+      transform: translate(-50%, -50%);
+      border: 0;
+      pointer-events: none;
+    }
     @media (max-width: 768px) {
       :global(.hero-video.hero-video-clean) {
         min-height: 85vh !important;
         height: 85vh;
+      }
+      :global(.hero-video-iframe) {
+        width: 177.78vh;
+        height: 85vh;
+        min-height: 47.81vw;
       }
     }
   </style>
