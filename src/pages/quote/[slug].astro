@@ -328,6 +328,12 @@ try {
       const variantData = {}
       brandData.variants.forEach((v) => { variantData[v.id] = v })
 
+      // Option metadata (requires / blockedBy / notes) keyed by option id.
+      // Only the Rover defines these; other models leave them undefined and
+      // fall straight through to the original availability logic below.
+      const optMeta = {}
+      brandData.categories.forEach((c) => c.options.forEach((o) => { optMeta[o.id] = o }))
+
       let currentVariant = firstVariantId
       const selected = new Set()
       const lead = { first_name: '', last_name: '', email: '', phone: '', intent: '' }
@@ -408,37 +414,54 @@ try {
         return map[variantId]
       }
 
+      // An option's prerequisite counts as "present" if it is included on the
+      // current variant (price 0) or the visitor has it ticked.
+      function isPresent(optId) {
+        const el = document.querySelector('.qb-opt[data-opt-id="' + optId + '"]')
+        if (!el) return false
+        return getOptionPrice(el, currentVariant) === 0 || selected.has(optId)
+      }
+
       function renderOptionPrices() {
         $$('.qb-opt').forEach((optEl) => {
-          const p = getOptionPrice(optEl, currentVariant)
+          const optId = optEl.dataset.optId
+          const meta = optMeta[optId] || {}
           const display = optEl.querySelector('[data-opt-price-display]')
-          if (p === null || p === undefined) {
-            display.textContent = 'N/A'
-            optEl.classList.add('qb-opt-unavailable')
-            optEl.querySelector('.qb-opt-check').disabled = true
-            optEl.querySelector('.qb-opt-check').checked = false
-            selected.delete(optEl.dataset.optId)
-          } else if (p === 'POA') {
-            display.textContent = 'POA'
-            optEl.classList.remove('qb-opt-unavailable')
-            optEl.querySelector('.qb-opt-check').disabled = false
-          } else if (p === 0) {
-            display.textContent = 'Included'
-            optEl.classList.remove('qb-opt-unavailable')
-            optEl.querySelector('.qb-opt-check').disabled = false
-          } else if (p < 0) {
-            display.textContent = fmtSigned(p) + ' credit'
-            optEl.classList.remove('qb-opt-unavailable')
-            optEl.querySelector('.qb-opt-check').disabled = false
-          } else {
-            display.textContent = fmtSigned(p)
-            optEl.classList.remove('qb-opt-unavailable')
-            optEl.querySelector('.qb-opt-check').disabled = false
+          const check = optEl.querySelector('.qb-opt-check')
+          const p = getOptionPrice(optEl, currentVariant)
+
+          const apply = (unavail, text, disabled) => {
+            optEl.classList.toggle('qb-opt-unavailable', unavail)
+            display.textContent = text
+            check.disabled = disabled
+            if (disabled) { check.checked = false; selected.delete(optId) }
           }
+
+          if (p === null || p === undefined) { apply(true, meta.naNote || 'N/A', true); return }
+          if (p === 0) { apply(false, 'Included', false); return }
+
+          // Priced option - apply dynamic dependency rules (Rover only).
+          const blocked = (meta.blockedBy || []).some((dep) => isPresent(dep))
+          if (blocked) { apply(true, meta.blockedNote || 'N/A', true); return }
+          const missing = (meta.requires || []).some((dep) => !isPresent(dep))
+          if (missing) { apply(true, meta.depNote || 'Locked', true); return }
+
+          if (p === 'POA') apply(false, 'POA', false)
+          else if (p < 0) apply(false, fmtSigned(p) + ' credit', false)
+          else apply(false, fmtSigned(p), false)
         })
       }
 
-      const DEALER_DELIVERY = 3500
+      // Dealer delivery is per-model - motorhomes carry ~$19k (5% stamp duty),
+      // the Rover is $3,500. Reads variant.delivery, then brand.delivery, then
+      // falls back to $3,500 so every existing model is unchanged.
+      const DEFAULT_DELIVERY = 3500
+      function deliveryFor(variantId) {
+        const v = variantData[variantId]
+        if (v && typeof v.delivery === 'number') return v.delivery
+        if (typeof brandData.delivery === 'number') return brandData.delivery
+        return DEFAULT_DELIVERY
+      }
 
       function renderSummary() {
         const v = variantData[currentVariant]
@@ -456,7 +479,9 @@ try {
         })
         $('[data-summary-count]').textContent = count
         $('[data-summary-options]').textContent = fmtSigned(optionsTotal)
-        const grandTotal = v.basePrice + optionsTotal + DEALER_DELIVERY
+        const delivery = deliveryFor(currentVariant)
+        $('[data-summary-delivery]').textContent = fmtSigned(delivery)
+        const grandTotal = v.basePrice + optionsTotal + delivery
         $('[data-summary-total]').textContent = fmt(grandTotal)
 
         // Sync hidden fields on the final commit form
@@ -499,6 +524,7 @@ try {
           const optEl = cb.closest('.qb-opt')
           if (cb.checked) selected.add(optEl.dataset.optId)
           else selected.delete(optEl.dataset.optId)
+          renderOptionPrices()
           renderSummary()
         })
       })
