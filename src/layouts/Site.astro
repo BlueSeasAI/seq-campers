@@ -383,6 +383,45 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       window.addEventListener('focus', nuke)
     })()
   </script>
+
+  <!-- Site-wide form page-tracker. Every Netlify form on the site gets two
+       hidden fields appended at runtime: source_page_url + source_page_title.
+       Means the Netlify Forms dashboard (and the email notifications) show
+       EXACTLY which page each submission came from - essential for forms
+       like used-caravan-enquiry (10+ caravan pages share one form name) and
+       build-page-lead-capture/quote-request (7 model pages share). Per
+       Bart 18 Jun. -->
+  <script is:inline>
+    (function () {
+      function attachPageTracking() {
+        document.querySelectorAll('form[data-netlify="true"]').forEach(function (form) {
+          if (form.dataset.pageTrackingBound === '1') return
+          form.dataset.pageTrackingBound = '1'
+          // source_page_url - the live URL the visitor is on
+          if (!form.querySelector('input[name="source_page_url"]')) {
+            var urlField = document.createElement('input')
+            urlField.type = 'hidden'
+            urlField.name = 'source_page_url'
+            urlField.value = window.location.href
+            form.appendChild(urlField)
+          }
+          // source_page_title - the document title (helps Maud match in the dashboard)
+          if (!form.querySelector('input[name="source_page_title"]')) {
+            var titleField = document.createElement('input')
+            titleField.type = 'hidden'
+            titleField.name = 'source_page_title'
+            titleField.value = document.title || ''
+            form.appendChild(titleField)
+          }
+        })
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachPageTracking)
+      } else {
+        attachPageTracking()
+      }
+    })()
+  </script>
 </head>
 <body data-home={isHome ? 'true' : 'false'}>
   {showSpecial && (

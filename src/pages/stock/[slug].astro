@@ -119,7 +119,7 @@ const authorisedDealerLabel = brandLower.includes('kimberley')
     : null
 
 // Per-listing enquiry form data. Each listing posts to Netlify Forms via the
-// shared "listing-enquiry" form name with the caravan's Sanity-loaded
+// shared "used-caravan-enquiry" form name with the caravan's Sanity-loaded
 // details prefilled as hidden fields. NO routing to Maud's brand pages -
 // those are for new-build spec configuration; this is for THIS specific
 // caravan with its specs already known from Sanity.
@@ -388,13 +388,13 @@ const productSchema = {
 
         <form
           class="enquiry-form"
-          name="listing-enquiry"
+          name="used-caravan-enquiry"
           method="POST"
           data-netlify="true"
           netlify-honeypot="bot-field"
           action="/thanks/"
         >
-          <input type="hidden" name="form-name" value="listing-enquiry" />
+          <input type="hidden" name="form-name" value="used-caravan-enquiry" />
           <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
 
           <!-- Caravan context (Sanity-sourced, hidden from the customer) -->

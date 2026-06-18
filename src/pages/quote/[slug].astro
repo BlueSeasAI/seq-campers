@@ -205,14 +205,14 @@ try {
 
         <form
           class="enquiry-form"
-          name="quote-builder-v2"
+          name="build-page-quote-request"
           method="POST"
           data-netlify="true"
           netlify-honeypot="bot-field"
           action="/thanks/"
           data-qb-form
         >
-          <input type="hidden" name="form-name" value="quote-builder-v2" />
+          <input type="hidden" name="form-name" value="build-page-quote-request" />
           <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
 
           <!-- All lead + spec context (populated by JS at submit time) -->
@@ -266,14 +266,14 @@ try {
 
       <form
         class="qb-lock-form"
-        name="quote-builder-lead"
+        name="build-page-lead-capture"
         method="POST"
         data-netlify="true"
         netlify-honeypot="bot-field"
         action="/thanks/"
         data-qb-lock-form
       >
-        <input type="hidden" name="form-name" value="quote-builder-lead" />
+        <input type="hidden" name="form-name" value="build-page-lead-capture" />
         <input type="hidden" name="brand_name" value={brand.name} />
         <input type="hidden" name="brand_slug" value={brand.slug} />
         <input type="hidden" name="page_url" value={pageUrl} />
