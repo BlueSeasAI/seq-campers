@@ -10,7 +10,7 @@ export default defineConfig({
       // Per Bart 18 Jun: handover pages are UNLISTED - shared only via the
       // printed handover letter / follow-up email. Keep them out of the
       // sitemap so they don't appear in search engines.
-      filter: (page) => !/\/handover\//.test(page),
+      filter: (page) => !/\/handover\//.test(page) && !/\/user-guide\//.test(page),
     }),
   ],
   output: 'static',
