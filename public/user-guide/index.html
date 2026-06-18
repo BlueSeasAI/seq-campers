@@ -170,18 +170,35 @@
     body { background: #fff; font-size: 10pt; line-height: 1.45; }
     .wrap { padding: 0; max-width: 100%; }
 
-    /* Cover sits on page 1 alone */
+    /* Page 1 - the cover, ALONE. Force a break-after and pad it up so
+       it visually fills the page. */
     .cover {
-      padding: 32px 28px;
+      padding: 40px 32px;
+      margin-bottom: 0;
+      min-height: 80vh;
+      box-sizing: border-box;
       page-break-after: always;
       break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
-    .cover h1 { font-size: 2rem; }
-    .cover .subtitle { font-size: 1.05rem; }
+    .cover h1 { font-size: 2.2rem; }
+    .cover .subtitle { font-size: 1.1rem; }
+    .cover .meta { margin-top: 36px; }
 
-    /* TOC ends with a forced page break so section 1 starts fresh */
-    .toc { page-break-after: always; break-after: page; padding: 16px 22px; }
-    .toc li { margin-bottom: 4px; font-size: 0.95rem; }
+    /* Page 2 - the Table of Contents, ALONE. */
+    .toc {
+      page-break-before: always;
+      break-before: page;
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      padding: 22px 28px;
+      margin-bottom: 0;
+    }
+    .toc h3 { font-size: 0.95rem; }
+    .toc li { margin-bottom: 6px; font-size: 1rem; }
 
     /* Section H2: NO forced page break - they flow naturally so short
        sections stack with neighbours. Keep heading attached to next block. */
