@@ -594,6 +594,7 @@ export const quoteBuilders = [
     brandFamily: 'Kimberley',
     name: 'Kimberley Kruiser T Class',
     intro: '7.3m luxury - sleeps 6 - satellite TV - washing machine - full ensuite.',
+    delivery: 3500,
     variants: [
       {
         id: 't3',
@@ -625,7 +626,7 @@ export const quoteBuilders = [
         options: [
           { id: 'stone-deflector', label: 'Custom Stone Deflector', price: 820 },
           { id: 'fold-steps', label: 'Internal Fold-Down Entry Steps', price: 990 },
-          { id: 'do45-hitch', label: 'VC DO45 4500kg Hitch', price: 'POA' },
+          { id: 'do45-hitch', label: 'VC DO45 4500kg Off-Road Hitch (upgrade from McHitch)', price: 0 },
         ],
       },
       {
@@ -641,7 +642,7 @@ export const quoteBuilders = [
         options: [
           { id: 'smart-touch-plus', label: 'Smart Touch PLUS Monitor', price: 990 },
           { id: 'battery-extra-5000', label: 'Extra 5000Wh Battery (10kWh total)', price: 7100 },
-          { id: 'solar-900', label: '900W Solar Upgrade', price: 970 },
+          { id: 'solar-900', label: 'Upgrade to 900W Merlin NASA Solar', note: 'Selecting this removes the rooftop A/C (a $3,910 credit will apply on your quote).', price: 970 },
           { id: 'gps-tracking', label: 'GPS Tracking System', price: 1650 },
           { id: 'portable-solar', label: 'Portable 170W Solar', price: 1710 },
         ],
@@ -701,6 +702,7 @@ export const quoteBuilders = [
     brandFamily: 'Kimberley',
     name: 'Kimberley Kruiser S Class',
     intro: 'Sleeps 6 - full ensuite - 48V Smart Power - king of the off road.',
+    delivery: 3500,
     variants: [
       {
         id: 'classic',
@@ -820,7 +822,7 @@ export const quoteBuilders = [
         title: 'Power & Solar',
         options: [
           { id: 'battery-5000', label: 'Upgrade to 5000Wh SMART 48V', priceByVariant: { classic: 4030, s3: 0 } },
-          { id: 'battery-second', label: 'Extra 5000Wh SMART 48V Battery', price: 7100 },
+          { id: 'battery-second', label: 'Extra 5000Wh SMART 48V Battery', note: 'Classic: only available after the 5000Wh upgrade above.', requires: ['battery-5000'], depNote: 'Add 5000Wh first', price: 7100 },
           { id: 'solar-400', label: 'Upgrade to 400W Merlin NASA Solar', priceByVariant: { classic: 650, s3: null } },
           { id: 'solar-500', label: 'Upgrade to 500W Merlin NASA Solar', priceByVariant: { classic: 1420, s3: 0 } },
           { id: 'witi-tracking', label: 'WiTi Anti-theft + GPS Tracking', price: 1650 },
