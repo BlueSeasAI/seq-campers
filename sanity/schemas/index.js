@@ -15,6 +15,7 @@ import newPageSettings from './newPageSettings.js'
 import servicePageSettings from './servicePageSettings.js'
 import showsPageSettings from './showsPageSettings.js'
 import quotePageSettings from './quotePageSettings.js'
+import handoverPage from './handoverPage.js'
 
 export const schemaTypes = [
   caravan,
@@ -30,4 +31,5 @@ export const schemaTypes = [
   servicePageSettings,
   showsPageSettings,
   quotePageSettings,
+  handoverPage,
 ]

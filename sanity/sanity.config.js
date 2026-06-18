@@ -242,6 +242,18 @@ export default defineConfig({
                   .defaultOrdering([{ field: 'category', direction: 'asc' }, { field: 'order', direction: 'asc' }])
               ),
 
+            S.listItem()
+              .title('🎁 Handover pages (UNLISTED)')
+              .icon(DocumentTextIcon)
+              .schemaType('handoverPage')
+              .child(
+                S.documentList()
+                  .title('Handover pages (UNLISTED - shared by direct URL only)')
+                  .schemaType('handoverPage')
+                  .filter('_type == "handoverPage"')
+                  .defaultOrdering([{ field: 'title', direction: 'asc' }])
+              ),
+
             S.divider(),
 
             // ─── AEO KEYWORDS (reference strategy table) ──────────────
