@@ -929,6 +929,23 @@ a:focus-visible, button:focus-visible {
 
 .enquiry-form textarea { min-height: 120px; resize: vertical; }
 
+/* Mobile: force 16px font on all form fields so iOS Safari doesn't
+   zoom-in when the user taps a field. Applies to every form on the site
+   (enquiry, quote builder, reserve, workshop booking, contact). */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="search"],
+  input[type="number"],
+  input[type="url"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 .enquiry-form button[type='submit'] {
   background: var(--rust);
   color: #fff;

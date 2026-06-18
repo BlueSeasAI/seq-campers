@@ -142,7 +142,8 @@ export default {
       title: 'Photos',
       type: 'array',
       description:
-        'Tip: select multiple files in your file picker to upload them in one go. On Windows: Ctrl+click (pick specific files) or Shift+click (pick a range). On a Mac: Cmd+click (specific) or Shift+click (range). You can also DRAG multiple selected files directly into the dropzone below. Then click each thumbnail to add Alt text. Drag thumbnails to reorder - the first photo is the main image shown in the listing grid.',
+        '⚡ TO UPLOAD MANY PHOTOS AT ONCE: open File Explorer (Windows) or Finder (Mac), select multiple photos (Ctrl+click on Windows / Cmd+click on Mac, or Shift+click for a range), then DRAG the whole selection into the dashed dropzone below. They will all upload in parallel. The "Add item" button only adds one photo at a time - use drag-and-drop for bulk. Drag thumbnails to reorder once uploaded - the first photo is the main image shown in the listing grid.',
+      options: { layout: 'grid' },
       of: [
         {
           type: 'image',

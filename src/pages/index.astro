@@ -432,13 +432,16 @@ const faqSchema = {
       line-height: 1.5;
     }
 
-    /* Hero video section: full viewport height. Renders either a YouTube
-       iframe (when Sanity heroVideo.youtubeUrl is set) or a self-hosted
-       MP4 fallback (/hero-video.mp4) via object-fit cover. */
+    /* Hero video section: full viewport height. Uses 100dvh (dynamic
+       viewport height) on modern browsers so the URL bar on mobile Safari
+       doesn't shift the hero off-screen. Falls back to 100vh on older
+       browsers. */
     :global(.hero-video.hero-video-clean) {
       padding: 0 !important;
       min-height: 100vh !important;
+      min-height: 100dvh !important;
       height: 100vh;
+      height: 100dvh;
     }
     :global(.hero-video-mp4) {
       position: absolute;
