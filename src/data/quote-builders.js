@@ -411,179 +411,779 @@ export const quoteBuilders = [
   // KIMBERLEY KRUISWAGEN
   // -------------------------------------------------------------------------
   {
-    slug: 'kruiswagen',
-    brandFamily: 'Kimberley',
-    name: 'Kimberley Kruiswagen',
-    intro: 'Mercedes Sprinter 419 LWB AWD - the ultimate off-road motorhome.',
+    slug: "kruiswagen",
+    brandFamily: "Kimberley",
+    name: "Kimberley Kruiswagen",
+    intro: "The luxury 4x4 motorhome - off-grid, premium, no compromises.",
+    delivery: 19000,
     variants: [
       {
-        id: 'classic',
-        name: 'Kruiswagen Classic',
+        id: "classic",
+        name: "Kruiswagen Classic",
         basePrice: 199850,
-        included: [
-          'Mercedes Sprinter 419 LWB AWD 2.0L Bi-Turbo A4M 4x4',
-          'Factory off-road lift kit',
-          'Navigation with 7-year map updates',
-          'Active Distance Assist (DISTRONIC)',
-          'KK Kruz Rack roof rack backbone',
-          'Composting toilet (OGO)',
-          'Full-size ensuite with gelcoat shower',
-          'Diesel HWS (Webasto)',
-          'SMART 48V Power Hub + 2000Wh battery',
-          '200W roof solar',
-          '2.2x4.5m HD manual roll-out awning',
-          '130L upright 12V fridge',
-          'Outside cook\'s kitchen (sink + 2-burner)',
-          'KK PowerGlide drop-down double bed',
-        ],
+        included: ["Mercedes Sprinter 419 LWB AWD 2.0L Bi-Turbo", "A4M 4x4 AWD + factory off-road lift kit", "Navigation (7-year map updates)", "Active Distance Assist (DISTRONIC)", "Air conditioning (TEMPMATIC)", "KK Kruz Rack roof rack backbone", "Composting toilet (OGO)", "Full-size ensuite with gelcoat shower", "Diesel HWS (Webasto)", "SMART 48V Power Hub + 2000Wh battery", "200W roof solar", "2.2 x 4.5m HD manual roll-out awning", "130L upright 12V fridge", "Outside cook's kitchen (sink + 2-burner)", "Rear mount gas bottle 2kg", "KK PowerGlide drop-down double bed", "Bluetooth sound system", "Vegan leather seating"]
       },
       {
-        id: 'ecoscape',
-        name: 'Kruiswagen EcoScape',
+        id: "ecoscape",
+        name: "Kruiswagen EcoScape",
         basePrice: 247990,
-        included: [
-          'Everything in Classic, plus:',
-          '360° parking camera',
-          'Electric sliding door',
-          'Long-range 93L fuel tank',
-          'KK Alloy Sports Bar with LED light bar',
-          '86L second water tank',
-          'Electric awning with dual options',
-          '5000Wh battery',
-          '400W solar',
-          '190L fridge/freezer',
-          'Dual induction + microwave',
-          'Smart TV',
-          'Solid leather seating',
-        ],
-      },
+        included: ["Everything in Classic, plus:", "360-degree parking camera", "Electric sliding door", "Long range 93L fuel tank", "Outback snorkel (black)", "KK Alloy Sports Bar + LED light bar", "KK Expedition Kruz Rack + 50\" LED bar", "x4 Corner LED security worklights", "KK rear swing-away (spare tyre + ladder)", "Electric automatic side steps", "KK Alloy off-road wheels 16\" AT tyres", "86L second water tank", "BEST water filter", "2.2 x 4.5m HD electric roll-out awning", "Bedouin extendable awning", "Internal shower furniture", "Outside hot & cold shower", "Space heater (uses diesel HWS)", "Rooftop reverse cycle A/C", "5000Wh SMART 48V Battery", "400W roof solar", "Outside kitchen + Ninja Electric BBQ", "190L fridge/freezer combo", "Dual plate induction + microwave", "Wireless benchtop charging", "Smart TV + upgraded sound system", "Dual reading LED lights", "Solid leather seating", "Vinyl floor plank upgrade"]
+      }
     ],
     categories: [
       {
-        id: 'vehicle-protection',
-        title: 'Vehicle Body & Protection',
+        id: "vehicle-body",
+        title: "Vehicle Body & Protection",
         options: [
-          { id: '360-camera', label: '360° Parking Camera Assist', priceByVariant: { classic: 582, ecoscape: 0 } },
-          { id: 'electric-door', label: 'Electric Sliding Door', priceByVariant: { classic: 1650, ecoscape: 0 } },
-          { id: 'fuel-93l', label: 'Long Range Fuel Tank 93L', priceByVariant: { classic: 1220, ecoscape: 0 } },
-          { id: 'fuel-151l', label: 'Long Range 151L Polyethylene Fuel Tank', price: 3575 },
-          { id: 'mercedes-infotainment', label: '10.25" Mercedes Infotainment Upgrade', price: 890 },
-          { id: 'heavy-alternator', label: '250A Heavy Duty Alternator', price: 910 },
-          { id: 'upgraded-paint', label: 'Upgraded Paint (multiple colours)', price: 1950 },
-          { id: 'permaguard', label: 'Mercedes Permaguard Lifetime Warranty', price: 3160 },
-          { id: 'gvm-upgrade', label: 'GVM Upgrade Kit (4,430kg)', price: 8645 },
-          { id: 'outback-snorkel', label: 'Outback Snorkel (Black)', price: 2540 },
-          { id: 'sports-bar-led', label: 'KK Alloy Sports Bar with LED', priceByVariant: { classic: 2650, ecoscape: 0 } },
-          { id: 'attitude-bullbar', label: 'KK ATTITUDE Bullbar', price: 5100 },
-          { id: 'warn-winch', label: 'Warn Winch 12-S Evo', price: 3290 },
-          { id: 'rear-bumper', label: 'KK Alloy Rear Bumper', price: 1820 },
-          { id: 'kruz-rack-led', label: 'KK Expedition Kruz Rack + 50" LED', price: 7050 },
-          { id: 'security-worklights', label: 'x4 Corner LED Security Worklights', price: 1240 },
-          { id: 'swing-spare', label: 'KK Rear Swing-Away (spare tyre)', price: 2995 },
-          { id: 'swing-gear', label: 'KK Rear Swing-Away Gear Rack', price: 2470 },
-          { id: 'delta-gullwing', label: 'Delta Gullwing Storage Box', price: 2250 },
-          { id: 'rear-bike', label: 'KK Rear Drop Bike Carrier', price: 1980 },
-          { id: 'aeropod', label: 'Motorhome AeroPod Storage Box', price: 2150 },
-          { id: 'electric-steps', label: 'Electric Automatic Side Steps', price: 2850 },
-          { id: 'underbody-protection', label: 'Underbody Protection', price: 2550 },
-          { id: 'arb-compressor', label: 'Built-in ARB Compressor', price: 1750 },
-          { id: 'towbar-pack', label: 'Towbar Pack & Electrics', price: 3220 },
-          { id: 'uhf', label: 'UHF Uniden Radio', price: 1050 },
-          { id: 'maxtrax', label: 'Set of Maxtrax x2 + Mount', price: 535 },
-        ],
+          {
+            id: "360cam",
+            label: "360- Parking Camera Assist",
+            priceByVariant: {
+              classic: 582,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "slidingdoor",
+            label: "Electric Sliding Door",
+            priceByVariant: {
+              classic: 1650,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "longtank",
+            label: "Long Range Fuel Tank 93L with Aux diesel take-off",
+            priceByVariant: {
+              classic: 1220,
+              ecoscape: 0
+            },
+            blockedBy: ["longtank2"]
+          },
+          {
+            id: "infotainment",
+            label: "10.25\" Mercedes Infotainment Upgrade",
+            priceByVariant: {
+              classic: 890,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "alternator",
+            label: "250A Heavy Duty Alternator",
+            priceByVariant: {
+              classic: 910,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "paint",
+            label: "Upgraded Paint (Selenite Grey / Stone Grey / custom)",
+            price: 1950
+          },
+          {
+            id: "permaguard",
+            label: "Mercedes Permaguard Lifetime Warranty (paint/leather/vinyl)",
+            price: 3160
+          },
+          {
+            id: "gvm",
+            label: "GVM Upgrade Kit (4,430kg, upgraded suspension, KK remote reservoir shocks)",
+            price: 8645,
+            requires: ["alloy-rims"]
+          },
+          {
+            id: "longtank2",
+            label: "Long Range 151L Polyethylene Fuel Tank (USA import)",
+            price: 3575,
+            blockedBy: ["longtank"]
+          },
+          {
+            id: "snorkel",
+            label: "Outback Snorkel - Black Exxonmobil Polyethylene",
+            priceByVariant: {
+              classic: 2540,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "sportsbar",
+            label: "KK Alloy Sports Bar with LED Light Bar",
+            priceByVariant: {
+              classic: 2650,
+              ecoscape: 0
+            },
+            blockedBy: ["bullbar", "bullbar-eco"]
+          },
+          {
+            id: "bullbar",
+            label: "KK ATTITUDE Bullbar - Black powdercoat, LED light bar + side LEDs, winch-ready",
+            priceByVariant: {
+              classic: 5100,
+              ecoscape: null
+            },
+            blockedBy: ["sportsbar", "bullbar-eco"],
+            naNote: "Only on Classic"
+          },
+          {
+            id: "bullbar-eco",
+            label: "KK ATTITUDE Bullbar - upgrade from Sports Bar (Ecoscape)",
+            priceByVariant: {
+              classic: null,
+              ecoscape: 2450
+            },
+            blockedBy: ["sportsbar", "bullbar"],
+            naNote: "Only on EcoScape"
+          },
+          {
+            id: "winch",
+            label: "Warn Winch 12-S Evo (5,445kg), 27m Dyneema rope",
+            price: 3290
+          },
+          {
+            id: "rearbumper",
+            label: "KK Alloy Rear Bumper with external step + LED lights",
+            price: 1820
+          },
+          {
+            id: "expedition-rack",
+            label: "KK Expedition Kruz Rack + 50\" LED Light Bar",
+            priceByVariant: {
+              classic: 7050,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "corner-lights",
+            label: "x4 Corner LED Security Worklights (requires Expedition rack)",
+            priceByVariant: {
+              classic: 1240,
+              ecoscape: 0
+            },
+            requires: ["expedition-rack"]
+          },
+          {
+            id: "swingaway-tyre",
+            label: "KK Rear Swing-Away (spare tyre + ladder frame, passenger door)",
+            priceByVariant: {
+              classic: 2995,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "swingaway-gear",
+            label: "KK Rear Swing-Away Gear Rack (driver door)",
+            price: 2470
+          },
+          {
+            id: "gullwing",
+            label: "Delta Gullwing Storage Box (insulated, up to 28kg - needs rear gear rack)",
+            price: 2250,
+            requires: ["swingaway-gear"],
+            blockedBy: ["bike-rack"]
+          },
+          {
+            id: "bike-rack",
+            label: "KK Rear Drop Bike Carrier (x2 bikes up to 30kg, gas strut) - needs gear rack",
+            price: 1980,
+            requires: ["swingaway-gear"],
+            blockedBy: ["gullwing"]
+          },
+          {
+            id: "aeropod",
+            label: "Motorhome Waterproof AeroPod Storage Box (rear platform)",
+            price: 2150
+          },
+          {
+            id: "sidesteps",
+            label: "Electric Automatic Side Steps (also serve as rock sliders)",
+            priceByVariant: {
+              classic: 2850,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "underbody",
+            label: "Underbody Protection - Engine & Gearbox Skid Plates",
+            price: 2550
+          },
+          {
+            id: "compressor",
+            label: "Built-in ARB Brushless Compressor + air tank & kit",
+            price: 1750
+          },
+          {
+            id: "towbar",
+            label: "Towbar Pack & Electrics (up to 2,000kg towable)",
+            price: 3220
+          },
+          {
+            id: "uhf",
+            label: "UHF Uniden Fitted with High Gain Antenna",
+            price: 1050
+          },
+          {
+            id: "lower-body",
+            label: "Lower Body Panel - Urethane Protection (each side)",
+            price: 752
+          },
+          {
+            id: "desert-wrapz",
+            label: "KK Desert Wrapz - 3M PPF Window Protection x5 windows (5yr warranty)",
+            price: 615
+          },
+          {
+            id: "maxtrax-mount",
+            label: "Maxtrax x4 Pin-Reinforced Mount Kit (side of vehicle)",
+            priceByVariant: {
+              classic: 225,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "maxtrax-set",
+            label: "Set of Maxtrax x2 (Black)",
+            price: 310
+          },
+          {
+            id: "remove-ac",
+            label: "Remove Rooftop A/C (credit - Ecoscape)",
+            priceByVariant: {
+              classic: null,
+              ecoscape: -3100
+            },
+            naNote: "Only on EcoScape"
+          }
+        ]
       },
       {
-        id: 'wheels',
-        title: 'Wheels',
+        id: "wheels",
+        title: "Wheels",
         options: [
-          { id: 'steel-bfg', label: 'Steel Rims + BFG A/T Tyres', priceByVariant: { classic: 1900, ecoscape: null } },
-          { id: 'alloy-16', label: 'KK Alloy Off-Road Wheels 16"', priceByVariant: { classic: 3575, ecoscape: null } },
-        ],
+          {
+            id: "steel-rims",
+            label: "Steel Rims + BFG A/T Off-Road Tyres 255/70 R16 LT (Classic)",
+            priceByVariant: {
+              classic: 1900,
+              ecoscape: null
+            },
+            blockedBy: ["alloy-rims"],
+            naNote: "Only on Classic"
+          },
+          {
+            id: "alloy-rims",
+            label: "KK Alloy Off-Road Wheels 16\" 255/70 R16 LT (needed for GVM upgrade)",
+            priceByVariant: {
+              classic: 3575,
+              ecoscape: 0
+            },
+            blockedBy: ["steel-rims"]
+          }
+        ]
       },
       {
-        id: 'water',
-        title: 'Water',
+        id: "water",
+        title: "Water",
         options: [
-          { id: 'water-86l', label: '86L Dedicated Second Water Tank', priceByVariant: { classic: 1570, ecoscape: 0 } },
-          { id: 'best-filter', label: 'BEST Water Filter', price: 465 },
-          { id: 'spare-tank', label: '80L Spare Wheel Emergency Tank', price: 1570 },
-        ],
+          {
+            id: "2nd-tank",
+            label: "86L Dedicated Second Water Tank",
+            priceByVariant: {
+              classic: 1570,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "water-filter",
+            label: "BEST Water Filter",
+            priceByVariant: {
+              classic: 465,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "spare-well-tank",
+            label: "80L Spare Wheel Well Emergency Aux Water Tank (needs rear wheel carrier)",
+            price: 1570,
+            requires: ["swingaway-tyre"]
+          }
+        ]
       },
       {
-        id: 'awnings',
-        title: 'Canvas & Awnings',
+        id: "canvas",
+        title: "Canvas & Awnings",
         options: [
-          { id: 'electric-awning', label: 'Electric Open/Close Awning Upgrade', priceByVariant: { classic: 780, ecoscape: 0 } },
-          { id: 'bedouin', label: 'Bedouin Extendable Awning', price: 1310 },
-          { id: 'draft-skirt', label: 'Vinyl Draft Skirt', price: 840 },
-          { id: 'full-walls', label: 'Full Canvas Mesh Walls', price: 4590 },
-        ],
+          {
+            id: "std-awning",
+            label: "Manual Wind-Out Awning (standard)",
+            priceByVariant: {
+              classic: 0,
+              ecoscape: null
+            },
+            naNote: "Only on Classic"
+          },
+          {
+            id: "elec-awning",
+            label: "Electric Open & Close Upgrade (wind-out awning)",
+            priceByVariant: {
+              classic: 780,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "bedouin",
+            label: "Bedouin Extendable Awning",
+            priceByVariant: {
+              classic: 1310,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "draftskirt",
+            label: "Vinyl Draft Skirt (awning)",
+            price: 840
+          },
+          {
+            id: "full-walls",
+            label: "Full Canvas Mesh Walls (fully enclosed al fresco, incl. anti-flap kit)",
+            price: 4590
+          }
+        ]
       },
       {
-        id: 'comfort',
-        title: 'Comfort & Heating',
+        id: "comfort",
+        title: "Comfort & Heating",
         options: [
-          { id: 'space-heater', label: 'Space Heater', price: 1180 },
-          { id: 'diesel-heater', label: 'Diesel Air Heater 2kW', price: 2750 },
-          { id: 'rooftop-ac', label: 'Rooftop Reverse Cycle A/C', price: 3100 },
-          { id: 'outside-shower', label: 'Outside Hot & Cold Shower', price: 820 },
-          { id: 'internal-shower-furniture', label: 'Internal Shower Furniture', price: 275 },
-          { id: 'door-screens', label: 'Main Door & Rear Canvas Screens', price: 1150 },
-          { id: 'magnetic-blinds', label: 'Magnetic Thermal Blinds', price: 880 },
-          { id: 'fan-12v', label: '12V Sirocco Fan with Timer', price: 290 },
-          { id: 'office-desk', label: 'Office Desk (Lagun)', price: 1450 },
-          { id: 'shower-walls', label: 'Shower Walls', price: 1125 },
-          { id: 'blackout-ensuite', label: 'Blackout Ensuite Curtain', price: 590 },
-          { id: 'cockpit-curtain', label: 'Cockpit Blackout Curtain', price: 785 },
-        ],
+          {
+            id: "space-heater",
+            label: "Space Heater (uses diesel HWS)",
+            priceByVariant: {
+              classic: 1180,
+              ecoscape: 0
+            },
+            blockedBy: ["diesel-air"]
+          },
+          {
+            id: "diesel-air",
+            label: "Diesel Air Heater Ducted 2kW (with thermostat)",
+            price: 2750,
+            blockedBy: ["space-heater"]
+          },
+          {
+            id: "ac",
+            label: "Lightweight Rooftop Reverse Cycle A/C (3.1kW cooling, 2.8kW heating)",
+            priceByVariant: {
+              classic: 3100,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "outside-shower",
+            label: "Outside Hot & Cold Shower (rear, AUX water source)",
+            priceByVariant: {
+              classic: 820,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "shower-furniture",
+            label: "Internal Shower Furniture (toilet roll holder, caddy, towel hooks, pebble mat)",
+            priceByVariant: {
+              classic: 275,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "midge-screens",
+            label: "Main Door & Rear Door Canvas Screens with midge windows",
+            priceByVariant: {
+              classic: 1150,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "thermal-blinds",
+            label: "Magnetic Thermal Blinds (rear windows + cockpit thermal kit)",
+            priceByVariant: {
+              classic: 880,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "fan",
+            label: "12V Sirocco Fan with Timer (1st)",
+            price: 290
+          },
+          {
+            id: "fan2",
+            label: "12V Sirocco Fan with Timer (2nd)",
+            price: 290
+          },
+          {
+            id: "office-desk",
+            label: "Office Desk - Lagun adjustable table (internal door / bench / servery)",
+            priceByVariant: {
+              classic: 1450,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "outside-table",
+            label: "Outside \"Table within a Table\" (portable, hidden internal storage)",
+            priceByVariant: {
+              classic: 1310,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "shower-walls",
+            label: "Shower Walls - Colour Coded to Vehicle",
+            priceByVariant: {
+              classic: null,
+              ecoscape: 1125
+            },
+            naNote: "Only on EcoScape"
+          },
+          {
+            id: "ensuite-curtain",
+            label: "Blackout Ensuite Curtain",
+            priceByVariant: {
+              classic: 590,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "cockpit-curtain",
+            label: "Cockpit Blackout Curtain - Thermal backed on rail",
+            price: 785,
+            requires: ["cockpit-shelf"]
+          },
+          {
+            id: "cockpit-shelf",
+            label: "Cockpit Shelf - Lightweight composite shelf above front seats (Classic)",
+            priceByVariant: {
+              classic: 790,
+              ecoscape: null
+            },
+            naNote: "Only on Classic"
+          },
+          {
+            id: "cockpit-shelf-eco",
+            label: "Cockpit Shelf - Lightweight composite shelf above front seats (Ecoscape)",
+            priceByVariant: {
+              classic: null,
+              ecoscape: 400
+            },
+            naNote: "Only on EcoScape"
+          },
+          {
+            id: "magazine-rack",
+            label: "Magazine Racks + SS Drink Holder",
+            priceByVariant: {
+              classic: 210,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "storage-pouches",
+            label: "Storage Pouches behind Driver Side Seat",
+            priceByVariant: {
+              classic: 180,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "kargo-keeper",
+            label: "Kargo Keeper - behind Passenger Side Seat",
+            priceByVariant: {
+              classic: 220,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "kargo-organiser",
+            label: "Kargo Organiser - Passenger Cockpit Seat Back",
+            priceByVariant: {
+              classic: 220,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "storage-pocket",
+            label: "Storage Pocket at Rear of Passenger & Driver Long Seat",
+            priceByVariant: {
+              classic: 320,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "kargo-barrier",
+            label: "Kargo Barrier (front & rear between seats) + Handbag Pouch",
+            price: 345
+          }
+        ]
       },
       {
-        id: 'kitchen',
-        title: 'Kitchen',
+        id: "kitchen",
+        title: "Kitchen",
         options: [
-          { id: 'fridge-190l', label: 'Upgrade to 190L Fridge/Freezer', priceByVariant: { classic: 1880, ecoscape: 0 } },
-          { id: 'induction', label: 'Smart RV Dual Plate Induction', priceByVariant: { classic: 1100, ecoscape: 0 } },
-          { id: 'microwave', label: 'Microwave Oven', priceByVariant: { classic: 475, ecoscape: 0 } },
-          { id: 'wireless-charging', label: 'Wireless Benchtop USB Charging', price: 240 },
-          { id: 'gas-bbq', label: 'Upgrade to Marine Hooded Gas BBQ', price: 390 },
-          { id: 'wok-burner', label: 'Upgrade to WOK Burner', price: 390 },
-          { id: 'ninja-bbq', label: 'Upgrade to Galley Kitchen + Ninja BBQ', price: 590 },
-          { id: 'gas-bottle-2kg', label: 'Rear Mount Gas Bottle 2kg', priceByVariant: { classic: 365, ecoscape: 0 } },
-        ],
+          {
+            id: "large-fridge",
+            label: "Upgrade to 190L Fridge/Freezer Combo (145L fridge + 45L freezer)",
+            priceByVariant: {
+              classic: 1880,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "dual-induction",
+            label: "Smart RV Dual Plate Induction Cooktop (built-in)",
+            priceByVariant: {
+              classic: 1100,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "microwave",
+            label: "Microwave Oven (inside)",
+            priceByVariant: {
+              classic: 475,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "wireless-charge",
+            label: "Wireless Benchtop USB Charging",
+            priceByVariant: {
+              classic: 240,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "outside-bbq",
+            label: "Upgrade outside kitchen - Marine Hooded Gas BBQ (vs 2-burner)",
+            price: 390,
+            blockedBy: ["outside-wok"]
+          },
+          {
+            id: "outside-wok",
+            label: "Upgrade outside kitchen - WOK Burner",
+            price: 390,
+            blockedBy: ["outside-bbq"]
+          },
+          {
+            id: "galley-ninja",
+            label: "Upgrade to Galley Kitchen - Large Sink + Portable Ninja Electric BBQ",
+            priceByVariant: {
+              classic: 590,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "gas-bottle",
+            label: "Rear Mount Gas Bottle - 2kg + 2,700mm Quick Connect SS Gas Line",
+            priceByVariant: {
+              classic: 0,
+              ecoscape: null
+            },
+            naNote: "Only on Classic"
+          }
+        ]
       },
       {
-        id: 'power',
-        title: 'Power & Solar',
+        id: "power",
+        title: "Power & Solar",
         options: [
-          { id: 'battery-5000', label: 'Upgrade to 5000Wh SMART 48V', priceByVariant: { classic: 3720, ecoscape: 0 } },
-          { id: 'battery-second', label: 'Second 5000Wh Battery', price: 7820 },
-          { id: 'solar-400', label: 'Upgrade to 400W Solar', priceByVariant: { classic: 1250, ecoscape: 0 } },
-          { id: 'solar-800', label: 'Upgrade to 800W Solar (flyover)', price: 2330 },
-          { id: 'solar-1200', label: 'Upgrade to 1200W Solar', priceByVariant: { classic: 3410, ecoscape: 2160 } },
-          { id: 'portable-solar', label: 'Portable 220W EcoFlow Bifacial', price: 1710 },
-        ],
+          {
+            id: "5000wh",
+            label: "Upgrade to 5000Wh SMART 48V Battery (Classic)",
+            priceByVariant: {
+              classic: 3720,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "2nd-5000wh",
+            label: "Second 5000Wh SMART 48V Battery (total 10,000Wh)",
+            price: 7820,
+            requires: ["battery-wiring"]
+          },
+          {
+            id: "battery-wiring",
+            label: "2nd Battery Wiring Ready - Cabling etc",
+            price: 750
+          },
+          {
+            id: "solar400",
+            label: "Upgrade to 400W Roof Solar (Classic)",
+            priceByVariant: {
+              classic: 1250,
+              ecoscape: 0
+            },
+            blockedBy: ["solar800", "solar800-eco", "solar1200", "solar1200-eco"]
+          },
+          {
+            id: "solar800",
+            label: "Upgrade to 800W Roof Solar (flyover A/C thermal roof)",
+            priceByVariant: {
+              classic: 2330,
+              ecoscape: null
+            },
+            blockedBy: ["solar400", "solar800-eco", "solar1200", "solar1200-eco"],
+            naNote: "Only on Classic"
+          },
+          {
+            id: "solar800-eco",
+            label: "Upgrade to 800W Roof Solar - upgrade from included 400W (Ecoscape)",
+            priceByVariant: {
+              classic: null,
+              ecoscape: 1080
+            },
+            blockedBy: ["solar400", "solar800", "solar1200", "solar1200-eco"],
+            naNote: "Only on EcoScape"
+          },
+          {
+            id: "solar1200",
+            label: "Upgrade to 1200W Roof Solar (max capacity)",
+            priceByVariant: {
+              classic: 3410,
+              ecoscape: null
+            },
+            blockedBy: ["solar400", "solar800", "solar800-eco", "solar1200-eco"],
+            naNote: "Only on Classic"
+          },
+          {
+            id: "solar1200-eco",
+            label: "Upgrade to 1200W Roof Solar - upgrade from included 400W (Ecoscape)",
+            priceByVariant: {
+              classic: null,
+              ecoscape: 2160
+            },
+            blockedBy: ["solar400", "solar800", "solar800-eco", "solar1200"],
+            naNote: "Only on EcoScape"
+          },
+          {
+            id: "portable-solar",
+            label: "Portable 220W EcoFlow Bifacial Solar (10m lead)",
+            price: 1710
+          }
+        ]
       },
       {
-        id: 'multimedia',
-        title: 'Multimedia & Connectivity',
+        id: "multimedia",
+        title: "Multimedia & Connectivity",
         options: [
-          { id: 'smart-tv', label: 'Smart LED TV + Mounting', priceByVariant: { classic: 1730, ecoscape: 0 } },
-          { id: 'starlink-mini', label: 'Starlink Mini Kit', price: 365 },
-          { id: 'starlink-roof', label: 'Starlink Roof-Mounted Gen 3/4', price: 960 },
-        ],
+          {
+            id: "tv",
+            label: "Smart LED TV + SS Bracket + Swivel Knuckle + External Mounting",
+            priceByVariant: {
+              classic: 1730,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "starlink-mini",
+            label: "Starlink Kit for Starlink Mini (24V DC converter)",
+            price: 365,
+            blockedBy: ["starlink-gen", "starlink-perm"]
+          },
+          {
+            id: "starlink-gen",
+            label: "Starlink Kit Gen 1/2/3 (RJ45 socket into living area)",
+            price: 320,
+            blockedBy: ["starlink-mini", "starlink-perm"]
+          },
+          {
+            id: "starlink-perm",
+            label: "Starlink Permanently Roof Mounted Gen 3/4 Dish (hardwired modem)",
+            price: 960,
+            blockedBy: ["starlink-mini", "starlink-gen"]
+          }
+        ]
       },
       {
-        id: 'interior',
-        title: 'Interior Fit-Out',
+        id: "interior",
+        title: "Interior Fit-Out",
         options: [
-          { id: 'leather-seating', label: 'Solid Leather Seating (27 colours)', priceByVariant: { classic: 800, ecoscape: 0 } },
-          { id: 'dual-hide', label: 'Dual-Hide Leather Seating', priceByVariant: { classic: 1580, ecoscape: 780 } },
-          { id: 'vinyl-floor', label: 'Premium Vinyl Floor Upgrade', priceByVariant: { classic: 645, ecoscape: 0 } },
-          { id: 'underbench-led', label: 'Underbench LED Lights', price: 330 },
-          { id: 'charge-points', label: 'Charge Points (USB-C + 12V)', price: 280 },
-        ],
-      },
-    ],
+          {
+            id: "leather",
+            label: "Solid Leather Seating (27 colours, 100% Australian hides)",
+            priceByVariant: {
+              classic: 800,
+              ecoscape: 0
+            },
+            blockedBy: ["leather-dual"]
+          },
+          {
+            id: "leather-dual",
+            label: "Dual-Hide Leather Seating (full face, 2 colours)",
+            priceByVariant: {
+              classic: 1580,
+              ecoscape: null
+            },
+            blockedBy: ["leather"],
+            naNote: "Only on Classic"
+          },
+          {
+            id: "leather-dual-eco",
+            label: "Upgrade to Dual-Hide Leather Seating (upgrade from solid leather)",
+            priceByVariant: {
+              classic: null,
+              ecoscape: 780
+            },
+            naNote: "Only on EcoScape"
+          },
+          {
+            id: "floor-upgrade",
+            label: "Premium Vinyl Floor Plank Upgrade",
+            priceByVariant: {
+              classic: 645,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "reading-led",
+            label: "Dual Reading LED Stalk Lights at bed head (dimmable)",
+            priceByVariant: {
+              classic: 210,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "underbench-led",
+            label: "Underbench LED Lights - dimmable",
+            priceByVariant: {
+              classic: 330,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "kitchen-led",
+            label: "Outside Kitchen LED Light - Dual Colour",
+            priceByVariant: {
+              classic: 185,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "charge-points",
+            label: "Charge Points - USB-C + 12V Outlet (outside kitchen + inside sink cabinet)",
+            priceByVariant: {
+              classic: 280,
+              ecoscape: 0
+            }
+          },
+          {
+            id: "kargo-bags",
+            label: "Kargo Bags with Zips Above Front Seats",
+            priceByVariant: {
+              classic: 390,
+              ecoscape: 0
+            }
+          }
+        ]
+      }
+    ]
   },
 
   // -------------------------------------------------------------------------
