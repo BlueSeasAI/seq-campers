@@ -142,7 +142,7 @@ export default {
       title: 'Photos',
       type: 'array',
       description:
-        'Tip: select multiple files in your file picker (Ctrl+click or Shift+click on Windows) to upload them in one go. Then click each thumbnail to add an Alt text. Drag to reorder - the first photo is the main image shown in the listing grid.',
+        'Tip: select multiple files in your file picker to upload them in one go. On Windows: Ctrl+click (pick specific files) or Shift+click (pick a range). On a Mac: Cmd+click (specific) or Shift+click (range). You can also DRAG multiple selected files directly into the dropzone below. Then click each thumbnail to add Alt text. Drag thumbnails to reorder - the first photo is the main image shown in the listing grid.',
       of: [
         {
           type: 'image',
@@ -286,13 +286,7 @@ export default {
           name: 'stockNumber',
           title: 'SEQ stock number',
           type: 'string',
-          description: 'The 4-digit SEQ Campers stock number (e.g. 1234). Shown on the listing for internal reference.',
-          validation: (Rule) =>
-            Rule.custom((v) => {
-              if (!v) return true
-              if (!/^[0-9]{3,5}$/.test(v)) return 'Use 3-5 digits only, e.g. 1234'
-              return true
-            }),
+          description: 'The SEQ Campers stock number. Free text - can include letters and numbers (e.g. 1234, K1234, SC-2024-001). Shown on the listing for internal reference.',
         },
         {
           name: 'vin',
@@ -523,15 +517,19 @@ export default {
 
   ],
 
-  // Controls how each caravan appears in the listing sidebar of the studio
+  // Controls how each caravan appears in the listing sidebar of the studio.
+  // Per Bart 18 Jun: surface the stock number in the list so Maud + Shane can
+  // ID a van at a glance without opening it. Format: title on first line,
+  // "$price - Status  ·  #stockNumber" on the second.
   preview: {
     select: {
       title: 'title',
       price: 'price',
       status: 'status',
+      stockNumber: 'compliance.stockNumber',
       media: 'photos.0',
     },
-    prepare({ title, price, status, media }) {
+    prepare({ title, price, status, stockNumber, media }) {
       const statusLabel = {
         'for-sale': 'For Sale',
         'sold': 'SOLD',
@@ -543,9 +541,11 @@ export default {
         ? `$${price.toLocaleString('en-AU')}`
         : 'No price set'
 
+      const stockSuffix = stockNumber ? `  ·  #${stockNumber}` : ''
+
       return {
         title,
-        subtitle: `${priceStr}  -  ${statusLabel}`,
+        subtitle: `${priceStr}  -  ${statusLabel}${stockSuffix}`,
         media,
       }
     },

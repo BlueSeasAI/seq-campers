@@ -78,6 +78,17 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
     rel="stylesheet"
   />
 
+  <!-- Google Analytics 4 - tracks page views, events, sessions across every
+       page on the site. Per Bart 18 Jun: GA4 property "SEQ Campers Website".
+       Measurement ID G-E9QKQRP1X4. Loaded async so it never blocks rendering. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9QKQRP1X4"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-E9QKQRP1X4', { anonymize_ip: true });
+  </script>
+
   <slot name="head" />
   <style>
     /* Form thanks panel - HIGH CONTRAST against cream page background so
@@ -220,36 +231,34 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       pointer-events: none !important;
     }
 
-    /* Hide YouTube iframe's initial play-button overlay that flashes for
-       1-2 seconds before autoplay engages. We cover every video container
-       with a sandy/poster overlay that fades out after the buffer window.
-       Per Bart 16 Jun - "those play controls flashing on load look tacky".
+    /* SITE-WIDE VIDEO LOAD-FLASH COVER (4th iteration per Bart 18 Jun).
+       The YouTube iframe shows a 1-3s buffer state with its play button +
+       title bar before autoplay engages. The pointer-event blocker divs
+       (.hero-video-block, .pathway-tile-block, etc) already sit ON TOP of
+       every iframe at high z-index. So we just make those blocks START
+       opaque and fade their background to transparent over ~3s. They keep
+       blocking clicks forever; the visitor only sees the iframe after the
+       fade completes.
 
-       The fade animation runs once per page load + lives ABOVE the video
-       so any browser-injected UI is hidden underneath until it's safely
-       past the load flicker.
+       Earlier iterations used a ::before pseudo-element layered separately.
+       Hit z-index quirks. This is simpler: the block IS the cover.
 
-       Hero is the most prominent so gets the longest cover (2.4s total).
-       Tile videos get a shorter cover (1.6s total). */
-    .hero-video-block::before,
-    .pathway-tile-block::before,
-    .broll-block::before,
-    .new-tile-block::before,
-    .service-video-block::before,
-    .workshop-weekly-block::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      background: var(--sand, #F4EDE0);
-      pointer-events: none;
-      animation: video-cover-fade-out 1.6s 0.5s ease-out forwards;
+       Bumped durations conservatively for slow connections:
+         - HERO:   poster image, 4s visible (1.5s delay + 2.5s fade)
+         - TILES:  sand colour, 3.5s visible (0.5s delay + 3.0s fade) */
+    .hero-video-block,
+    .pathway-tile-block,
+    .broll-block,
+    .new-tile-block,
+    .service-video-block,
+    .workshop-weekly-block {
+      background-color: var(--sand, #F4EDE0) !important;
+      animation: video-cover-bg-fade-out 3.0s 0.5s ease-out forwards;
     }
-    /* Hero gets the poster image instead of a flat sand colour and a longer
-       cover window because it loads the largest video. */
-    .hero-video-block::before {
-      background: #1a1a1c url('/hero-poster.jpg') center/cover no-repeat;
-      animation: video-cover-fade-out 2.4s 1.2s ease-out forwards;
+    /* Hero - poster image instead of flat colour, longer delay (biggest file). */
+    .hero-video-block {
+      background: #1a1a1c url('/hero-poster.jpg') center/cover no-repeat !important;
+      animation: video-cover-bg-fade-out 2.5s 1.5s ease-out forwards;
     }
     /* /quote intro and /shows compilation video containers don't have a
        block element child. We use ::after on the media container itself. */
@@ -265,7 +274,12 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       z-index: 6;
       background: var(--sand, #F4EDE0);
       pointer-events: none;
-      animation: video-cover-fade-out 1.6s 0.5s ease-out forwards;
+      animation: video-cover-fade-out 3.0s 0.5s ease-out forwards;
+    }
+    @keyframes video-cover-bg-fade-out {
+      0%   { background-color: var(--sand, #F4EDE0); }
+      99%  { background-color: rgba(244, 237, 224, 0); }
+      100% { background: transparent !important; }
     }
     @keyframes video-cover-fade-out {
       0%   { opacity: 1; visibility: visible; }

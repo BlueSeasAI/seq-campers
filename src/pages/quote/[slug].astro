@@ -26,17 +26,17 @@ const exFactoryLocation = brand.brandFamily === 'Stockman' ? 'Melbourne' : 'Ball
 // used as the tile defaults on /new). Bart 16 Jun: "video placeholder
 // must come BEFORE they choose their model on every build page".
 const VIDEO_DEFAULTS = {
-  'kruiswagen': { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
-  'kruiser-t':  { id: 'xYf81xUZtNE', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
-  'kruiser-s':  { id: 'xYf81xUZtNE', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
-  'karavan':    { id: 'WwgapQt3xO4', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
-  'kube':       { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
-  'trekka':     { id: 'xYf81xUZtNE', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
-  'rover':      { id: 'WwgapQt3xO4', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
-  'pod':        { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon. Maud refreshes this in Sanity.' },
+  'kruiswagen': { id: 'tozC7prVbOg', caption: null },
+  'kruiser-t':  { id: 'xYf81xUZtNE', caption: null },
+  'kruiser-s':  { id: 'xYf81xUZtNE', caption: null },
+  'karavan':    { id: 'WwgapQt3xO4', caption: null },
+  'kube':       { id: 'tozC7prVbOg', caption: null },
+  'trekka':     { id: 'xYf81xUZtNE', caption: null },
+  'rover':      { id: 'WwgapQt3xO4', caption: null },
+  'pod':        { id: 'tozC7prVbOg', caption: null },
 }
 
-let introVideo = VIDEO_DEFAULTS[brand.slug] || { id: 'tozC7prVbOg', caption: 'Walk-around video coming soon.' }
+let introVideo = VIDEO_DEFAULTS[brand.slug] || { id: 'tozC7prVbOg', caption: null }
 try {
   const settings = await getSiteSettings() || {}
   const slotKey = `quoteVideo_${brand.slug.replace(/-/g, '_')}`
