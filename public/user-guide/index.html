@@ -200,15 +200,21 @@
     .toc h3 { font-size: 0.95rem; }
     .toc li { margin-bottom: 6px; font-size: 1rem; }
 
-    /* Section H2: NO forced page break - they flow naturally so short
-       sections stack with neighbours. Keep heading attached to next block. */
+    /* Default: each section H2 starts a new page (per Bart 18 Jun -
+       most sections deserve their own page). The only exceptions are
+       the very short sections marked with .flow which let them stack
+       with the previous section on the same page. */
     h2 {
       margin: 18px 0 8px;
       font-size: 1.3rem;
+      page-break-before: always;
+      break-before: page;
       page-break-after: avoid;
       break-after: avoid;
-      page-break-before: auto;
-      break-before: auto;
+    }
+    h2.flow {
+      page-break-before: auto !important;
+      break-before: auto !important;
     }
     h3 {
       margin: 14px 0 6px;
@@ -474,7 +480,7 @@
   </ol>
 
   <!-- 5. STOCK PAGE -->
-  <h2 id="stock">5. Stock (used caravans) page</h2>
+  <h2 id="stock" class="flow">5. Stock (used caravans) page</h2>
 
   <p>This menu is a shortcut to your used caravans. Same as Caravans &rarr; For Sale, but filtered to just the used ones.</p>
   <p>Click <span class="ui">🚐 Stock (used caravans) page</span> - a list of every used caravan currently for sale, sorted most expensive first.</p>
@@ -485,7 +491,7 @@
   </div>
 
   <!-- 6. VIDEOS PAGE -->
-  <h2 id="videos">6. Videos page</h2>
+  <h2 id="videos" class="flow">6. Videos page</h2>
 
   <p>Click <span class="ui">🎥 Videos page</span>. Two sections: <strong>Kimberley Kingdom</strong> (6 slots) and <strong>Stockman Convoy</strong> (6 slots).</p>
 
@@ -499,7 +505,7 @@
   <p>Leave a slot blank to hide that tile completely on the live page.</p>
 
   <!-- 7. SERVICE PAGE -->
-  <h2 id="service">7. Service &amp; workshop page</h2>
+  <h2 id="service" class="flow">7. Service &amp; workshop page</h2>
 
   <p>Click <span class="ui">🔧 Service &amp; workshop page</span>. Two sections.</p>
 
@@ -603,7 +609,7 @@
   </ol>
 
   <!-- 11. AEO KEYWORDS -->
-  <h2 id="aeo">11. AEO Keywords (search strategy)</h2>
+  <h2 id="aeo" class="flow">11. AEO Keywords (search strategy)</h2>
 
   <p>Click <span class="ui">🎯 AEO Keywords</span>. This is a <strong>reference table</strong>, not a live wiring - changing a keyword here doesn't automatically rewrite the website. It exists so you can see, sort and prioritise the search-strategy alongside the other content.</p>
 
