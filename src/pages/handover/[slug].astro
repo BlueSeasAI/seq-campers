@@ -152,17 +152,18 @@ const isPlaceholder = !page
           {(section.videos || []).map((v) => {
             const vid = youtubeId(v.youtubeUrl)
             return vid ? (
-              <div class="handover-video-tile">
-                <div class="handover-video-media">
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${vid}?modestbranding=1&rel=0&iv_load_policy=3&playsinline=1`}
-                    title={v.title}
-                    frameborder="0"
-                    allow="encrypted-media; picture-in-picture"
-                    allowfullscreen
+              <div class="handover-video-tile" data-handover-tile data-yid={vid}>
+                <button type="button" class="handover-video-media" aria-label={`Play: ${v.title}`}>
+                  <img
+                    src={`https://i.ytimg.com/vi/${vid}/maxresdefault.jpg`}
+                    alt={v.title}
                     loading="lazy"
-                  ></iframe>
-                </div>
+                    onerror="this.src='https://i.ytimg.com/vi/'+this.parentElement.parentElement.dataset.yid+'/hqdefault.jpg'"
+                  />
+                  <span class="handover-play-overlay" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="56" height="56" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </span>
+                </button>
                 <div class="handover-video-meta">
                   <h3 class="handover-video-title">{v.title}</h3>
                   {v.description && <p class="handover-video-desc">{v.description}</p>}
@@ -179,7 +180,7 @@ const isPlaceholder = !page
     <div class="container" style="text-align:center; max-width:640px;">
       <h2 style="margin-bottom:10px;">Need a hand?</h2>
       <p style="color:var(--muted); margin-bottom:18px;">
-        Anything you're not sure about - give us a call. We are at the workshop most days and happy to walk you through anything.
+        Anything you're not sure about? Give us a call.
       </p>
       <p style="font-family:'Inter Tight',sans-serif; font-weight:700; font-size:1.1rem;">
         <a href="tel:0753707933" style="color:var(--rust);">(07) 5370 7933</a>
@@ -188,6 +189,31 @@ const isPlaceholder = !page
       </p>
     </div>
   </section>
+
+  <!-- Click-to-play: until the user clicks, no YouTube UI is loaded. On
+       click, we swap in an iframe with autoplay+controls so the user can
+       watch with sound + pause/seek. -->
+  <script is:inline>
+    (function () {
+      document.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-handover-tile] .handover-video-media')
+        if (!btn) return
+        const tile = btn.closest('[data-handover-tile]')
+        if (!tile || tile.dataset.playing === '1') return
+        const vid = tile.dataset.yid
+        if (!vid) return
+        const iframe = document.createElement('iframe')
+        iframe.src = 'https://www.youtube-nocookie.com/embed/' + vid +
+          '?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1'
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen')
+        iframe.setAttribute('allowfullscreen', '')
+        iframe.title = btn.getAttribute('aria-label') || 'Handover video'
+        btn.innerHTML = ''
+        btn.appendChild(iframe)
+        tile.dataset.playing = '1'
+      })
+    })()
+  </script>
 
   <style>
     .handover-section { padding-top: 40px; padding-bottom: 40px; }
@@ -208,11 +234,29 @@ const isPlaceholder = !page
       transform: translateY(-2px);
       box-shadow: 0 10px 26px rgba(42,22,8,0.12);
     }
+    /* The thumb is a <button> so it has the right semantics + keyboard support.
+       Becomes a fully-opaque thumbnail with a centered red play button until
+       clicked. After click the iframe replaces it. */
     .handover-video-media {
       position: relative;
+      display: block;
+      width: 100%;
       aspect-ratio: 16 / 9;
       background: #1a1a1c;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      overflow: hidden;
     }
+    .handover-video-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .handover-video-tile:hover .handover-video-media img { transform: scale(1.04); }
     .handover-video-media iframe {
       position: absolute;
       inset: 0;
@@ -220,6 +264,29 @@ const isPlaceholder = !page
       height: 100%;
       border: 0;
     }
+    .handover-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .handover-play-overlay svg {
+      color: #fff;
+      background: var(--rust, #C0341A);
+      border-radius: 50%;
+      padding: 14px 12px 14px 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .handover-video-tile:hover .handover-play-overlay svg {
+      transform: scale(1.08);
+      background: #A52910;
+    }
+    /* When playing, hide the play overlay - the iframe replaces it */
+    .handover-video-tile[data-playing="1"] .handover-play-overlay { display: none; }
+
     .handover-video-meta { padding: 14px 16px 16px; }
     .handover-video-title {
       font-family: 'Inter Tight', sans-serif;

@@ -231,6 +231,38 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       pointer-events: none !important;
     }
 
+    /* CROP every autoplay-loop iframe so YouTube's title bar (top ~50px)
+       and controls bar (bottom ~50px) are PHYSICALLY OFF-SCREEN inside
+       the container. The container clips them via overflow:hidden. The
+       iframe is sized 150% taller than the container and offset by -25%
+       so only the middle 50% of the iframe shows. The video centre stays
+       visible; YouTube's UI is permanently outside the visible window.
+       Works regardless of YouTube's controls state. Per Bart 18 Jun -
+       "still visible on every fucking page" - 5th iteration. */
+    .hero-video-bg,
+    .pathway-tile-media,
+    .broll-media,
+    .new-tile-media,
+    .service-video-media,
+    .workshop-weekly-media,
+    .quote-intro-media,
+    .shows-compilation-media {
+      overflow: hidden !important;
+    }
+    .pathway-tile-media iframe,
+    .broll-media iframe,
+    .new-tile-media iframe,
+    .service-video-media iframe,
+    .workshop-weekly-media iframe,
+    .quote-intro-media iframe {
+      position: absolute !important;
+      top: -25% !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 150% !important;
+      pointer-events: none !important;
+    }
+
     /* SITE-WIDE VIDEO LOAD-FLASH COVER (4th iteration per Bart 18 Jun).
        The YouTube iframe shows a 1-3s buffer state with its play button +
        title bar before autoplay engages. The pointer-event blocker divs
