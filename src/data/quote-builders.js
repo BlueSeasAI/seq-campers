@@ -973,67 +973,130 @@ export const quoteBuilders = [
   },
 
   // -------------------------------------------------------------------------
-  // STOCKMAN TREKKA (rebuilt - Maud's source page is broken)
-  // Placeholder configurator - real options to be confirmed with Shane.
+  // STOCKMAN TREKKA 01 - ported from Bart's trekka.html (18 Jun 2026)
+  // 3 variants: On-Road, Ultra XT, Platinum XT. Dealer delivery $4,500
+  // (subject to fuel surcharge) - note higher than other models.
   // -------------------------------------------------------------------------
   {
     slug: 'trekka',
     brandFamily: 'Stockman',
-    name: 'Stockman Trekka',
+    name: 'Stockman Trekka 01',
     intro: 'The serious off-road camper trailer - tough, light, made for tracks.',
-    placeholderNote: "Trekka configurator is being rebuilt. The options below are indicative - send us your spec and we'll come back with an accurate quote.",
+    delivery: 4500,
     variants: [
       {
-        id: 'trekka-standard',
-        name: 'Trekka Standard',
-        basePrice: 62000,
+        id: 'onroad',
+        name: 'Trekka 01 On-Road',
+        basePrice: 99990,
         included: [
+          'Tare 2,435kg / ATM 3,100kg',
           'Australian-built galvanised chassis',
-          'Independent off-road suspension',
           'Hot-dip galvanised everywhere',
-          'Hard-floor camper trailer design',
-          '150Ah AGM battery',
-          '200W solar',
-          'Slide-out kitchen (sink + cooker)',
-          'Standard roll-out awning',
+          'Hard-floor off-road camper trailer',
         ],
       },
       {
-        id: 'trekka-plus',
-        name: 'Trekka Plus',
-        basePrice: 71000,
+        id: 'ultra',
+        name: 'Trekka 01 Ultra XT',
+        basePrice: 114990,
         included: [
-          'Everything in Standard, plus:',
-          '200Ah lithium battery',
-          '400W solar',
-          'Slide-out kitchen with fridge',
-          'Premium awning with walls',
-          'Internal upgrades',
+          'Everything in On-Road, plus:',
+          'Tare 2,485kg / ATM 3,100kg',
+          'Cruisemaster XT Airbag Suspension + Dual Shocks',
+          'Webasto Reverse-Cycle A/C (off-grid capable)',
+          '17" Alloy + 265/65/17 Maxxis RAZR A/T tyres',
+          'Stone Guard + Underbody Rubber Flap',
+        ],
+      },
+      {
+        id: 'platinum',
+        name: 'Trekka 01 Platinum XT',
+        basePrice: 129990,
+        included: [
+          'Everything in Ultra XT, plus:',
+          'Tare 2,540kg / ATM 3,400kg (engineered)',
+          'Cruisemaster BCS Auto-Leveling',
+          'Custom Exterior Colour (Autumn Green / Sand / Grey)',
+          'Internal Bench-Top Induction Cooker',
+          '30L Drawer Fridge in External Kitchen',
+          '24" TV on Swing Bracket',
+          'Rear Protection Bar',
+          '220W Portable Solar Blanket + Rear Anderson Plug',
         ],
       },
     ],
     categories: [
       {
-        id: 'power',
-        title: 'Power & Solar',
+        id: 'suspension',
+        title: 'Suspension, Braking & Chassis',
         options: [
-          { id: 'battery-300ah', label: 'Upgrade to 300Ah lithium', price: 'POA' },
-          { id: 'solar-600', label: 'Upgrade to 600W solar', price: 'POA' },
+          { id: 'airbag', label: 'Cruisemaster XT Airbag Suspension + Dual Shocks', note: 'Air compressor outlet, manual controls, softer off-road ride.', naNote: 'Not on On-Road', priceByVariant: { onroad: null, ultra: 0, platinum: 0 } },
+          { id: 'bcs', label: 'Cruisemaster BCS Auto-Leveling', naNote: 'Only on Platinum XT', priceByVariant: { onroad: null, ultra: null, platinum: 0 } },
+          { id: 'tyres', label: '17" Alloy + 265/65/17 Maxxis RAZR A/T tyres', naNote: 'Not on On-Road', priceByVariant: { onroad: null, ultra: 0, platinum: 0 } },
+          { id: 'atm', label: 'Engineered ATM Upgrade to 3,400kg', note: 'Heavier payload capacity. Available as an option on Ultra XT (Platinum XT has it standard).', naNote: 'Not on On-Road', priceByVariant: { onroad: null, ultra: 250, platinum: 0 } },
+          { id: 'antisway', label: 'Cruisemaster Bosch Anti-Sway Braking', price: 3400 },
+          { id: 'stoneguard', label: 'Stone Guard + Underbody Rubber Flap', priceByVariant: { onroad: 2299, ultra: 0, platinum: 0 } },
+          { id: 'rearbar', label: 'Rear Protection Bar', priceByVariant: { onroad: 1400, ultra: 1400, platinum: 0 } },
+          { id: 'camera', label: 'Reverse Camera + Bluetooth 5" Screen', price: 1300 },
+        ],
+      },
+      {
+        id: 'exterior',
+        title: 'Exterior & Colour',
+        options: [
+          { id: 'colour', label: 'Custom Exterior Colour (Autumn Green / Sand / Grey)', priceByVariant: { onroad: 5999, ultra: 5999, platinum: 0 } },
         ],
       },
       {
         id: 'kitchen',
-        title: 'Kitchen',
+        title: 'Kitchen, Fridge & A/C',
         options: [
-          { id: 'internal-kitchen', label: 'Internal kitchen layout', price: 'POA' },
-          { id: 'fridge-upgrade', label: 'Fridge upgrade', price: 'POA' },
+          { id: 'ac', label: 'Webasto Reverse-Cycle A/C (off-grid capable)', priceByVariant: { onroad: 3999, ultra: 0, platinum: 0 } },
+          { id: 'intcooker', label: 'Internal Bench-Top Induction Cooker', priceByVariant: { onroad: 450, ultra: 450, platinum: 0 } },
+          { id: 'drawerfridge', label: '30L Drawer Fridge in External Kitchen', priceByVariant: { onroad: 1399, ultra: 1399, platinum: 0 } },
+        ],
+      },
+      {
+        id: 'multimedia',
+        title: 'Multimedia',
+        options: [
+          { id: 'tv', label: '24" TV on Swing Bracket', priceByVariant: { onroad: 900, ultra: 900, platinum: 0 } },
+        ],
+      },
+      {
+        id: 'power',
+        title: 'Power & Solar',
+        options: [
+          { id: 'extra-300ah', label: 'Extra 300Ah Lithium Battery', note: 'Add multiple if needed - per bank.', price: 1899 },
+          { id: 'extra-solar-200', label: 'Extra 200W Roof Solar Panel', note: 'Add multiple if needed - per panel.', price: 799 },
+          { id: 'solarblanket', label: '220W Portable Solar Blanket + Rear Anderson Plug', priceByVariant: { onroad: 500, ultra: 500, platinum: 0 } },
         ],
       },
       {
         id: 'awnings',
-        title: 'Awnings & Annex',
+        title: 'Awnings & Walls',
         options: [
-          { id: 'premium-walls', label: 'Premium awning with walls + floor', price: 'POA' },
+          { id: 'porch', label: 'Porch Front Extension + Joiner', price: 1100 },
+          { id: 'rearwall', label: 'Rear Wall + Bar Joiner', price: 900 },
+          { id: 'longwall', label: 'Long Wall Privacy Screen', price: 500 },
+          { id: 'table', label: 'Fold-Out Side Table', price: 340 },
+        ],
+      },
+      {
+        id: 'carrying',
+        title: 'Carrying & Storage',
+        options: [
+          { id: 'fridgeslide', label: 'XL Heavy-Duty Fridge Slide (up to 95L)', price: 650 },
+          { id: 'bikefork', label: 'Bike-Slide Fork Mounting Style', price: 1950 },
+          { id: 'bikewheels', label: 'Bike-Slide Wheels-On Style for 2 E-Bikes', price: 2500 },
+          { id: 'shovel', label: 'Shovel Mounts (set of 2)', price: 150 },
+        ],
+      },
+      {
+        id: 'extras',
+        title: 'Extras',
+        options: [
+          { id: 'sullage', label: 'Sullage Pack', price: 350 },
         ],
       },
     ],
