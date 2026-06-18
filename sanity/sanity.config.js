@@ -4,7 +4,7 @@ import {
   TagIcon, ClockIcon, PauseIcon, CheckmarkCircleIcon, OlistIcon,
   PlayIcon, CogIcon, EditIcon, FilterIcon, CalendarIcon,
   DocumentTextIcon, HelpCircleIcon, HomeIcon, RocketIcon,
-  SearchIcon,
+  SearchIcon, TrashIcon,
 } from '@sanity/icons'
 // Video doc schema removed 1 June 2026. /videos page now reads from
 // videosPageSettings (12 fixed slots), home page videos from siteSettings.
@@ -354,6 +354,45 @@ export default defineConfig({
     }),
   ],
   schema: { types: schemaTypes },
+
+  // Per Bart 18 Jun: make the DELETE action far more prominent on
+  // caravan documents - Maud + Shane couldn't find it in the default
+  // kebab menu. We wrap the built-in delete action with a clearer
+  // label, a trash icon, critical (red) tone, and reorder it to
+  // appear right next to Publish so it's the second-most-visible
+  // secondary action.
+  document: {
+    actions: (prev, context) => {
+      if (context.schemaType !== 'caravan') return prev
+
+      // Find the delete action and reposition it to second slot (right
+      // after publish) with prominent styling.
+      const deleteIdx = prev.findIndex((a) => a?.action === 'delete')
+      if (deleteIdx === -1) return prev
+
+      const ordered = [...prev]
+      const [deleteAction] = ordered.splice(deleteIdx, 1)
+
+      // Wrap the action so we can tweak its label, icon and tone.
+      const wrappedDelete = (props) => {
+        const original = deleteAction(props)
+        if (!original) return null
+        return {
+          ...original,
+          label: original.label === 'Delete' ? 'Delete this listing' : original.label,
+          icon: TrashIcon,
+          tone: 'critical',
+        }
+      }
+      wrappedDelete.action = 'delete'
+
+      // Place the wrapped delete just after publish (index 1) so it
+      // shows up at the very top of the secondary-actions dropdown.
+      ordered.splice(1, 0, wrappedDelete)
+      return ordered
+    },
+  },
+
   studio: {
     components: {
       logo: SeqCampersLogo,
