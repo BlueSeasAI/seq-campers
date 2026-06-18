@@ -495,6 +495,12 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           }
           try {
             const data = new FormData(form)
+            // Force-set source_page tracking AT SUBMIT TIME so timing issues
+            // (cache, DOMContentLoaded race) can't leave these blank. Per
+            // Bart 18 Jun - previous JS-only approach left fields empty
+            // on his test. FormData.set replaces if present, adds if not.
+            data.set('source_page_url', window.location.href)
+            data.set('source_page_title', document.title || '')
             const body = new URLSearchParams()
             for (const [k, v] of data.entries()) body.append(k, String(v))
             const res = await fetch('/', {
@@ -512,10 +518,12 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
               '</div>' +
               '<h2 class="inline-form-thanks-title">Thanks! Your message is on its way.</h2>' +
               '<p class="inline-form-thanks-body">We\'ll come back to you shortly with the next step. Most enquiries get a reply same day.</p>' +
-              '<div class="inline-form-thanks-cta">' +
-              '<span class="inline-form-thanks-label">Need us sooner?</span>' +
+              '<div class="inline-form-thanks-cta" style="flex-direction:column; gap:14px;">' +
+              '<span class="inline-form-thanks-label" style="margin-bottom:0; font-size:1rem;">Need us sooner?</span>' +
+              '<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px 32px;">' +
               '<a href="tel:0753707933">Call (07) 5370 7933</a>' +
               '<a href="sms:0422624920">Text 0422 624 920</a>' +
+              '</div>' +
               '</div>'
             /* Replace the WHOLE enquiry section so the "Let\'s make sure
                this van is right for you" heading + subheading + form all
