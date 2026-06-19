@@ -545,7 +545,8 @@ export const quoteBuilders = [
             id: "gvm",
             label: "GVM Upgrade Kit (4,430kg, upgraded suspension, KK remote reservoir shocks)",
             price: 8645,
-            requires: ["alloy-rims"]
+            requires: ["alloy-rims"],
+            depNote: "Add the KK Alloy Wheels first"
           },
           {
             id: "longtank2",
@@ -732,7 +733,8 @@ export const quoteBuilders = [
               classic: 3575,
               ecoscape: 0
             },
-            blockedBy: ["steel-rims"]
+            blockedBy: ["steel-rims"],
+            blockedNote: "Remove steel rims first"
           }
         ]
       },

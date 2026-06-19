@@ -175,10 +175,12 @@ try {
                 <span>Options (<span data-summary-count>0</span>)</span>
                 <strong data-summary-options>+$0</strong>
               </div>
-              <div class="qb-summary-options-line" data-flat-delivery>
-                <span>Dealer delivery <small style="color:var(--muted); font-size:0.78rem;">(subj. to fuel surcharge)</small></span>
-                <strong data-summary-delivery>+$3,500</strong>
-              </div>
+              {!brand.onRoad && (
+                <div class="qb-summary-options-line" data-flat-delivery>
+                  <span>Dealer delivery <small style="color:var(--muted); font-size:0.78rem;">(subj. to fuel surcharge)</small></span>
+                  <strong data-summary-delivery>+$3,500</strong>
+                </div>
+              )}
               <!-- Itemised on-road costs - only shown for models that carry an
                    onRoad{} config (the Kruiswagen motorhome). Hidden otherwise. -->
               <div data-onroad-block hidden>
@@ -575,7 +577,7 @@ try {
           statusEl.textContent = 'Within GVM - ' + kg(readyPayload) + ' of payload to spare for your gear.'
         } else if (!hasGvmKit) {
           block.classList.add('qb-weight-warn')
-          statusEl.textContent = 'Over GVM by ' + kg(Math.abs(readyPayload)) + '. Add the GVM Upgrade Kit (Vehicle Body section) to lift your legal limit to 4,430kg.'
+          statusEl.textContent = 'Over GVM by ' + kg(Math.abs(readyPayload)) + '. Add the GVM Upgrade Kit (needs the KK Alloy Off-Road Wheels first) to lift your legal limit to 4,430kg.'
         } else {
           block.classList.add('qb-weight-over')
           statusEl.textContent = 'Over GVM by ' + kg(Math.abs(readyPayload)) + ' even with the upgrade. Remove some heavy options or reduce your load.'
