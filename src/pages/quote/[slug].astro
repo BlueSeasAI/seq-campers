@@ -516,7 +516,11 @@ try {
       // correct the fineprint (this model INCLUDES stamp duty + rego).
       if (onRoad) {
         const flat = $('[data-flat-delivery]')
-        if (flat) flat.hidden = true
+        // Use inline display:none, not the `hidden` attribute - the
+        // .qb-summary-options-line rule sets display:flex which overrides
+        // [hidden], leaving the old flat delivery line visible alongside
+        // the itemised on-road breakdown (Bart spotted the duplicate).
+        if (flat) flat.style.display = 'none'
         const block = $('[data-onroad-block]')
         if (block) block.hidden = false
         const fineprint = $('[data-fineprint]')
