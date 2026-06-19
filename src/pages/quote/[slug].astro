@@ -175,15 +175,49 @@ try {
                 <span>Options (<span data-summary-count>0</span>)</span>
                 <strong data-summary-options>+$0</strong>
               </div>
-              <div class="qb-summary-options-line">
+              <div class="qb-summary-options-line" data-flat-delivery>
                 <span>Dealer delivery <small style="color:var(--muted); font-size:0.78rem;">(subj. to fuel surcharge)</small></span>
                 <strong data-summary-delivery>+$3,500</strong>
               </div>
+              <!-- Itemised on-road costs - only shown for models that carry an
+                   onRoad{} config (the Kruiswagen motorhome). Hidden otherwise. -->
+              <div data-onroad-block hidden>
+                <div class="qb-summary-options-line">
+                  <span>Stamp duty <small style="color:var(--muted); font-size:0.78rem;">(5%)</small></span>
+                  <strong data-onroad-stamp>+$0</strong>
+                </div>
+                <div class="qb-summary-options-line">
+                  <span>Registration, CTP &amp; fees</span>
+                  <strong data-onroad-rego>+$0</strong>
+                </div>
+                <div class="qb-summary-options-line">
+                  <span>Dealer delivery &amp; handover</span>
+                  <strong data-onroad-delivery>+$0</strong>
+                </div>
+              </div>
               <div class="qb-summary-total">
-                <span>Indicative total</span>
+                <span>Indicative driveaway</span>
                 <strong data-summary-total>$0</strong>
               </div>
-              <p class="qb-summary-fineprint">
+              <!-- Weight & payload panel - only shown for models that carry a
+                   weight{} config + per-variant tare (the Kruiswagen). -->
+              <div class="qb-weight" data-weight-block hidden>
+                <div class="qb-weight-title">Weight &amp; payload</div>
+                <div class="qb-weight-row">
+                  <span>Est. TARE (dry, fitted)</span>
+                  <strong data-weight-tare>&mdash;</strong>
+                </div>
+                <div class="qb-weight-row">
+                  <span>GVM limit</span>
+                  <strong data-weight-gvm>&mdash;</strong>
+                </div>
+                <div class="qb-weight-row qb-weight-payload-row">
+                  <span>Payload, ready to travel</span>
+                  <strong data-weight-payload>&mdash;</strong>
+                </div>
+                <div class="qb-weight-status" data-weight-status></div>
+              </div>
+              <p class="qb-summary-fineprint" data-fineprint>
                 Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST. Excludes stamp duty + registration.
               </p>
               <a href="#qb-finish" class="btn-primary qb-summary-cta">Finish + send to me ↓</a>
@@ -452,15 +486,96 @@ try {
         })
       }
 
-      // Dealer delivery is per-model - motorhomes carry ~$19k (5% stamp duty),
-      // the Rover is $3,500. Reads variant.delivery, then brand.delivery, then
-      // falls back to $3,500 so every existing model is unchanged.
+      // ─── DELIVERY / ON-ROAD COSTS ─────────────────────────────────
+      // Most models carry a flat dealer-delivery number (variant.delivery,
+      // then brand.delivery, then $3,500). The Kruiswagen is a registered
+      // motor vehicle, so it instead carries an onRoad{} config and the
+      // delivery line becomes a sliding stamp-duty + rego + delivery total
+      // that moves with the build price. See quote-builders.js.
       const DEFAULT_DELIVERY = 3500
-      function deliveryFor(variantId) {
+      const onRoad = brandData.onRoad || null
+      const weightCfg = brandData.weight || null
+
+      function flatDeliveryFor(variantId) {
         const v = variantData[variantId]
         if (v && typeof v.delivery === 'number') return v.delivery
         if (typeof brandData.delivery === 'number') return brandData.delivery
         return DEFAULT_DELIVERY
+      }
+
+      // Returns { stamp, rego, delivery, total } for onRoad models.
+      function onRoadFor(unitTotal) {
+        const stamp = Math.round((onRoad.stampDutyRate || 0) * unitTotal)
+        const rego = onRoad.registration || 0
+        const delivery = onRoad.dealerDelivery || 0
+        return { stamp, rego, delivery, total: stamp + rego + delivery }
+      }
+
+      // One-time visibility setup (Kruiswagen only) - swap the flat delivery
+      // line for the itemised on-road block, reveal the weight panel, and
+      // correct the fineprint (this model INCLUDES stamp duty + rego).
+      if (onRoad) {
+        const flat = $('[data-flat-delivery]')
+        if (flat) flat.hidden = true
+        const block = $('[data-onroad-block]')
+        if (block) block.hidden = false
+        const fineprint = $('[data-fineprint]')
+        if (fineprint) fineprint.textContent =
+          'Indicative driveaway - includes 5% stamp duty, registration/CTP & fees, and dealer delivery & handover. Final quote confirmed by SEQ Campers within one business day. Incl. GST.'
+      }
+      if (weightCfg) {
+        const wb = $('[data-weight-block]')
+        if (wb) wb.hidden = false
+      }
+
+      // ─── WEIGHT / GVM PAYLOAD (weight{} models only) ──────────────
+      function renderWeight(v) {
+        const w = weightCfg
+        const baseTare = typeof v.tare === 'number' ? v.tare : 0
+
+        // Hardware weight: add an option's kg only when it is a genuine paid
+        // add for this variant (price > 0). Included items (price 0) are
+        // already inside baseTare, so they never double-count.
+        let added = 0
+        $$('.qb-opt').forEach((optEl) => {
+          const id = optEl.dataset.optId
+          if (!selected.has(id)) return
+          const p = getOptionPrice(optEl, currentVariant)
+          if (typeof p === 'number' && p > 0) added += (w.weights[id] || 0)
+        })
+        const estTare = Math.round(baseTare + added)
+
+        const hasGvmKit = isPresent(w.gvmOptionId)
+        const gvm = hasGvmKit ? w.upgradedGvm : w.baseGvm
+        const grossPayload = gvm - estTare
+
+        // Consumables: count when the tank is PRESENT (Included or ticked) -
+        // TARE is dry, so full tanks add on top.
+        let fuel = w.fuelBase
+        ;(w.fuelExtra || []).forEach((f) => { if (isPresent(f.optId)) fuel += f.kg })
+        let water = w.waterBase
+        ;(w.waterExtra || []).forEach((wt) => { if (isPresent(wt.optId)) water += wt.kg })
+        const travelLoad = w.passengers + fuel + water
+        const readyPayload = Math.round(grossPayload - travelLoad)
+
+        const kg = (n) => Math.round(n).toLocaleString('en-AU') + 'kg'
+        $('[data-weight-tare]').textContent = kg(estTare)
+        $('[data-weight-gvm]').textContent = kg(gvm) + (hasGvmKit ? ' (upgraded)' : '')
+        $('[data-weight-payload]').textContent = (readyPayload < 0 ? '-' : '') + kg(Math.abs(readyPayload))
+
+        const statusEl = $('[data-weight-status]')
+        const block = $('[data-weight-block]')
+        block.classList.remove('qb-weight-ok', 'qb-weight-warn', 'qb-weight-over')
+        if (readyPayload >= 0) {
+          block.classList.add('qb-weight-ok')
+          statusEl.textContent = 'Within GVM - ' + kg(readyPayload) + ' of payload to spare for your gear.'
+        } else if (!hasGvmKit) {
+          block.classList.add('qb-weight-warn')
+          statusEl.textContent = 'Over GVM by ' + kg(Math.abs(readyPayload)) + '. Add the GVM Upgrade Kit (Vehicle Body section) to lift your legal limit to 4,430kg.'
+        } else {
+          block.classList.add('qb-weight-over')
+          statusEl.textContent = 'Over GVM by ' + kg(Math.abs(readyPayload)) + ' even with the upgrade. Remove some heavy options or reduce your load.'
+        }
       }
 
       function renderSummary() {
@@ -479,10 +594,24 @@ try {
         })
         $('[data-summary-count]').textContent = count
         $('[data-summary-options]').textContent = fmtSigned(optionsTotal)
-        const delivery = deliveryFor(currentVariant)
-        $('[data-summary-delivery]').textContent = fmtSigned(delivery)
-        const grandTotal = v.basePrice + optionsTotal + delivery
+
+        // Delivery / on-road line(s)
+        const unitTotal = v.basePrice + optionsTotal
+        let delivery
+        if (onRoad) {
+          const r = onRoadFor(unitTotal)
+          delivery = r.total
+          $('[data-onroad-stamp]').textContent = fmtSigned(r.stamp)
+          $('[data-onroad-rego]').textContent = fmtSigned(r.rego)
+          $('[data-onroad-delivery]').textContent = fmtSigned(r.delivery)
+        } else {
+          delivery = flatDeliveryFor(currentVariant)
+          $('[data-summary-delivery]').textContent = fmtSigned(delivery)
+        }
+        const grandTotal = unitTotal + delivery
         $('[data-summary-total]').textContent = fmt(grandTotal)
+
+        if (weightCfg) renderWeight(v)
 
         // Sync hidden fields on the final commit form
         $('[data-hidden-variant-name]').value = v.name

@@ -3122,6 +3122,67 @@ a:focus-visible, button:focus-visible {
 }
 .qb-summary-cta:hover { background: var(--rust-dark); }
 
+/* Weight & payload panel (Kruiswagen builder) - sits inside the dark summary
+   card. State class set by JS on .qb-weight: -ok / -warn / -over. */
+.qb-weight {
+  margin: 4px 0 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(244, 237, 224, 0.18);
+  border-radius: var(--radius);
+  background: rgba(244, 237, 224, 0.04);
+}
+.qb-weight-title {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.qb-weight-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 0.88rem;
+  color: var(--sand);
+}
+.qb-weight-row strong {
+  font-family: 'Inter Tight', sans-serif;
+  color: var(--sand);
+  font-variant-numeric: tabular-nums;
+}
+.qb-weight-payload-row {
+  border-top: 1px solid rgba(244, 237, 224, 0.15);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+.qb-weight-payload-row strong { color: var(--gold); }
+.qb-weight-status {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+.qb-weight-ok .qb-weight-status {
+  background: rgba(63, 156, 92, 0.18);
+  color: #BFE9CC;
+  border: 1px solid rgba(63, 156, 92, 0.40);
+}
+.qb-weight-warn .qb-weight-status {
+  background: rgba(214, 158, 46, 0.18);
+  color: #F4D89B;
+  border: 1px solid rgba(214, 158, 46, 0.45);
+}
+.qb-weight-warn .qb-weight-payload-row strong { color: #F4D89B; }
+.qb-weight-over .qb-weight-status {
+  background: rgba(192, 52, 26, 0.22);
+  color: #F3B7AC;
+  border: 1px solid rgba(192, 52, 26, 0.50);
+}
+.qb-weight-over .qb-weight-payload-row strong { color: #F3B7AC; }
+
 .qb-actions {
   display: flex;
   gap: 12px;

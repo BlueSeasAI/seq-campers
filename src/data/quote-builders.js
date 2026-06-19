@@ -415,18 +415,73 @@ export const quoteBuilders = [
     brandFamily: "Kimberley",
     name: "Kimberley Kruiswagen",
     intro: "The luxury 4x4 motorhome - off-grid, premium, no compromises.",
-    delivery: 19000,
+    // The Kruiswagen is a registered MOTOR VEHICLE (Mercedes Sprinter), not a
+    // towed trailer - so its "dealer delivery" is really a full driveaway /
+    // on-road cost that SLIDES with the build price. Per Maud's
+    // Kruiswagen-Rego-Calculator.xlsx (Jun 2026): stamp duty = 5% of
+    // (base + options) rounded, + $1,190 rego/CTP/fees, + $4,500 dealer
+    // delivery & handover. Replaces the old flat $19,000. Only this model
+    // carries onRoad{} - every other builder keeps its flat `delivery`.
+    onRoad: {
+      stampDutyRate: 0.05,
+      registration: 1190,
+      dealerDelivery: 4500,
+    },
+    // GVM / payload model - per Maud's Kruiswagen-Weight-Calculator.xlsx.
+    // A motorhome cannot be legally loaded past its GVM. Heavy options eat into
+    // payload; if ready-to-travel payload goes negative the buyer needs the GVM
+    // Upgrade Kit (id `gvm`), which lifts the limit 4,100 -> 4,430kg and itself
+    // requires the alloy wheels (already enforced via requires[]).
+    //   - weights{} = hardware kg added to TARE, but ONLY when the option is a
+    //     genuine paid add for the chosen variant (price > 0). Items that come
+    //     Included on a variant are already inside its base TARE, so ticking
+    //     them adds 0kg (no double-count). Options absent from weights{} = 0kg.
+    //   - fuelExtra/waterExtra = consumable kg counted when the tank is PRESENT
+    //     (Included OR ticked) - TARE is always dry, so full tanks add on top.
+    weight: {
+      baseGvm: 4100,
+      upgradedGvm: 4430,
+      gvmOptionId: "gvm",
+      passengers: 150,        // 2 passengers, fixed
+      fuelBase: 79,           // standard ~93L tank, full
+      waterBase: 110,         // standard tank(s), full
+      fuelExtra: [{ optId: "longtank2", kg: 48 }],          // 151L long-range tank
+      waterExtra: [
+        { optId: "2nd-tank", kg: 86 },                       // 86L second water tank
+        { optId: "spare-well-tank", kg: 80 },                // 80L spare-well aux tank
+      ],
+      weights: {
+        gvm: 39, "alloy-rims": 17,
+        bullbar: 37.5, winch: 32.8, underbody: 13.95, "lower-body": 2.1,
+        snorkel: 7, "maxtrax-set": 6.8, compressor: 7.5, towbar: 36.1,
+        sidesteps: 8,
+        "5000wh": 14, "2nd-5000wh": 41, solar800: 20.7, solar1200: 40.7,
+        "portable-solar": 7.2,
+        longtank: 9, longtank2: 53.2, "2nd-tank": 8, "spare-well-tank": 89,
+        "large-fridge": 99, "galley-ninja": 14, "office-desk": 8,
+        "cockpit-shelf": 4.9, "cockpit-shelf-eco": 4.9, "outside-table": 10.15,
+        "kargo-barrier": 0.8,
+        "diesel-air": 2, fan: 0.75, fan2: 0.75,
+        "cockpit-curtain": 1.2, "ensuite-curtain": 1.5,
+        bedouin: 11, "elec-awning": 2, draftskirt: 3.6, "full-walls": 22,
+        "expedition-rack": 44, "swingaway-gear": 10.3, "swingaway-tyre": 12,
+        rearbumper: -4.7, "bike-rack": 23.3, gullwing: 24.6, aeropod: 21.5,
+        slidingdoor: 8, uhf: 5, "starlink-mini": 6.7,
+      },
+    },
     variants: [
       {
         id: "classic",
         name: "Kruiswagen Classic",
         basePrice: 199850,
+        tare: 3340,
         included: ["Mercedes Sprinter 419 LWB AWD 2.0L Bi-Turbo", "A4M 4x4 AWD + factory off-road lift kit", "Navigation (7-year map updates)", "Active Distance Assist (DISTRONIC)", "Air conditioning (TEMPMATIC)", "KK Kruz Rack roof rack backbone", "Composting toilet (OGO)", "Full-size ensuite with gelcoat shower", "Diesel HWS (Webasto)", "SMART 48V Power Hub + 2000Wh battery", "200W roof solar", "2.2 x 4.5m HD manual roll-out awning", "130L upright 12V fridge", "Outside cook's kitchen (sink + 2-burner)", "Rear mount gas bottle 2kg", "KK PowerGlide drop-down double bed", "Bluetooth sound system", "Vegan leather seating"]
       },
       {
         id: "ecoscape",
         name: "Kruiswagen EcoScape",
         basePrice: 247990,
+        tare: 3565,
         included: ["Everything in Classic, plus:", "360-degree parking camera", "Electric sliding door", "Long range 93L fuel tank", "Outback snorkel (black)", "KK Alloy Sports Bar + LED light bar", "KK Expedition Kruz Rack + 50\" LED bar", "x4 Corner LED security worklights", "KK rear swing-away (spare tyre + ladder)", "Electric automatic side steps", "KK Alloy off-road wheels 16\" AT tyres", "86L second water tank", "BEST water filter", "2.2 x 4.5m HD electric roll-out awning", "Bedouin extendable awning", "Internal shower furniture", "Outside hot & cold shower", "Space heater (uses diesel HWS)", "Rooftop reverse cycle A/C", "5000Wh SMART 48V Battery", "400W roof solar", "Outside kitchen + Ninja Electric BBQ", "190L fridge/freezer combo", "Dual plate induction + microwave", "Wireless benchtop charging", "Smart TV + upgraded sound system", "Dual reading LED lights", "Solid leather seating", "Vinyl floor plank upgrade"]
       }
     ],

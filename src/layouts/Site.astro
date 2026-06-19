@@ -646,6 +646,14 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       </div>
     </div>
   </footer>
+
+  <!-- Podium webchat widget - SEQ Campers' "Text Us" button + site pop-up.
+       Loads Podium's customer-messaging widget site-wide (added per Maud,
+       Jun 2026). `defer` so it never blocks render. The org token is a
+       PUBLIC client-side embed token (safe to ship in HTML, like a GA ID),
+       not a secret credential. If SEQ moves off Podium later, delete this
+       one block. -->
+  <script defer src="https://connect.podium.com/widget.js#ORG_TOKEN=d3fc1986-1a61-405d-ab70-92be25d92809" id="podium-widget" data-organization-api-token="d3fc1986-1a61-405d-ab70-92be25d92809"></script>
 </body>
 </html>
 
