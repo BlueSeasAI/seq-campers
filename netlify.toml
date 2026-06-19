@@ -21,6 +21,15 @@
   from = "/quote/kruiser-t/*"
   to = "/quote/kruiser/"
   status = 301
+# kruiser-s retired - all S-Class models now live on /quote/kruiser.
+[[redirects]]
+  from = "/quote/kruiser-s"
+  to = "/quote/kruiser/"
+  status = 301
+[[redirects]]
+  from = "/quote/kruiser-s/*"
+  to = "/quote/kruiser/"
+  status = 301
 
 [[headers]]
   for = "/*"
