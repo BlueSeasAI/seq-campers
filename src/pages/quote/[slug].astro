@@ -181,22 +181,16 @@ try {
                   <strong data-summary-delivery>+$3,500</strong>
                 </div>
               )}
-              <!-- Itemised on-road costs - only shown for models that carry an
-                   onRoad{} config (the Kruiswagen motorhome). Hidden otherwise. -->
-              <div data-onroad-block hidden>
+              <!-- On-road costs as ONE combined line (Kruiswagen motorhome):
+                   stamp duty + rego/CTP + dealer delivery rolled into a single
+                   figure so the customer sees one price, not three. The small
+                   note explains why the number is large (it's all-in). -->
+              {brand.onRoad && (
                 <div class="qb-summary-options-line">
-                  <span>Stamp duty <small style="color:var(--muted); font-size:0.78rem;">(5%)</small></span>
-                  <strong data-onroad-stamp>+$0</strong>
+                  <span>Dealer delivery &amp; on-road <small style="color:var(--muted); font-size:0.78rem;">(incl. stamp duty + rego)</small></span>
+                  <strong data-onroad-total>+$0</strong>
                 </div>
-                <div class="qb-summary-options-line">
-                  <span>Registration, CTP &amp; fees</span>
-                  <strong data-onroad-rego>+$0</strong>
-                </div>
-                <div class="qb-summary-options-line">
-                  <span>Dealer delivery &amp; handover</span>
-                  <strong data-onroad-delivery>+$0</strong>
-                </div>
-              </div>
+              )}
               <div class="qb-summary-total">
                 <span>Indicative driveaway</span>
                 <strong data-summary-total>$0</strong>
@@ -220,7 +214,7 @@ try {
                 <div class="qb-weight-status" data-weight-status></div>
               </div>
               <p class="qb-summary-fineprint" data-fineprint>
-                Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST. Excludes stamp duty + registration.
+                Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST.
               </p>
               <a href="#qb-finish" class="btn-primary qb-summary-cta">Finish + send to me ↓</a>
             </div>
@@ -517,14 +511,10 @@ try {
       // line for the itemised on-road block, reveal the weight panel, and
       // correct the fineprint (this model INCLUDES stamp duty + rego).
       if (onRoad) {
-        const flat = $('[data-flat-delivery]')
-        // Use inline display:none, not the `hidden` attribute - the
-        // .qb-summary-options-line rule sets display:flex which overrides
-        // [hidden], leaving the old flat delivery line visible alongside
-        // the itemised on-road breakdown (Bart spotted the duplicate).
-        if (flat) flat.style.display = 'none'
-        const block = $('[data-onroad-block]')
-        if (block) block.hidden = false
+        // The flat delivery line and the single on-road line are both
+        // server-rendered conditionally, so there is nothing to show/hide
+        // here. Just correct the fineprint - this model rolls stamp duty +
+        // rego + delivery into the one driveaway figure.
         const fineprint = $('[data-fineprint]')
         if (fineprint) fineprint.textContent =
           'Indicative driveaway - includes 5% stamp duty, registration/CTP & fees, and dealer delivery & handover. Final quote confirmed by SEQ Campers within one business day. Incl. GST.'
@@ -607,9 +597,7 @@ try {
         if (onRoad) {
           const r = onRoadFor(unitTotal)
           delivery = r.total
-          $('[data-onroad-stamp]').textContent = fmtSigned(r.stamp)
-          $('[data-onroad-rego]').textContent = fmtSigned(r.rego)
-          $('[data-onroad-delivery]').textContent = fmtSigned(r.delivery)
+          $('[data-onroad-total]').textContent = fmtSigned(r.total)
         } else {
           delivery = flatDeliveryFor(currentVariant)
           $('[data-summary-delivery]').textContent = fmtSigned(delivery)
