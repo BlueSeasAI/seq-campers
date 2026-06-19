@@ -1250,7 +1250,7 @@ export const quoteBuilders = [
   // the old T3-only kruiser-t. Dealer delivery $3,500.
   // -------------------------------------------------------------------------
   {
-    slug: 'kruiser-t',
+    slug: 'kruiser',
     brandFamily: 'Kimberley',
     name: 'Kimberley Kruiser',
     intro: 'The flagship off-road tourer - choose your Kruiser: the S Class Classic, the S3 30th Anniversary, or the 7.3m T Class.',
