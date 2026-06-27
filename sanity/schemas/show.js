@@ -38,13 +38,54 @@ export default {
       validation: (Rule) => Rule.required().min(4).max(120),
     },
     {
+      name: 'eventWebsiteUrl',
+      title: "Show's own website (external link)",
+      type: 'url',
+      group: 'basics',
+      description:
+        "The official website of the show or expo itself, e.g. https://adventureexpo.com.au. This is the EXTERNAL organiser's site we link out to - NOT the web address of this page. Leave the 'URL slug' field below to auto-fill (just click Generate).",
+      validation: (Rule) =>
+        Rule.uri({ scheme: ['http', 'https'], allowRelative: false }).error(
+          'Enter a full web address starting with https:// (or leave blank).'
+        ),
+    },
+    {
       name: 'slug',
-      title: 'URL slug',
+      title: 'URL slug (auto - just click Generate)',
       type: 'slug',
       group: 'basics',
-      description: 'The /shows/{slug} URL ending. Click Generate to auto-fill from the title.',
-      options: { source: 'title', maxLength: 96 },
-      validation: (Rule) => Rule.required(),
+      description:
+        "The ending of THIS page's web address: seqcampers.com.au/shows/{slug}. Click the blue Generate button to fill it from the show title - that is the easiest way to get it right. Do NOT paste the show's website here - use the 'Show's own website' field above for that. Only lowercase letters, numbers and hyphens are allowed.",
+      options: {
+        source: 'title',
+        maxLength: 96,
+        slugify: (input) =>
+          String(input)
+            .toLowerCase()
+            .normalize('NFKD')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .slice(0, 96),
+      },
+      validation: (Rule) =>
+        Rule.required()
+          .error('Slug is required - click the blue Generate button to auto-create it from the show title.')
+          .custom((value) => {
+            if (!value?.current) return true
+            const slug = value.current
+            if (!/^[a-z0-9-]+$/.test(slug)) {
+              return 'The URL slug can only contain lowercase letters, numbers and hyphens - it looks like a full web address was pasted here. Click the blue Generate button to auto-fix it, and put the show\'s website in the "Show\'s own website" field above.'
+            }
+            if (slug.startsWith('-') || slug.endsWith('-')) {
+              return 'Slug cannot start or end with a hyphen. Click Generate to auto-fix.'
+            }
+            if (slug.includes('--')) {
+              return 'Slug cannot contain double-hyphens. Click Generate to auto-fix.'
+            }
+            return true
+          }),
     },
     {
       name: 'status',
@@ -376,7 +417,7 @@ export default {
           name: 'brandCard',
           fields: [
             { name: 'name', title: 'Caravan name', type: 'string', validation: (Rule) => Rule.required().max(120) },
-            { name: 'brand', title: 'Brand family label', type: 'string', description: 'e.g. "Stockman" or "Kimberley".', validation: (Rule) => Rule.required().max(60) },
+            { name: 'brand', title: 'Brand family label', type: 'string', description: 'e.g. "Stockman Products" or "Kimberley Kampers" - use the public-facing brand name as shown on the website.', validation: (Rule) => Rule.required().max(60) },
             { name: 'quoteSlug', title: 'Quote builder slug', type: 'string', description: 'The /quote/{slug} URL ending, e.g. "rover" or "kruiser-s". Must already exist in /quote.', validation: (Rule) => Rule.required().regex(/^[a-z0-9-]+$/, { name: 'lowercase-hyphens-only' }) },
             { name: 'tagline', title: 'Tagline', type: 'string', validation: (Rule) => Rule.required().max(240) },
             { name: 'showSpecial', title: 'Show special line', type: 'string', description: 'e.g. "$2,500 of free accessories included - show only".', validation: (Rule) => Rule.max(200) },

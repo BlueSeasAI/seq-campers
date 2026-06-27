@@ -115,11 +115,11 @@ const brandLower = (caravan.brand ?? '').toLowerCase()
 const authorisedDealerLabel = brandLower.includes('kimberley')
   ? 'Authorised Kimberley Kampers Dealer'
   : brandLower.includes('stockman')
-    ? 'Authorised Stockman Dealer'
+    ? 'Authorised Stockman Products Dealer'
     : null
 
 // Per-listing enquiry form data. Each listing posts to Netlify Forms via the
-// shared "listing-enquiry" form name with the caravan's Sanity-loaded
+// shared "used-caravan-enquiry" form name with the caravan's Sanity-loaded
 // details prefilled as hidden fields. NO routing to Maud's brand pages -
 // those are for new-build spec configuration; this is for THIS specific
 // caravan with its specs already known from Sanity.
@@ -239,6 +239,21 @@ const productSchema = {
           </div>
         )}
 
+        {caravan.topFeatures?.length > 0 && (
+          <div style="margin-top:24px; background:#fff; border:1px solid var(--rust); border-radius:14px; padding:22px 26px;">
+            <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">Your caravantage point</div>
+            <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.25rem; font-weight:700; margin:0 0 14px;">Is this the right van for you? Top 5 benefits.</h2>
+            <ol class="top-features-list">
+              {caravan.topFeatures.slice(0, 5).map((f, i) => (
+                <li>
+                  <span class="top-features-num">{i + 1}</span>
+                  <span class="top-features-text">{f}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
         {descriptionHtml && (
           <div style="margin-top:32px;">
             <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:12px;">About this caravan</h2>
@@ -296,54 +311,34 @@ const productSchema = {
 
         {caravan.specs && (
         <div class="specs-block">
-          <div class="specs-block-label">Specs</div>
+          <div class="specs-block-label">Can you tow it?</div>
           <div class="specs-grid">
-            {caravan.specs.sleeps && (
-              <div class="spec-item">
-                <span class="spec-label">Sleeps</span>
-                <span class="spec-value">{caravan.specs.sleeps}</span>
-              </div>
-            )}
-            {caravan.specs.length && (
-              <div class="spec-item">
-                <span class="spec-label">Length</span>
-                <span class="spec-value">{caravan.specs.length}ft</span>
+            {caravan.specs.atm && (
+              <div class="spec-item spec-item-key">
+                <span class="spec-label">ATM</span>
+                <span class="spec-value">{caravan.specs.atm.toLocaleString('en-AU')}<span class="spec-unit">kg</span></span>
+                <span class="spec-hint">towing weight</span>
               </div>
             )}
             {caravan.specs.tareWeight && (
-              <div class="spec-item">
-                <span class="spec-label">Tare weight</span>
-                <span class="spec-value">{caravan.specs.tareWeight}kg</span>
+              <div class="spec-item spec-item-key">
+                <span class="spec-label">Tare</span>
+                <span class="spec-value">{caravan.specs.tareWeight.toLocaleString('en-AU')}<span class="spec-unit">kg</span></span>
+                <span class="spec-hint">empty weight</span>
               </div>
             )}
-            {caravan.specs.atm && (
-              <div class="spec-item">
-                <span class="spec-label">ATM</span>
-                <span class="spec-value">{caravan.specs.atm}kg</span>
+            {caravan.specs.length && (
+              <div class="spec-item spec-item-key">
+                <span class="spec-label">Length</span>
+                <span class="spec-value">{caravan.specs.length}<span class="spec-unit">m</span></span>
+                <span class="spec-hint">overall</span>
               </div>
             )}
-            {batteryTypeLabel && (
-              <div class="spec-item">
-                <span class="spec-label">Battery</span>
-                <span class="spec-value">{batteryTypeLabel}</span>
-              </div>
-            )}
-            {caravan.power?.batteryCapacityAh && (
-              <div class="spec-item">
-                <span class="spec-label">Capacity</span>
-                <span class="spec-value">{caravan.power.batteryCapacityAh}Ah</span>
-              </div>
-            )}
-            {caravan.power?.solarWatts && (
-              <div class="spec-item">
-                <span class="spec-label">Solar</span>
-                <span class="spec-value">{caravan.power.solarWatts}W</span>
-              </div>
-            )}
-            {caravan.power?.inverterWatts && (
-              <div class="spec-item">
-                <span class="spec-label">Inverter</span>
-                <span class="spec-value">{caravan.power.inverterWatts}W</span>
+            {caravan.specs.waterCapacityL && (
+              <div class="spec-item spec-item-key">
+                <span class="spec-label">Water</span>
+                <span class="spec-value">{caravan.specs.waterCapacityL}<span class="spec-unit">L</span></span>
+                <span class="spec-hint">fresh tank</span>
               </div>
             )}
           </div>
@@ -393,13 +388,13 @@ const productSchema = {
 
         <form
           class="enquiry-form"
-          name="listing-enquiry"
+          name="used-caravan-enquiry"
           method="POST"
           data-netlify="true"
           netlify-honeypot="bot-field"
           action="/thanks/"
         >
-          <input type="hidden" name="form-name" value="listing-enquiry" />
+          <input type="hidden" name="form-name" value="used-caravan-enquiry" />
           <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
 
           <!-- Caravan context (Sanity-sourced, hidden from the customer) -->
@@ -546,3 +541,5 @@ const productSchema = {
     </section>
   </div>
 </Site>
+
+

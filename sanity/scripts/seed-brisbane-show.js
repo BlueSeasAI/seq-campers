@@ -125,8 +125,6 @@ const doc = {
   standCaravans: [
     { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Kruiswagen', detail: 'Mercedes 4x4 motorhome' },
     { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Karavan Eco Suite', detail: 'with media release' },
-    { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Kruiser T Class', detail: 'luxury off-road tourer' },
-    { _type: 'standCaravan', _key: key('s'), name: 'Kimberley Kruiser S Class', detail: 'flagship apartment-grade' },
     { _type: 'standCaravan', _key: key('s'), name: 'Stockman Trekka', detail: 'serious off-road camper trailer' },
     { _type: 'standCaravan', _key: key('s'), name: 'Stockman Rover', detail: 'all-rounder family off-grid' },
     { _type: 'standCaravan', _key: key('s'), name: 'Stockman POD All-Roader', detail: 'demo unit - 20% off, rooftop tent included' },
@@ -148,7 +146,10 @@ const doc = {
     { _type: 'inclusion', _key: key('i'), label: 'Stockman Rover accessory pack', value: 2500, note: '$2,500 of off-grid accessories - lithium, solar, awning, your pick.' },
     { _type: 'inclusion', _key: key('i'), label: 'Stockman Trekka accessory pack', value: 5000, note: '$5,000 of trail-ready accessories. Show-only inclusion.' },
     { _type: 'inclusion', _key: key('i'), label: 'Stockman POD accessory pack', value: 500, note: '$500 of POD accessories to kit your trailer out.' },
-    { _type: 'inclusion', _key: key('i'), label: '$3,000 accessory credit (Kimberley)', value: 3000, note: 'Solar, lithium, or whatever upgrade matters most.' },
+    { _type: 'inclusion', _key: key('i'), label: 'Kimberley Karavan - 50% off 2nd battery', value: 3911, note: 'Show-only deal. Doubles your usable amp-hours for half the spend.' },
+    { _type: 'inclusion', _key: key('i'), label: 'Kimberley Kube - 50% off 2nd battery', value: 1750, note: 'Show-only deal on the second battery upgrade.' },
+    { _type: 'inclusion', _key: key('i'), label: 'Kimberley Kruiswagen - 50% off 2nd battery', value: 3911, note: 'Show-only. Combine with the solar deal below for full off-grid spec.' },
+    { _type: 'inclusion', _key: key('i'), label: 'Kimberley Kruiswagen - double-up solar OR free portable solar', value: 549, note: 'Show-only. Take the doubled roof solar OR the portable kit - your call.' },
     { _type: 'inclusion', _key: key('i'), label: 'Stone deflector + rock tamer kit', value: 880, note: 'Save your windows on corrugations.' },
     { _type: 'inclusion', _key: key('i'), label: 'Show floor handover pack', value: 540, note: 'Levellers, sand pegs, hose, mat. Ready to camp.' },
     { _type: 'inclusion', _key: key('i'), label: 'Locked-in 2026 pricing', value: 5000, note: 'Pre-July factory price rises do not apply to show buyers.' },
@@ -164,11 +165,9 @@ const doc = {
   brandCards: [
     { _type: 'brandCard', _key: key('q'), name: 'Stockman Rover', brand: 'Stockman', quoteSlug: 'rover', tagline: 'The all-rounder. Off-grid ready, family friendly, 90 second setup.', showSpecial: '$2,500 of free accessories included - show only' },
     { _type: 'brandCard', _key: key('q'), name: 'Stockman Trekka', brand: 'Stockman', quoteSlug: 'trekka', tagline: 'The serious off-road camper trailer. Tough, light, made for tracks.', showSpecial: '$5,000 of free accessories included - show only' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Karavan', brand: 'Kimberley', quoteSlug: 'karavan', tagline: 'The iconic Australian-made off-road caravan. 30 years of refinement.', showSpecial: '$3,000 accessory credit (Kimberley factory promotion)' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kube', brand: 'Kimberley', quoteSlug: 'kube', tagline: 'Compact, capable, premium off-grid living. Couples and small families.', showSpecial: 'Show package - lock in 2026 pricing before July rises' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiswagen', brand: 'Kimberley', quoteSlug: 'kruiswagen', tagline: 'The expedition motorhome. Self-contained, anywhere, any track.', showSpecial: 'Show special - ask Shane on the stand' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiser T Class', brand: 'Kimberley', quoteSlug: 'kruiser-t', tagline: 'The luxury off-road caravan. Touring with everything you need.', showSpecial: 'Show package - lock in 2026 pricing before July rises' },
-    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiser S Class', brand: 'Kimberley', quoteSlug: 'kruiser-s', tagline: 'The flagship. Apartment-grade interior in a true off-road shell.', showSpecial: 'Show package - lock in 2026 pricing before July rises' },
+    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Karavan', brand: 'Kimberley', quoteSlug: 'karavan', tagline: 'The iconic Australian-made off-road caravan. 30 years of refinement.', showSpecial: '50% off 2nd battery - save $3,911 (show only)' },
+    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kube', brand: 'Kimberley', quoteSlug: 'kube', tagline: 'Compact, capable, premium off-grid living. Couples and small families.', showSpecial: '50% off 2nd battery - save $1,750 (show only)' },
+    { _type: 'brandCard', _key: key('q'), name: 'Kimberley Kruiswagen', brand: 'Kimberley', quoteSlug: 'kruiswagen', tagline: 'The expedition motorhome. Self-contained, anywhere, any track.', showSpecial: 'Double up solar free OR free portable solar ($549), plus 50% off 2nd battery ($3,911) - show only' },
   ],
 
   // ─── Narrative copy ─────────────────────────────────────
@@ -209,7 +208,7 @@ const doc = {
       _type: 'faq',
       _key: key('f'),
       q: 'Which caravans are you bringing to the show?',
-      a: 'Kimberley Kruiswagen (Mercedes 4x4 motorhome), Kimberley Karavan Eco Suite (with media release), Kimberley Kruiser T Class and S Class, plus Stockman Trekka and Stockman Rover. A full lineup across the Kimberley and Stockman ranges.',
+      a: 'Kimberley Kruiswagen (Mercedes 4x4 motorhome), Kimberley Karavan Eco Suite (with media release), plus Stockman Trekka, Stockman Rover and our demo Stockman POD All-Roader. A solid lineup across the Kimberley and Stockman ranges.',
     },
     {
       _type: 'faq',

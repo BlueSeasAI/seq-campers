@@ -15,6 +15,13 @@
     Each form here mirrors the live form's `name` + `data-netlify` setup
     with a single required field. Netlify never serves this page to users
     (robots noindex + no internal links) - it only reads it at build time.
+
+    Renamed 18 Jun 2026 per Bart - the names below match what Maud + Shane
+    see in the Netlify Forms dashboard.
+
+    Every form has source_page_url + source_page_title hidden fields that
+    are auto-populated by the layout script at submit time, so the Netlify
+    submission view shows EXACTLY which page the lead came from.
   -->
 
   <form name="enquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
@@ -25,10 +32,12 @@
     <input type="text" name="experience" />
     <input type="text" name="video_watched" />
     <textarea name="message"></textarea>
+    <input type="text" name="source_page_url" />
+    <input type="text" name="source_page_title" />
     <input name="bot-field" />
   </form>
 
-  <form name="listing-enquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <form name="used-caravan-enquiry" data-netlify="true" netlify-honeypot="bot-field" hidden>
     <input type="text" name="customer_name" />
     <input type="email" name="customer_email" />
     <input type="tel" name="customer_phone" />
@@ -44,6 +53,8 @@
     <input type="text" name="video_watched" />
     <input type="checkbox" name="send_spec_sheet" />
     <textarea name="message"></textarea>
+    <input type="text" name="source_page_url" />
+    <input type="text" name="source_page_title" />
     <input name="bot-field" />
   </form>
 
@@ -57,6 +68,8 @@
     <input type="text" name="motivation" />
     <input type="text" name="timeline" />
     <textarea name="message"></textarea>
+    <input type="text" name="source_page_url" />
+    <input type="text" name="source_page_title" />
     <input name="bot-field" />
   </form>
 
@@ -66,19 +79,61 @@
     <input type="tel" name="phone" />
     <input type="text" name="caravan" />
     <textarea name="message"></textarea>
+    <input type="text" name="source_page_url" />
+    <input type="text" name="source_page_title" />
     <input name="bot-field" />
   </form>
 
-  <form name="quote-builder" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <!-- Build-page lead capture (renamed from quote-builder-lead on 18 Jun).
+       The "Tell us who you are first" pop-up overlay on every /quote/{slug}
+       build page. -->
+  <form name="build-page-lead-capture" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="first_name" />
+    <input type="text" name="last_name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="intent" />
+    <input type="text" name="brand_name" />
+    <input type="text" name="brand_slug" />
+    <input type="text" name="page_url" />
+    <input type="text" name="source_page_url" />
+    <input type="text" name="source_page_title" />
+    <input name="bot-field" />
+  </form>
+
+  <!-- Build-page quote request (renamed from quote-builder-v2 on 18 Jun).
+       The final "Email me my quote" step after a customer finishes building
+       their spec on /quote/{slug}. -->
+  <form name="build-page-quote-request" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="text" name="lead_first_name" />
+    <input type="text" name="lead_last_name" />
+    <input type="email" name="lead_email" />
+    <input type="tel" name="lead_phone" />
+    <input type="text" name="lead_intent" />
+    <input type="text" name="brand_name" />
+    <input type="text" name="brand_slug" />
+    <input type="text" name="page_url" />
+    <input type="text" name="variant_name" />
+    <input type="text" name="variant_base_price" />
+    <input type="text" name="selected_options" />
+    <input type="text" name="total_indicative_price" />
+    <textarea name="message"></textarea>
+    <input type="text" name="source_page_url" />
+    <input type="text" name="source_page_title" />
+    <input name="bot-field" />
+  </form>
+
+  <!-- Reserve slot (16 Jun 2026 - /reserve page) - Tesla-style booking form
+       to drive showroom visits at Marcoola. -->
+  <form name="reserve-slot" data-netlify="true" netlify-honeypot="bot-field" hidden>
     <input type="text" name="name" />
     <input type="email" name="email" />
     <input type="tel" name="phone" />
-    <input type="text" name="brand" />
-    <input type="text" name="model" />
-    <input type="text" name="variant" />
-    <input type="text" name="options" />
-    <input type="text" name="estimated_price" />
-    <textarea name="message"></textarea>
+    <input type="text" name="visit_window" />
+    <input type="text" name="interest" />
+    <textarea name="notes"></textarea>
+    <input type="text" name="source_page_url" />
+    <input type="text" name="source_page_title" />
     <input name="bot-field" />
   </form>
 

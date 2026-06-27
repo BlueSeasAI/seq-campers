@@ -1,10 +1,11 @@
 ---
 import '../styles/global.css'
 import { getSiteSettings } from '../lib/sanity.js'
+import TrustStrip from '../components/TrustStrip.astro'
 
 const {
   title = 'Premium Off-Road Caravans',
-  description = "Queensland's home for premium off-road caravans. Kimberley Kampers, Stockman, and more.",
+  description = "The Sunshine Coast's home for premium off-road caravans. Authorised Kimberley Kampers and Stockman Products dealer. Hand-picked, hand-inspected, ready to tow.",
   ogImage,
   ogType = 'website',
   noindex = false,
@@ -77,6 +78,17 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
     rel="stylesheet"
   />
 
+  <!-- Google Analytics 4 - tracks page views, events, sessions across every
+       page on the site. Per Bart 18 Jun: GA4 property "SEQ Campers Website".
+       Measurement ID G-E9QKQRP1X4. Loaded async so it never blocks rendering. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E9QKQRP1X4"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-E9QKQRP1X4', { anonymize_ip: true });
+  </script>
+
   <slot name="head" />
   <style>
     /* Form thanks panel - HIGH CONTRAST against cream page background so
@@ -128,15 +140,16 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 10px 16px;
-      padding-top: 14px;
+      gap: 14px 28px;
+      padding-top: 18px;
       border-top: 1px solid rgba(255, 255, 255, 0.22);
     }
     .inline-form-thanks-label {
       color: rgba(255, 255, 255, 0.85);
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       width: 100%;
-      margin-bottom: 4px;
+      margin-bottom: 12px;
+      text-align: center;
     }
     .inline-form-thanks-cta a {
       display: inline-block;
@@ -197,7 +210,219 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       .show-special-banner { font-size: 0.85rem; padding: 8px 0; }
       .show-special-inner { gap: 8px; }
     }
+    /* Site-wide kill switch for browser-native media controls on every
+       autoplay video (hero, pathway tiles, broll cards, /quote intro, /service
+       team grid, workshop weekly, /new tiles). Per Bart 16 Jun - "remove the
+       on-screen play controls" on every preloaded video site-wide. */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-panel,
+    video::-webkit-media-controls-play-button,
+    video::-webkit-media-controls-start-playback-button,
+    video::-webkit-media-controls-overlay-play-button,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-media-controls-current-time-display,
+    video::-webkit-media-controls-time-remaining-display,
+    video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-volume-slider,
+    video::-webkit-media-controls-mute-button,
+    video::-webkit-media-controls-fullscreen-button {
+      display: none !important;
+      -webkit-appearance: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* CROP every autoplay-loop iframe so YouTube's title bar (top ~50px)
+       and controls bar (bottom ~50px) are PHYSICALLY OFF-SCREEN inside
+       the container. The container clips them via overflow:hidden. The
+       iframe is sized 150% taller than the container and offset by -25%
+       so only the middle 50% of the iframe shows. The video centre stays
+       visible; YouTube's UI is permanently outside the visible window.
+       Works regardless of YouTube's controls state. Per Bart 18 Jun -
+       "still visible on every fucking page" - 5th iteration. */
+    .hero-video-bg,
+    .pathway-tile-media,
+    .broll-media,
+    .new-tile-media,
+    .service-video-media,
+    .workshop-weekly-media,
+    .quote-intro-media,
+    .shows-compilation-media {
+      overflow: hidden !important;
+    }
+    .pathway-tile-media iframe,
+    .broll-media iframe,
+    .new-tile-media iframe,
+    .service-video-media iframe,
+    .workshop-weekly-media iframe,
+    .quote-intro-media iframe {
+      position: absolute !important;
+      top: -25% !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 150% !important;
+      pointer-events: none !important;
+    }
+
+    /* SITE-WIDE VIDEO LOAD-FLASH COVER (4th iteration per Bart 18 Jun).
+       The YouTube iframe shows a 1-3s buffer state with its play button +
+       title bar before autoplay engages. The pointer-event blocker divs
+       (.hero-video-block, .pathway-tile-block, etc) already sit ON TOP of
+       every iframe at high z-index. So we just make those blocks START
+       opaque and fade their background to transparent over ~3s. They keep
+       blocking clicks forever; the visitor only sees the iframe after the
+       fade completes.
+
+       Earlier iterations used a ::before pseudo-element layered separately.
+       Hit z-index quirks. This is simpler: the block IS the cover.
+
+       Bumped durations conservatively for slow connections:
+         - HERO:   poster image, 4s visible (1.5s delay + 2.5s fade)
+         - TILES:  sand colour, 3.5s visible (0.5s delay + 3.0s fade) */
+    .hero-video-block,
+    .pathway-tile-block,
+    .broll-block,
+    .new-tile-block,
+    .service-video-block,
+    .workshop-weekly-block {
+      background-color: var(--sand, #F4EDE0) !important;
+      animation: video-cover-bg-fade-out 3.0s 0.5s ease-out forwards;
+    }
+    /* Hero - poster image instead of flat colour, longer delay (biggest file). */
+    .hero-video-block {
+      background: #1a1a1c url('/hero-poster.jpg') center/cover no-repeat !important;
+      animation: video-cover-bg-fade-out 2.5s 1.5s ease-out forwards;
+    }
+    /* /quote intro and /shows compilation video containers don't have a
+       block element child. We use ::after on the media container itself. */
+    .quote-intro-media,
+    .shows-compilation-media {
+      position: relative;
+    }
+    .quote-intro-media::after,
+    .shows-compilation-media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      background: var(--sand, #F4EDE0);
+      pointer-events: none;
+      animation: video-cover-fade-out 3.0s 0.5s ease-out forwards;
+    }
+    @keyframes video-cover-bg-fade-out {
+      0%   { background-color: var(--sand, #F4EDE0); }
+      99%  { background-color: rgba(244, 237, 224, 0); }
+      100% { background: transparent !important; }
+    }
+    @keyframes video-cover-fade-out {
+      0%   { opacity: 1; visibility: visible; }
+      99%  { opacity: 0; visibility: visible; }
+      100% { opacity: 0; visibility: hidden; }
+    }
   </style>
+
+  <!-- Site-wide media-session blockade. Chrome's "Global Media Controls"
+       attach Media Session handlers WHEN a video starts playing (not before),
+       so a one-shot clear races and loses. We clear repeatedly for the first
+       30 seconds + on every play/playing event + on tab focus/visibility
+       change. Applies to every page via the layout. -->
+  <script is:inline>
+    (function () {
+      function nuke() {
+        try {
+          if ('mediaSession' in navigator) {
+            ['play', 'pause', 'seekbackward', 'seekforward', 'previoustrack', 'nexttrack', 'stop', 'seekto', 'skipad'].forEach(function (action) {
+              try { navigator.mediaSession.setActionHandler(action, null) } catch (e) {}
+            })
+            try { navigator.mediaSession.metadata = null } catch (e) {}
+            try { navigator.mediaSession.playbackState = 'none' } catch (e) {}
+          }
+        } catch (e) { /* no-op */ }
+      }
+      nuke()
+      document.addEventListener('DOMContentLoaded', nuke)
+      window.addEventListener('load', nuke)
+
+      var ticks = 0
+      var iv = setInterval(function () {
+        nuke()
+        ticks++
+        if (ticks > 60) clearInterval(iv) // 30 seconds
+      }, 500)
+
+      function bindAllVideos() {
+        Array.prototype.forEach.call(document.querySelectorAll('video'), function (v) {
+          if (v.dataset.nukeBound === '1') return
+          v.dataset.nukeBound = '1'
+          v.removeAttribute('controls')
+          v.controls = false
+          try { v.disablePictureInPicture = true } catch (e) {}
+          ;['play', 'playing', 'pause', 'loadedmetadata', 'loadeddata', 'canplay'].forEach(function (ev) {
+            v.addEventListener(ev, function () { v.controls = false; nuke() })
+          })
+        })
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindAllVideos)
+      } else {
+        bindAllVideos()
+      }
+      // Re-scan after dynamic content (e.g. lazy-loaded sections) injects new <video>
+      function attachObserver() {
+        try {
+          if (!document.body) return
+          new MutationObserver(function () { bindAllVideos() }).observe(document.body, { childList: true, subtree: true })
+        } catch (e) { /* no-op */ }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachObserver)
+      } else {
+        attachObserver()
+      }
+
+      document.addEventListener('visibilitychange', nuke)
+      window.addEventListener('focus', nuke)
+    })()
+  </script>
+
+  <!-- Site-wide form page-tracker. Every Netlify form on the site gets two
+       hidden fields appended at runtime: source_page_url + source_page_title.
+       Means the Netlify Forms dashboard (and the email notifications) show
+       EXACTLY which page each submission came from - essential for forms
+       like used-caravan-enquiry (10+ caravan pages share one form name) and
+       build-page-lead-capture/quote-request (7 model pages share). Per
+       Bart 18 Jun. -->
+  <script is:inline>
+    (function () {
+      function attachPageTracking() {
+        document.querySelectorAll('form[data-netlify="true"]').forEach(function (form) {
+          if (form.dataset.pageTrackingBound === '1') return
+          form.dataset.pageTrackingBound = '1'
+          // source_page_url - the live URL the visitor is on
+          if (!form.querySelector('input[name="source_page_url"]')) {
+            var urlField = document.createElement('input')
+            urlField.type = 'hidden'
+            urlField.name = 'source_page_url'
+            urlField.value = window.location.href
+            form.appendChild(urlField)
+          }
+          // source_page_title - the document title (helps Maud match in the dashboard)
+          if (!form.querySelector('input[name="source_page_title"]')) {
+            var titleField = document.createElement('input')
+            titleField.type = 'hidden'
+            titleField.name = 'source_page_title'
+            titleField.value = document.title || ''
+            form.appendChild(titleField)
+          }
+        })
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachPageTracking)
+      } else {
+        attachPageTracking()
+      }
+    })()
+  </script>
 </head>
 <body data-home={isHome ? 'true' : 'false'}>
   {showSpecial && (
@@ -235,7 +460,7 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         <a href="/videos" class={isActive('/videos') ? 'is-active' : ''}>Videos</a>
         <a href="/service" class={isActive('/service') ? 'is-active' : ''}>Service</a>
         <a href="/shows" class={isActive('/shows') || isActive('/brisbane-show-2026') ? 'is-active' : ''}>Shows</a>
-        <a href="/brisbane-show-2026" class="nav-cta">Reserve a show slot</a>
+        <a href="/reserve" class={`nav-cta ${isActive('/reserve') ? 'is-active' : ''}`}>Reserve your slot</a>
       </nav>
     </div>
   </header>
@@ -270,6 +495,12 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           }
           try {
             const data = new FormData(form)
+            // Force-set source_page tracking AT SUBMIT TIME so timing issues
+            // (cache, DOMContentLoaded race) can't leave these blank. Per
+            // Bart 18 Jun - previous JS-only approach left fields empty
+            // on his test. FormData.set replaces if present, adds if not.
+            data.set('source_page_url', window.location.href)
+            data.set('source_page_title', document.title || '')
             const body = new URLSearchParams()
             for (const [k, v] of data.entries()) body.append(k, String(v))
             const res = await fetch('/', {
@@ -287,10 +518,12 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
               '</div>' +
               '<h2 class="inline-form-thanks-title">Thanks! Your message is on its way.</h2>' +
               '<p class="inline-form-thanks-body">We\'ll come back to you shortly with the next step. Most enquiries get a reply same day.</p>' +
-              '<div class="inline-form-thanks-cta">' +
-              '<span class="inline-form-thanks-label">Need us sooner?</span>' +
+              '<div class="inline-form-thanks-cta" style="flex-direction:column; gap:14px;">' +
+              '<span class="inline-form-thanks-label" style="margin-bottom:0; font-size:1rem;">Need us sooner?</span>' +
+              '<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px 32px;">' +
               '<a href="tel:0753707933">Call (07) 5370 7933</a>' +
               '<a href="sms:0422624920">Text 0422 624 920</a>' +
+              '</div>' +
               '</div>'
             /* Replace the WHOLE enquiry section so the "Let\'s make sure
                this van is right for you" heading + subheading + form all
@@ -361,12 +594,16 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
     <slot />
   </main>
 
+  {!isHome && (
+    <TrustStrip variant="bottom" />
+  )}
+
   <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <h4>SEQ Campers</h4>
-          <p class="footer-brand">Premium off-road caravans on the Sunshine Coast. Kimberley Kampers and Stockman, hand-picked and inspected by the SEQ team.</p>
+          <h4>SEQ Campers - Sunshine Coast</h4>
+          <p class="footer-brand">Premium off-road caravans on the Sunshine Coast, Queensland. Authorised Kimberley Kampers and Stockman Products dealer. Hand-picked and inspected by the SEQ team.</p>
           <address class="footer-address">
             3B/6 Bonanza Court<br />
             Marcoola QLD 4564<br />
@@ -388,38 +625,35 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         </div>
 
         <div class="footer-col">
-          <h4>Browse</h4>
-          <ul>
-            <li><a href="/stock">Stock</a></li>
-            <li><a href="/videos">Videos</a></li>
-            <li><a href="/service">Service & workshop</a></li>
-            <li><a href="/whats-happening">What's happening</a></li>
-            <li><a href="/brisbane-show-2026">Brisbane Show 2026</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
           <h4>About SEQ</h4>
           <ul>
             <li><a href="/about">About us</a></li>
             <li><a href="/contact">Contact</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQs</a></li>
             <li><a href="/privacy">Privacy</a></li>
             <li><a href="/terms">Terms</a></li>
-            <li><a href="https://www.youtube.com/channel/UCOeiI-wxOLUCX1UzMiE6XVg" target="_blank" rel="noopener">YouTube channel</a></li>
+            <li><a href="https://www.youtube.com/@seqcampers9450?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a></li>
           </ul>
         </div>
       </div>
 
-      <div class="footer-bottom">
+      <div class="footer-bottom footer-bottom-clean">
         <div>&copy; {new Date().getFullYear()} SEQ Campers. Queensland, Australia.</div>
-        <div class="footer-links">
-          <a href="/about">About</a>
-          <a href="/contact">Contact</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
+        <div class="footer-built-by">
+          Built by <a href="https://blueseas.ai" target="_blank" rel="noopener">Blue Seas AI</a>
         </div>
       </div>
     </div>
   </footer>
+
+  <!-- Podium webchat widget - SEQ Campers' "Text Us" button + site pop-up.
+       Loads Podium's customer-messaging widget site-wide (added per Maud,
+       Jun 2026). `defer` so it never blocks render. The org token is a
+       PUBLIC client-side embed token (safe to ship in HTML, like a GA ID),
+       not a secret credential. If SEQ moves off Podium later, delete this
+       one block. -->
+  <script defer src="https://connect.podium.com/widget.js#ORG_TOKEN=d3fc1986-1a61-405d-ab70-92be25d92809" id="podium-widget" data-organization-api-token="d3fc1986-1a61-405d-ab70-92be25d92809"></script>
 </body>
 </html>
+

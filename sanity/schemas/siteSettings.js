@@ -1,96 +1,30 @@
-// Sanity schema: Site Settings (singleton)
+// Singleton: Site-wide settings (banner + Reserve Stripe CTA only).
 //
-// One-off document for site-wide content. Created by clicking "Site Settings"
-// in the Studio sidebar - there is only ever one of these.
+// Per Bart 16 Jun: each page in Studio now has its own per-page singleton.
+// This document only holds the truly site-wide things that don't belong
+// to one page:
+//   - Show Special banner (thin strip across the top of every page)
+//   - Reserve $1,000 Stripe CTA (button + URL shown on /new caravans)
 //
-// Currently controls:
-//   - Hero video URL (the YouTube background loop on the home page)
-//   - Shane's Pick reference (the featured used caravan on the home page)
-//   - Show Special banner (the site-wide "Get it before [date]" strip)
-//   - Reserve $1,000 CTA (button text + Stripe URL shown on /new caravans)
-//   - Marketing intros for /about and /shows
-//
-// Hours and street address are NOT here - they're hardcoded in src/layouts/Site.astro
-// footer + src/pages/contact.astro because they almost never change and we don't
-// want Maud accidentally publishing a typo'd address.
+// Page-specific singletons live in:
+//   homePageSettings    - hero, Shane's Pick, pathway videos
+//   newPageSettings     - 8 new-page video tiles
+//   servicePageSettings - 3 team videos + workshop weekly
+//   showsPageSettings   - intro + compilation video
+//   quotePageSettings   - 8 model intro videos
+//   videosPageSettings  - 12 video library tiles (Kingdom + Convoy)
 
 export default {
   name: 'siteSettings',
-  title: 'Site Settings',
+  title: 'Site-wide settings',
   type: 'document',
-  // Singleton - locked to a single instance in sanity.config.js structure
-
-  groups: [
-    { name: 'home', title: 'Home page', default: true },
-    { name: 'homeVideos', title: 'Home page videos (Watch / Visit / Adventure)' },
-    { name: 'banner', title: 'Show Special banner' },
-    { name: 'reserve', title: 'Reserve $1,000 CTA' },
-    { name: 'shows', title: 'Shows page intro' },
-  ],
 
   fields: [
-    // ─── HOME PAGE ────────────────────────────────────────────────
-    {
-      name: 'heroVideo',
-      title: 'Home page hero video',
-      type: 'object',
-      group: 'home',
-      description: 'The YouTube video that plays as a loop in the home page hero. When set, replaces the default SVG outback illustration.',
-      options: { columns: 1 },
-      fields: [
-        {
-          name: 'youtubeUrl',
-          title: 'YouTube URL',
-          type: 'url',
-          description: 'Paste the full link. The site converts it to an autoplay muted loop.',
-        },
-        {
-          name: 'caption',
-          title: 'Optional caption',
-          type: 'string',
-          description: 'Shown briefly when the video starts. Optional.',
-        },
-      ],
-    },
-
-    {
-      name: 'shanesPick',
-      title: 'Shane\'s Pick (this week\'s featured caravan)',
-      type: 'object',
-      group: 'home',
-      description: 'Featured used caravan promoted on the home page. The reference field below pulls the caravan; the override fields below let you add the special "Shane\'s Pick" framing.',
-      options: { columns: 1 },
-      fields: [
-        {
-          name: 'caravan',
-          title: 'Caravan to feature',
-          type: 'reference',
-          to: [{ type: 'caravan' }],
-          description: 'Pick from existing caravan listings. Leave blank to hide the Shane\'s Pick block.',
-        },
-        {
-          name: 'originalPrice',
-          title: 'Original price (optional)',
-          type: 'number',
-          description: 'If this is a price drop, enter the original price - the listing price will show with a strike-through above the discounted price.',
-          validation: (Rule) => Rule.positive().integer(),
-        },
-        {
-          name: 'shanesQuote',
-          title: 'Shane\'s quote about this van',
-          type: 'text',
-          rows: 3,
-          description: 'A few sentences from Shane on why this one is special. Shown as the body copy.',
-        },
-      ],
-    },
-
     // ─── SHOW SPECIAL BANNER (site-wide) ────────────────────────────
     {
       name: 'showSpecial',
       title: 'Show Special banner (site-wide strip)',
       type: 'object',
-      group: 'banner',
       description: 'The thin coloured strip that runs across the top of every page. Use it to push a deadline ("Get it before the Brisbane Caravan Show ends Sun 8 June"). Leave the headline blank to hide the banner entirely.',
       options: { columns: 1 },
       fields: [
@@ -98,38 +32,35 @@ export default {
           name: 'headline',
           title: 'Banner headline',
           type: 'string',
-          description: 'Short, urgency-led. Example: "Get it before the Brisbane Caravan Show ends Sun 8 June". Leave blank to hide.',
+          description: 'Short, urgency-led. Leave blank to hide the banner.',
           validation: (Rule) => Rule.max(140),
         },
         {
           name: 'endDate',
           title: 'Banner end date',
           type: 'date',
-          description: 'Optional. When this date passes the banner auto-hides. Use it so you do not have to remember to switch the banner off after the show.',
+          description: 'Optional. When this date passes the banner auto-hides.',
           options: { dateFormat: 'YYYY-MM-DD' },
         },
         {
           name: 'ctaText',
           title: 'CTA link text (optional)',
           type: 'string',
-          description: 'Optional clickable text shown after the headline, e.g. "See the show offers".',
           validation: (Rule) => Rule.max(60),
         },
         {
           name: 'ctaUrl',
           title: 'CTA link URL (optional)',
           type: 'string',
-          description: 'Where the CTA text links to. Use a relative path like /show-offer or a full URL.',
         },
       ],
     },
 
-    // ─── RESERVE $1,000 CTA ─────────────────────────────────────────
+    // ─── RESERVE $1,000 STRIPE CTA (shown on /new) ──────────────────
     {
       name: 'reserveCta',
       title: 'Reserve $1,000 CTA (shown on /new)',
       type: 'object',
-      group: 'reserve',
       description: 'The "Reserve this van for $1,000" Stripe payment button shown on the New Caravans page. Leave the Stripe URL blank to hide the button.',
       options: { columns: 1 },
       fields: [
@@ -137,14 +68,12 @@ export default {
           name: 'enabled',
           title: 'Show the Reserve button?',
           type: 'boolean',
-          description: 'Tick to show the Reserve button on /new. Untick to hide it everywhere.',
           initialValue: false,
         },
         {
           name: 'buttonText',
           title: 'Button text',
           type: 'string',
-          description: 'What the button says. Default: "Reserve for $1,000".',
           initialValue: 'Reserve for $1,000',
           validation: (Rule) => Rule.max(60),
         },
@@ -152,78 +81,22 @@ export default {
           name: 'stripeUrl',
           title: 'Stripe payment link URL',
           type: 'url',
-          description: 'The Stripe payment-link URL Maud creates in her Stripe dashboard. Format: https://buy.stripe.com/...',
+          description: 'The Stripe payment-link URL Maud creates in her Stripe dashboard.',
         },
         {
           name: 'helperText',
           title: 'Helper text under the button',
           type: 'string',
-          description: 'Short reassurance line. Default: "Fully refundable. Holds your build slot."',
           initialValue: 'Fully refundable. Holds your build slot.',
           validation: (Rule) => Rule.max(120),
         },
       ],
     },
-
-    // ─── HOME PAGE PATHWAY VIDEOS (Watch / Visit / Adventure) ───
-    // These 3 slots drive the looping B-roll videos behind the home
-    // page pathway tiles. The pathway labels ("1. Watch", "2. Visit",
-    // "3. Adventure") and link targets (/videos, /stock, /service)
-    // are page structure - they stay in code. Maud controls only the
-    // video URL and the one-line sub text under each label.
-    {
-      name: 'homepageVideo1',
-      title: '1. Watch - pathway video (links to /videos)',
-      type: 'object',
-      group: 'homeVideos',
-      options: { columns: 1, collapsible: true, collapsed: false },
-      description: 'The looping video behind the WATCH pathway tile on the home page. Leave URL blank to fall back to the default.',
-      fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link, e.g. https://www.youtube.com/watch?v=abc123' },
-        { name: 'description', title: 'Sub text (one line)', type: 'string', description: 'The short line shown under "1. Watch". Leave blank to keep the default copy.', validation: (Rule) => Rule.max(220) },
-      ],
-    },
-    {
-      name: 'homepageVideo2',
-      title: '2. Visit - pathway video (links to /stock)',
-      type: 'object',
-      group: 'homeVideos',
-      options: { columns: 1, collapsible: true, collapsed: true },
-      description: 'The looping video behind the VISIT pathway tile on the home page. Leave URL blank to fall back to the default.',
-      fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link.' },
-        { name: 'description', title: 'Sub text (one line)', type: 'string', description: 'The short line shown under "2. Visit". Leave blank to keep the default copy.', validation: (Rule) => Rule.max(220) },
-      ],
-    },
-    {
-      name: 'homepageVideo3',
-      title: '3. Adventure - pathway video (links to /service)',
-      type: 'object',
-      group: 'homeVideos',
-      options: { columns: 1, collapsible: true, collapsed: true },
-      description: 'The looping video behind the ADVENTURE pathway tile on the home page. Leave URL blank to fall back to the default.',
-      fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link.' },
-        { name: 'description', title: 'Sub text (one line)', type: 'string', description: 'The short line shown under "3. Adventure". Leave blank to keep the default copy.', validation: (Rule) => Rule.max(220) },
-      ],
-    },
-
-    // ─── SHOWS PAGE INTRO ─────────────────────────────────────────
-    {
-      name: 'showsIndexIntro',
-      title: 'Shows page - intro paragraph',
-      type: 'text',
-      group: 'shows',
-      rows: 4,
-      description: 'The intro paragraph shown above the list of upcoming shows on /shows. Plain text. Leave blank to fall back to the default hard-coded copy.',
-      validation: (Rule) => Rule.max(600),
-    },
-
   ],
 
   preview: {
     prepare() {
-      return { title: 'Site Settings', subtitle: 'Hero, Shane\'s Pick, banner, Reserve CTA, intros' }
+      return { title: 'Site-wide settings', subtitle: 'Banner + Reserve Stripe CTA' }
     },
   },
 }

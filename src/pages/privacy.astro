@@ -1,17 +1,16 @@
 ---
 import Site from '../layouts/Site.astro'
 
-const lastUpdated = '24 May 2026'
+const lastUpdated = 'June 2026'
 ---
 
 <Site
   title="Privacy Policy"
-  description="How SEQ Campers collects, uses, and protects your personal information when you enquire about a caravan or use this website."
+  description="How SEQ Campers collects, uses, and protects your personal information when you visit our website, submit quote requests, or make a payment."
 >
-  <div class="page-header">
+  <div class="page-header page-header-tight">
     <div class="container">
-      <div class="page-eyebrow">Legal</div>
-      <h1>Privacy Policy</h1>
+      <h1>SEQ Campers Privacy Policy</h1>
       <p>Last updated: {lastUpdated}</p>
     </div>
   </div>
@@ -19,49 +18,163 @@ const lastUpdated = '24 May 2026'
   <section class="section">
     <div class="container" style="max-width:760px;">
       <div class="rich-text">
+
+        <h2>1. Introduction</h2>
         <p>
-          This is a placeholder privacy policy. SEQ Campers will update this
-          page with the formal policy text. The summary below reflects how
-          we currently handle information.
+          SEQ Campers (we, us, or our) is committed to protecting your privacy and ensuring you have a positive
+          experience on our website. This Privacy Policy explains how we collect, use, disclose, and otherwise
+          process your personal information when you visit our website, submit quote requests, subscribe to our
+          newsletter, or make deposits and payments.
         </p>
 
-        <h2>What we collect</h2>
+        <h2>2. Information We Collect</h2>
+
+        <h3>2.1 Information You Provide Directly</h3>
+        <p>We collect information you voluntarily provide through our website, including:</p>
+        <ul>
+          <li>
+            <strong>Contact Form Data:</strong> When you submit a quote request or inquiry form, we collect your
+            name, email address, phone number, postcode, and details about your camper interests or inquiry.
+          </li>
+          <li>
+            <strong>Newsletter Subscription:</strong> When you subscribe to our newsletter or marketing emails,
+            we collect your email address and any other information you provide.
+          </li>
+          <li>
+            <strong>Payment Information:</strong> When you make a deposit or payment:
+            <ul>
+              <li>
+                <em>For online deposits via Stripe:</em> We collect billing name, address, and transaction
+                details. Your card information (credit/debit card numbers, expiry dates, CVC codes) is processed
+                securely by Stripe, our certified payment processor. We do not store, process, or have access to
+                your full card details.
+              </li>
+              <li>
+                <em>For direct bank transfers:</em> We collect transaction confirmation details and bank account
+                information you provide to us. This information is used only to reconcile payments and
+                communicate with you.
+              </li>
+            </ul>
+          </li>
+          <li>
+            <strong>Communications:</strong> If you contact us directly via email or other communication
+            channels, we collect the information you include in your message.
+          </li>
+        </ul>
+
+        <h3>2.2 Information Collected Automatically</h3>
+        <p>When you visit our website, we may automatically collect:</p>
+        <ul>
+          <li>Browser and device information (browser type, operating system, device type)</li>
+          <li>IP address and general location information</li>
+          <li>Usage data (pages visited, time spent, links clicked)</li>
+        </ul>
+
+        <h2>3. How We Use Your Information</h2>
+        <p>We use the information we collect for the following purposes:</p>
+        <ul>
+          <li>To respond to your inquiry or quote request</li>
+          <li>To process and confirm deposits and payments</li>
+          <li>To send payment confirmations and invoices</li>
+          <li>To send you marketing communications and newsletters (with your consent)</li>
+          <li>To improve our website and services</li>
+          <li>To prevent fraud and unauthorized transactions (for online payments)</li>
+          <li>To comply with legal and tax obligations</li>
+        </ul>
+
+        <h2>4. Sharing of Information</h2>
         <p>
-          When you submit an enquiry through this website, we collect the
-          name, phone number, email address, and message you provide.
-          Web analytics cookies (where used) may collect anonymous data
-          about pages visited, time on site, and referring source.
+          We do not sell, rent, or lease your personal information to third parties. However, we may share your
+          information in the following circumstances:
+        </p>
+        <ul>
+          <li>
+            With Stripe (for online deposits only) to process secure payments and prevent fraud. Stripe is
+            PCI-DSS Level 1 compliant. See Stripe's Privacy Policy at
+            <a href="https://stripe.com/privacy" target="_blank" rel="noopener">https://stripe.com/privacy</a>
+          </li>
+          <li>
+            With other service providers who assist us (e.g., email service providers, website hosts) under
+            confidentiality agreements
+          </li>
+          <li>When required by law or legal process</li>
+          <li>To protect our rights, privacy, safety, or property</li>
+          <li>In connection with a merger, acquisition, or sale of assets (we will notify you of such change)</li>
+        </ul>
+
+        <h2>5. Data Security</h2>
+        <p>
+          We implement reasonable administrative, technical, and physical safeguards to protect your personal
+          information from unauthorized access, alteration, disclosure, and destruction.
+        </p>
+        <p>
+          For online deposits via Stripe, we use industry-standard encryption (SSL/TLS) and partner with Stripe,
+          a Payment Card Industry (PCI) Data Security Standard Level 1 compliant service provider. We never
+          store your full credit card details on our systems. For direct bank transfer payments, we protect
+          banking information through secure communication channels and restricted access to payment records.
         </p>
 
-        <h2>How we use it</h2>
+        <h2>6. Data Retention</h2>
         <p>
-          Enquiry details are used only to reply to your enquiry and
-          provide the quote you have requested. We do not sell, rent,
-          or share your contact details with third parties.
+          We retain your personal information for as long as necessary to fulfill the purposes outlined in this
+          Privacy Policy, unless a longer retention period is required by law. For quote requests, we typically
+          retain information for 12 months. For payment records, invoices, and transaction details (whether via
+          Stripe or direct transfer), we retain information for 7 years to comply with Australian tax law and
+          accounting standards. Newsletter subscribers can have their information retained until they unsubscribe.
         </p>
 
-        <h2>How long we keep it</h2>
+        <h2>7. Your Rights</h2>
+        <p>Under Australian Privacy Law, you have the right to:</p>
+        <ul>
+          <li>Access the personal information we hold about you</li>
+          <li>Request correction of inaccurate information</li>
+          <li>Opt-out of marketing communications at any time</li>
+          <li>Request deletion of your information (subject to legal obligations)</li>
+        </ul>
         <p>
-          Enquiry records are retained for as long as required to
-          service the enquiry and meet any legal record-keeping
-          obligations, then deleted on request.
+          To exercise any of these rights, please contact us using the details provided in Section 9. For
+          payment-related data held by Stripe, please contact Stripe directly at
+          <a href="mailto:privacy@stripe.com">privacy@stripe.com</a>.
         </p>
 
-        <h2>Access and corrections</h2>
+        <h2>8. Marketing Communications</h2>
         <p>
-          You can request access to, correction of, or deletion of
-          your personal information held by SEQ Campers at any time.
-          Email <a href="mailto:office@seqcampers.com.au">office@seqcampers.com.au</a>
-          or call <a href="tel:0753707933">(07) 5370 7933</a>.
+          If you subscribe to our newsletter or marketing emails, we will use your email address to send you
+          updates, promotions, and information about our products and services.
+        </p>
+        <p>You can unsubscribe from marketing communications at any time by:</p>
+        <ul>
+          <li>Clicking the Unsubscribe link in any email we send you</li>
+          <li>Contacting us directly at the email address or phone number below</li>
+        </ul>
+
+        <h2>9. Contact Us</h2>
+        <p>
+          If you have questions about this Privacy Policy, wish to access or correct your information, or want
+          to exercise your privacy rights, please contact us:
+        </p>
+        <p>
+          <strong>SEQ Campers</strong><br />
+          Email: <a href="mailto:admin@seqcampers.com.au">admin@seqcampers.com.au</a><br />
+          Phone: <a href="tel:0753707933">07 5370 7933</a><br />
+          Address: 3B/6 Bonanza Court, Marcoola QLD 4564
         </p>
 
-        <h2>Complaints</h2>
+        <h2>10. Changes to This Privacy Policy</h2>
         <p>
-          If you believe we have mishandled your personal information,
-          please contact us first so we can put it right. If you are
-          not satisfied, you can lodge a complaint with the Office of
-          the Australian Information Commissioner at
-          <a href="https://www.oaic.gov.au">oaic.gov.au</a>.
+          We may update this Privacy Policy from time to time to reflect changes in our practices, technology,
+          legal requirements, or other factors. We will notify you of any material changes by posting the
+          updated Privacy Policy on our website and updating the Last Updated date.
+        </p>
+
+        <h2>11. Compliance</h2>
+        <p>
+          This Privacy Policy is designed to comply with the Privacy Act 1988 (Cth) and the Australian Privacy
+          Principles (APPs), as well as other applicable privacy and data protection laws.
+        </p>
+
+        <p style="margin-top:32px; color:var(--muted); font-size:0.88rem;">
+          &copy; 2026 SEQ Campers. All rights reserved.
         </p>
       </div>
     </div>

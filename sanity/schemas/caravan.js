@@ -16,7 +16,7 @@ export default {
       name: 'title',
       title: 'Caravan name',
       type: 'string',
-      description: 'Shown in the listing - e.g. "Stockman Trekka 2024"',
+      description: 'Shown in the listing - e.g. "Stockman Products Trekka 2024" or "Kimberley Kampers Karavan 2023"',
       validation: (Rule) => Rule.required().min(3),
     },
 
@@ -62,7 +62,7 @@ export default {
       title: 'Brand',
       type: 'reference',
       to: [{ type: 'brand' }],
-      description: 'Pick the manufacturer (Kimberley, Stockman, etc.)',
+      description: 'Pick the manufacturer (Kimberley Kampers, Stockman Products, etc.)',
       validation: (Rule) => Rule.required(),
     },
 
@@ -142,7 +142,8 @@ export default {
       title: 'Photos',
       type: 'array',
       description:
-        'Tip: select multiple files in your file picker (Ctrl+click or Shift+click on Windows) to upload them in one go. Then click each thumbnail to add an Alt text. Drag to reorder - the first photo is the main image shown in the listing grid.',
+        '⚡ TO UPLOAD MANY PHOTOS AT ONCE: open File Explorer (Windows) or Finder (Mac), select multiple photos (Ctrl+click on Windows / Cmd+click on Mac, or Shift+click for a range), then DRAG the whole selection into the dashed dropzone below. They will all upload in parallel. The "Add item" button only adds one photo at a time - use drag-and-drop for bulk. Drag thumbnails to reorder once uploaded - the first photo is the main image shown in the listing grid.',
+      options: { layout: 'grid' },
       of: [
         {
           type: 'image',
@@ -251,7 +252,28 @@ export default {
               .max(800)
               .warning('Most caravans have ball weights of 100-450kg - confirm if outside this range'),
         },
+        {
+          name: 'waterCapacityL',
+          title: 'Water capacity (L)',
+          type: 'number',
+          description: 'Total fresh-water tank capacity in litres. Off-road caravans typically carry 90-300L.',
+          validation: (Rule) =>
+            Rule.positive()
+              .integer()
+              .min(20)
+              .max(1000)
+              .warning('Most caravans carry 90-300L - confirm if outside this range'),
+        },
       ],
+    },
+
+    {
+      name: 'topFeatures',
+      title: 'Top 5 features ("Is this right for you?")',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'The five biggest selling points of this caravan. Per Shane (16 Jun): "what are the five benefits of this van? Is this right for you?" Each one should be a short, specific benefit (e.g. "Tows behind a mid-size SUV - 1,800kg ATM"). Aim for 5 lines.',
+      validation: (Rule) => Rule.max(7).warning('Aim for exactly 5'),
     },
 
     {
@@ -265,13 +287,7 @@ export default {
           name: 'stockNumber',
           title: 'SEQ stock number',
           type: 'string',
-          description: 'The 4-digit SEQ Campers stock number (e.g. 1234). Shown on the listing for internal reference.',
-          validation: (Rule) =>
-            Rule.custom((v) => {
-              if (!v) return true
-              if (!/^[0-9]{3,5}$/.test(v)) return 'Use 3-5 digits only, e.g. 1234'
-              return true
-            }),
+          description: 'The SEQ Campers stock number. Free text - can include letters and numbers (e.g. 1234, K1234, SC-2024-001). Shown on the listing for internal reference.',
         },
         {
           name: 'vin',
@@ -502,15 +518,19 @@ export default {
 
   ],
 
-  // Controls how each caravan appears in the listing sidebar of the studio
+  // Controls how each caravan appears in the listing sidebar of the studio.
+  // Per Bart 18 Jun: surface the stock number in the list so Maud + Shane can
+  // ID a van at a glance without opening it. Format: title on first line,
+  // "$price - Status  ·  #stockNumber" on the second.
   preview: {
     select: {
       title: 'title',
       price: 'price',
       status: 'status',
+      stockNumber: 'compliance.stockNumber',
       media: 'photos.0',
     },
-    prepare({ title, price, status, media }) {
+    prepare({ title, price, status, stockNumber, media }) {
       const statusLabel = {
         'for-sale': 'For Sale',
         'sold': 'SOLD',
@@ -522,9 +542,11 @@ export default {
         ? `$${price.toLocaleString('en-AU')}`
         : 'No price set'
 
+      const stockSuffix = stockNumber ? `  ·  #${stockNumber}` : ''
+
       return {
         title,
-        subtitle: `${priceStr}  -  ${statusLabel}`,
+        subtitle: `${priceStr}  -  ${statusLabel}${stockSuffix}`,
         media,
       }
     },

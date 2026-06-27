@@ -9,6 +9,28 @@
 # needed for routing. The Netlify form submission redirect lives on the
 # form itself (action="/thanks/") so it survives static deploys.
 
+# The Kruiser quote builder was renamed /quote/kruiser-t -> /quote/kruiser
+# (it now lists all 3 models). 301 the old path so printed Brisbane-show QR
+# codes, shared-spec links and bookmarks keep working. Query strings are
+# preserved automatically.
+[[redirects]]
+  from = "/quote/kruiser-t"
+  to = "/quote/kruiser/"
+  status = 301
+[[redirects]]
+  from = "/quote/kruiser-t/*"
+  to = "/quote/kruiser/"
+  status = 301
+# kruiser-s retired - all S-Class models now live on /quote/kruiser.
+[[redirects]]
+  from = "/quote/kruiser-s"
+  to = "/quote/kruiser/"
+  status = 301
+[[redirects]]
+  from = "/quote/kruiser-s/*"
+  to = "/quote/kruiser/"
+  status = 301
+
 [[headers]]
   for = "/*"
   [headers.values]

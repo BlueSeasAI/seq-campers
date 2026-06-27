@@ -1,8 +1,12 @@
 # SEQ Campers - robots.txt
 # Allow all standard search engines + AI crawlers (AEO competitive moat)
+# Disallow /handover/ - UNLISTED post-sale owner pages, shared by direct URL only
+# Disallow /user-guide/ - UNLISTED admin guide for Maud + Shane
 
 User-agent: *
 Allow: /
+Disallow: /handover/
+Disallow: /user-guide/
 
 # AI search crawlers - explicit allow for AEO visibility
 User-agent: GPTBot

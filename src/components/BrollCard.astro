@@ -12,7 +12,9 @@ import { sanityImage, youtubeId } from '../lib/sanity.js'
 
 const { caravan: c } = Astro.props
 const slugStr = typeof c.slug === 'string' ? c.slug : c.slug?.current
-const href = slugStr ? `/stock/${slugStr}` : '#'
+// "Coming soon" placeholder tiles (grid fillers) have no real spec page, so
+// they render WITHOUT an href - non-clickable, never a dead /stock/placeholder.
+const href = (slugStr && !c._isPlaceholder) ? `/stock/${slugStr}` : undefined
 
 const vid = youtubeId(c.brollVideoUrl)
 const stockNo = c.compliance?.stockNumber || ''

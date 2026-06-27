@@ -3,7 +3,9 @@ import Site from '../layouts/Site.astro'
 import CaravanCard from '../components/CaravanCard.astro'
 import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
-import { getSiteSettings, sanityImage, conditionLabel, youtubeId } from '../lib/sanity.js'
+import ReserveCta from '../components/ReserveCta.astro'
+import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
+import { getSiteSettings, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
 
 let settings = null
 try {
@@ -12,10 +14,20 @@ try {
   console.warn('Sanity unreachable on build:', err.message)
 }
 
+// Hero video resolution: Sanity siteSettings.heroVideo.youtubeUrl wins when
+// set. Falls back to the self-hosted /hero-video.mp4 so the page still works
+// if the field is empty or Sanity is unreachable.
+// Per Bart 16 Jun: Kyle was pasting YouTube URLs into the field and they
+// were ignored because the hero used to be hardcoded MP4. This wires them
+// up properly.
+const heroYouTubeId = settings?.heroVideo?.youtubeUrl
+  ? youtubeId(settings.heroVideo.youtubeUrl)
+  : null
+
 // Pathway tile defaults - used when Maud hasn't filled a slot in Site
 // Settings → Home page videos (Watch / Visit / Adventure).
 const PATHWAY_DEFAULTS = [
-  { videoId: 'tozC7prVbOg', sub: 'Our video library - every model, Kimberley and Stockman.' },
+  { videoId: 'tozC7prVbOg', sub: 'Our video library - every model, Kimberley Kampers and Stockman Products.' },
   { videoId: 'xYf81xUZtNE', sub: 'Pre-loved and new display vans available now.' },
   { videoId: 'WwgapQt3xO4', sub: 'From our driveway to your driveway. Camping support.' },
 ]
@@ -50,12 +62,14 @@ const shanesPick = settings?.shanesPick?.caravan
       caravan: settings.shanesPick.caravan,
       originalPrice: settings.shanesPick.originalPrice,
       quote: settings.shanesPick.shanesQuote,
+      status: settings.shanesPick.status || 'hidden',
       isPlaceholder: false,
     }
   : {
       caravan: PLACEHOLDER_SHANES_PICK_CARAVAN,
       originalPrice: null,
       quote: 'Shane has not picked a caravan yet. Browse the full stock list to see what is currently available, or call us on (07) 5370 7933.',
+      status: 'hidden',
       isPlaceholder: true,
     }
 
@@ -84,11 +98,25 @@ const testimonials = [
   },
 ]
 
-const upcomingNews = [
-  { date: '10 May', type: 'New Arrival', title: 'New Stockman Rover 02 arrival', body: 'The 2026 model is in the showroom. Come see the upgrades in person.' },
-  { date: '17 May', type: 'Handover', title: 'Mitchell family handover', body: 'Another family heading out on their first big trip. Safe travels!' },
-  { date: '03 Jun', type: 'Event', title: 'Brisbane Caravan, Camping & Touring Supershow', body: 'Five days at the Brisbane Showgrounds, stand 2693 in the Main Oval. Come and find us at the show - or book a chat before we go.', href: '/brisbane-show-2026' },
-]
+// What's Happening (homepage view). Pulls from Sanity - getHappeningsFeed
+// merges editor "What's Happening" items with upcoming/active shows so a show
+// added in Studio appears here automatically. Newest 3 flagged for homepage.
+let happeningsFeed = []
+try {
+  happeningsFeed = await getHappeningsFeed()
+} catch (err) {
+  console.warn('Sanity unreachable for homepage feed:', err.message)
+}
+const homeFeed = happeningsFeed.filter((i) => i.showOnHomepage).slice(0, 3)
+
+const typeColors = {
+  'New Arrival': 'rust',
+  'Handover': 'green',
+  'Event': 'gold',
+  'New Video': 'blue',
+  'Workshop': 'muted',
+  'News': 'muted',
+}
 
 // LocalBusiness schema - tells Google/AI "we are an Australian caravan dealer"
 const localBusiness = {
@@ -96,7 +124,7 @@ const localBusiness = {
   '@type': 'AutoDealer',
   '@id': 'https://seqcampers.com.au/#business',
   name: 'SEQ Campers',
-  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman stock. Off-road camping experts since 2013.",
+  description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman Products stock. Off-road camping experts since 2013.",
   url: 'https://seqcampers.com.au',
   telephone: '+61-7-5370-7933',
   email: 'office@seqcampers.com.au',
@@ -128,7 +156,7 @@ const faqSchema = {
       name: 'What brands of caravan does SEQ Campers stock?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SEQ Campers specialises in premium off-road caravans from Kimberley Kampers and Stockman Caravans. Every van on the lot is hand-picked, inspected, and prepared by Shane and the SEQ team before it goes on sale.',
+        text: 'SEQ Campers specialises in premium off-road caravans from Kimberley Kampers and Stockman Products. Every van on the lot is hand-picked, inspected, and prepared by Shane and the SEQ team before it goes on sale.',
       },
     },
     {
@@ -169,7 +197,7 @@ const faqSchema = {
 
 <Site
   title="Premium Off-Road Caravans"
-  description="SEQ Campers - Queensland's home for premium off-road caravans. Hand-picked Kimberley Kampers and Stockman stock, hand-inspected by Shane. Off-road camping on the Sunshine Coast since 2013."
+  description="SEQ Campers - the Sunshine Coast home of off-road caravan and off-grid camping Australia. Hand-picked Kimberley Kampers (Karavan, Kube, Kruiswagen, Kruiser) and Stockman Products (Trekka, Rover, Pod) off-grid caravans and 4x4 camper vans. Authorised dealer for Queensland. Off-road camping experts since 2013."
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
@@ -179,22 +207,41 @@ const faqSchema = {
        (the controls that occasionally flicker in). -->
   <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
-      <video
-        class="hero-video-mp4"
-        src="/hero-video.mp4"
-        poster="/hero-poster.jpg"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="metadata"
-        disablepictureinpicture
-        controlslist="nodownload nofullscreen noremoteplayback"
-        tabindex="-1"
-      ></video>
+      {heroYouTubeId ? (
+        <iframe
+          class="hero-video-iframe"
+          src={`https://www.youtube-nocookie.com/embed/${heroYouTubeId}?autoplay=1&mute=1&loop=1&playlist=${heroYouTubeId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+          title="Home page hero video"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen="false"
+          tabindex="-1"
+          inert
+          loading="eager"
+        ></iframe>
+      ) : (
+        <video
+          class="hero-video-mp4"
+          src="/hero-video.mp4"
+          poster="/hero-poster.jpg"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          disablepictureinpicture
+          controlslist="nodownload nofullscreen noremoteplayback"
+          tabindex="-1"
+        ></video>
+      )}
       <div class="hero-video-block" aria-hidden="true"></div>
     </div>
   </section>
+
+  <!-- Media Session blockade now lives site-wide in Site.astro - covers every
+       autoplay video on every page (hero, pathway, BrollCard, /new tiles,
+       /quote intro, /service team + workshop, /shows compilation). -->
+
 
   <!-- Three pathway video tiles (Kimberley-style 4-box pattern but with 3 +
        video-backgrounds). Shane's preferred home page architecture: compact
@@ -204,94 +251,41 @@ const faqSchema = {
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
         <div class="page-eyebrow" style="color:var(--rust);">How it works</div>
-        <h2 class="section-title">Three steps to your next adventure.</h2>
+        <h2 class="section-title">Three steps to your next off-road adventure.</h2>
+        <p style="color:var(--muted); font-size:0.98rem; margin-top:6px; max-width:620px; margin-left:auto; margin-right:auto;">
+          From browsing off-road caravans and off-grid hybrids to driving away from our Marcoola showroom on the Sunshine Coast - the way SEQ Campers does it.
+        </p>
       </div>
 
       <div class="pathway-tile-grid">
-        <a href="/videos" class="pathway-tile pathway-tile-watch" data-video-id={pathwayWatch.videoId}>
-          <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayWatch.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
-            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
-            <div class="pathway-tile-block" aria-hidden="true"></div>
-            <div class="pathway-tile-overlay" aria-hidden="true"></div>
-          </div>
-          <div class="pathway-tile-inner">
-            <div class="pathway-tile-label">1. Watch</div>
-            <div class="pathway-tile-sub">{pathwayWatch.sub}</div>
-          </div>
-        </a>
-
-        <a href="/stock" class="pathway-tile pathway-tile-visit" data-video-id={pathwayVisit.videoId}>
-          <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayVisit.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
-            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
-            <div class="pathway-tile-block" aria-hidden="true"></div>
-            <div class="pathway-tile-overlay" aria-hidden="true"></div>
-          </div>
-          <div class="pathway-tile-inner">
-            <div class="pathway-tile-label">2. Visit</div>
-            <div class="pathway-tile-sub">{pathwayVisit.sub}</div>
-          </div>
-        </a>
-
-        <a href="/service" class="pathway-tile pathway-tile-adventure" data-video-id={pathwayAdventure.videoId}>
-          <div class="pathway-tile-media">
-            <img class="pathway-tile-poster" src={`https://img.youtube.com/vi/${pathwayAdventure.videoId}/hqdefault.jpg`} alt="" loading="lazy" />
-            <div class="pathway-tile-iframe-wrap" aria-hidden="true"></div>
-            <div class="pathway-tile-block" aria-hidden="true"></div>
-            <div class="pathway-tile-overlay" aria-hidden="true"></div>
-          </div>
-          <div class="pathway-tile-inner">
-            <div class="pathway-tile-label">3. Adventure</div>
-            <div class="pathway-tile-sub">{pathwayAdventure.sub}</div>
-          </div>
-        </a>
+        {[
+          { href: '/videos', label: '1. Watch', sub: pathwayWatch.sub, videoId: pathwayWatch.videoId, variant: 'watch' },
+          { href: '/stock', label: '2. Visit', sub: pathwayVisit.sub, videoId: pathwayVisit.videoId, variant: 'visit' },
+          { href: '/service', label: '3. Adventure', sub: pathwayAdventure.sub, videoId: pathwayAdventure.videoId, variant: 'adventure' },
+        ].map((p) => (
+          <a href={p.href} class={`pathway-tile pathway-tile-${p.variant}`}>
+            <div class="pathway-tile-media">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${p.videoId}?autoplay=1&mute=1&loop=1&playlist=${p.videoId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+                title={p.label}
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen="false"
+                tabindex="-1"
+                inert
+                loading="lazy"
+              ></iframe>
+              <div class="pathway-tile-block" aria-hidden="true"></div>
+            </div>
+            <div class="pathway-tile-meta">
+              <div class="pathway-tile-label">{p.label}</div>
+              <div class="pathway-tile-sub">{p.sub}</div>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   </section>
-
-  <script is:inline>
-    /* Pathway tiles: hover (or touch) swaps the poster for an autoplay iframe.
-       Mouse-leave / tap-out clears the iframe so other tiles never trigger
-       multiple videos at once. */
-    (function () {
-      const tiles = document.querySelectorAll('.pathway-tile')
-      tiles.forEach(function (tile) {
-        const videoId = tile.getAttribute('data-video-id')
-        if (!videoId) return
-        const wrap = tile.querySelector('.pathway-tile-iframe-wrap')
-        let iframe = null
-
-        function play() {
-          if (iframe) return
-          iframe = document.createElement('iframe')
-          iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId +
-            '?autoplay=1&mute=1&loop=1&playlist=' + videoId +
-            '&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0'
-          iframe.setAttribute('frameborder', '0')
-          iframe.setAttribute('allow', 'autoplay; encrypted-media')
-          iframe.setAttribute('tabindex', '-1')
-          iframe.setAttribute('inert', '')
-          wrap.appendChild(iframe)
-          tile.classList.add('is-playing')
-        }
-        function stop() {
-          if (!iframe) return
-          iframe.remove()
-          iframe = null
-          tile.classList.remove('is-playing')
-        }
-        tile.addEventListener('mouseenter', play)
-        tile.addEventListener('mouseleave', stop)
-        tile.addEventListener('focusin', play)
-        tile.addEventListener('focusout', stop)
-        /* Touch devices: tap once = preview, tap twice / link follow = navigate */
-        tile.addEventListener('touchstart', function (e) {
-          if (!iframe) { e.preventDefault(); play() }
-        }, { passive: false })
-      })
-    })()
-  </script>
 
   <TrustStrip />
 
@@ -317,7 +311,15 @@ const faqSchema = {
         <div class="section-header">
           <div>
             <div class="page-eyebrow" style="color:var(--rust);">Sale of the week</div>
-            <h2 class="section-title">Shane's Pick</h2>
+            <h2 class="section-title">
+              Shane's Pick
+              {shanesPick.status === 'available-now' && (
+                <span class="shanes-pick-status shanes-pick-status-available" aria-label="Available now">Available now</span>
+              )}
+              {shanesPick.status === 'coming-soon' && (
+                <span class="shanes-pick-status shanes-pick-status-soon" aria-label="Coming soon">Coming soon</span>
+              )}
+            </h2>
           </div>
           <a href={`/stock/${shanesPick.caravan.slug?.current}`} class="section-link">View this listing →</a>
         </div>
@@ -375,6 +377,10 @@ const faqSchema = {
       padding-top: 32px;
       padding-bottom: 32px;
     }
+    /* Pathway tiles - landscape 16:9 cards matching the /stock BrollCard
+       pattern per Shane's request 16 Jun. Each tile auto-plays its YouTube
+       video muted and looping, with the label + sub rendered below the
+       video (not overlaid). */
     .pathway-tile-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -384,42 +390,27 @@ const faqSchema = {
       .pathway-tile-grid { grid-template-columns: 1fr; gap: 14px; }
     }
     .pathway-tile {
-      position: relative;
       display: block;
-      aspect-ratio: 4 / 5;
-      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 10px;
       overflow: hidden;
       text-decoration: none;
       color: inherit;
-      background: #1a1a1c;
-      transition: transform 0.25s, box-shadow 0.25s;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     }
     .pathway-tile:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 38px rgba(42, 22, 8, 0.22);
+      transform: translateY(-3px);
+      border-color: var(--rust, #C0341A);
+      box-shadow: 0 10px 28px rgba(42, 22, 8, 0.14);
     }
     .pathway-tile-media {
-      position: absolute;
-      inset: 0;
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #1a1a1c;
       overflow: hidden;
     }
-    .pathway-tile-poster {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: opacity 0.3s;
-    }
-    .pathway-tile.is-playing .pathway-tile-poster {
-      opacity: 0;
-    }
-    .pathway-tile-iframe-wrap {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-    .pathway-tile-iframe-wrap iframe {
+    .pathway-tile-media iframe {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -433,52 +424,38 @@ const faqSchema = {
     .pathway-tile-block {
       position: absolute;
       inset: 0;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .pathway-tile-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.78) 100%);
-      pointer-events: none;
-    }
-    .pathway-tile-inner {
-      position: absolute;
-      inset: 0;
       z-index: 5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      text-align: center;
-      padding: 24px 22px 26px;
-      color: #fff;
-      pointer-events: none;
+      background: transparent;
+      pointer-events: auto;
+    }
+    .pathway-tile-meta {
+      padding: 14px 16px 16px;
     }
     .pathway-tile-label {
       font-family: 'Inter Tight', sans-serif;
-      font-size: 1.8rem;
       font-weight: 800;
+      color: var(--ink, #2A1608);
+      font-size: 1.15rem;
+      line-height: 1.2;
       letter-spacing: -0.01em;
-      line-height: 1.1;
-      text-shadow: 0 2px 16px rgba(0,0,0,0.5);
     }
     .pathway-tile-sub {
-      margin-top: 6px;
-      font-size: 0.92rem;
+      margin-top: 4px;
+      color: var(--muted, #8B6A40);
+      font-size: 0.9rem;
       line-height: 1.5;
-      color: rgba(255,255,255,0.92);
-      max-width: 280px;
-      text-shadow: 0 1px 10px rgba(0,0,0,0.45);
     }
 
-    /* Hero video section: full viewport height. Self-hosted MP4 fills the
-       hero in both dimensions via object-fit cover. */
+    /* Hero video section: full viewport height. Uses 100dvh (dynamic
+       viewport height) on modern browsers so the URL bar on mobile Safari
+       doesn't shift the hero off-screen. Falls back to 100vh on older
+       browsers. */
     :global(.hero-video.hero-video-clean) {
       padding: 0 !important;
       min-height: 100vh !important;
+      min-height: 100dvh !important;
       height: 100vh;
+      height: 100dvh;
     }
     :global(.hero-video-mp4) {
       position: absolute;
@@ -490,11 +467,88 @@ const faqSchema = {
       border: 0;
       pointer-events: none;
     }
+    /* Aggressively hide every browser-native media control on the hero MP4.
+       Without these, Chrome/Safari surface skip-back / pause / skip-forward
+       icons on hover (the "global media controls" overlay) which kills the
+       cinematic feel Shane wants. */
+    :global(.hero-video-mp4::-webkit-media-controls),
+    :global(.hero-video-mp4::-webkit-media-controls-panel),
+    :global(.hero-video-mp4::-webkit-media-controls-play-button),
+    :global(.hero-video-mp4::-webkit-media-controls-start-playback-button),
+    :global(.hero-video-mp4::-webkit-media-controls-overlay-play-button),
+    :global(.hero-video-mp4::-webkit-media-controls-enclosure),
+    :global(.hero-video-mp4::-webkit-media-controls-current-time-display),
+    :global(.hero-video-mp4::-webkit-media-controls-time-remaining-display),
+    :global(.hero-video-mp4::-webkit-media-controls-timeline),
+    :global(.hero-video-mp4::-webkit-media-controls-volume-slider),
+    :global(.hero-video-mp4::-webkit-media-controls-mute-button),
+    :global(.hero-video-mp4::-webkit-media-controls-fullscreen-button) {
+      display: none !important;
+      -webkit-appearance: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    /* hero-video-block sits over the video element to intercept ALL pointer
+       events so the browser's hover-media-controls never trigger. Critical
+       for keeping the hero clean. */
+    :global(.hero-video-block) {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: transparent;
+      pointer-events: auto;
+      cursor: default;
+    }
+    /* YouTube iframe needs a wider-than-100% trick so the 16:9 video covers
+       the full viewport-height hero box without letterboxing. */
+    :global(.hero-video-iframe) {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 177.78vh;
+      height: 100vh;
+      min-width: 100vw;
+      min-height: 56.25vw;
+      transform: translate(-50%, -50%);
+      border: 0;
+      pointer-events: none;
+    }
     @media (max-width: 768px) {
       :global(.hero-video.hero-video-clean) {
         min-height: 85vh !important;
         height: 85vh;
       }
+      :global(.hero-video-iframe) {
+        width: 177.78vh;
+        height: 85vh;
+        min-height: 47.81vw;
+      }
+    }
+
+    /* Shane's Pick status pill - sits next to the Shane's Pick heading.
+       "Coming soon" = orange amber. "Available now" = green. Maud picks
+       which one shows in Sanity Studio. Per Bart 8 Jun. */
+    .shanes-pick-status {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 12px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1;
+    }
+    .shanes-pick-status-available {
+      background: linear-gradient(135deg, #2BA85F 0%, #1F8049 100%);
+      box-shadow: 0 4px 14px rgba(43, 168, 95, 0.30);
+    }
+    .shanes-pick-status-soon {
+      background: linear-gradient(135deg, #E58A2A 0%, #B45D10 100%);
+      box-shadow: 0 4px 14px rgba(229, 138, 42, 0.30);
     }
   </style>
 
@@ -505,7 +559,10 @@ const faqSchema = {
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:8px;">
         <div class="page-eyebrow" style="color:var(--rust);">In their own words</div>
-        <h2 class="section-title">Real owners, real trips, real stories</h2>
+        <h2 class="section-title">Real off-road owners, real trips, real stories</h2>
+        <p style="color:var(--muted); font-size:0.98rem; margin-top:6px; max-width:620px; margin-left:auto; margin-right:auto; text-align:center;">
+          From Kimberley Karavan and Kruiser owners exploring the outback to Stockman Trekka and Rover families chasing off-grid camping weekends - here's what they have to say about SEQ Campers.
+        </p>
       </div>
       <div class="testimonial-grid">
         {testimonials.map((t) => (
@@ -523,4 +580,43 @@ const faqSchema = {
       </div>
     </div>
   </section>
+
+  <!-- What's Happening - shows + editor news from Sanity (newest 3). Hidden
+       when the feed is empty. Full list lives at /whats-happening. -->
+  {homeFeed.length > 0 && (
+    <section class="section" style="background:var(--sand-deep); padding-top:56px; padding-bottom:56px;">
+      <div class="container" style="max-width:880px;">
+        <div class="section-header" style="margin-bottom:28px;">
+          <div>
+            <div class="page-eyebrow" style="color:var(--rust);">What's happening</div>
+            <h2 class="section-title">News from the showroom floor</h2>
+          </div>
+          <a href="/whats-happening" class="section-link">See all →</a>
+        </div>
+        <div class="news-timeline">
+          {homeFeed.map((n) => (
+            <article class="news-item">
+              <div class="news-date">{shortDate(n.date)}</div>
+              <div class="news-body">
+                <span class={`news-type news-type-${typeColors[n.type] || 'muted'}`}>{n.type}</span>
+                <h3>{n.title}</h3>
+                <p>{n.body}</p>
+                {n.link && (
+                  <a
+                    href={n.link}
+                    {...(/^https?:\/\//i.test(n.link) ? { rel: 'noopener', target: '_blank' } : {})}
+                    style="color:var(--rust); font-weight:600; text-decoration:none;"
+                  >Read more →</a>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <YoutubeSubscribeBar variant="bar" />
+  <ReserveCta variant="band" />
 </Site>
+

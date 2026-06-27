@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>SEQ Campers website - user guide for Maud &amp; Shane</title>
+<style>
+  /* SEQ brand palette */
+  :root {
+    --sand: #F4EDE0;
+    --sand-deep: #EBE0CD;
+    --ink: #2A1608;
+    --rust: #C0341A;
+    --rust-dark: #A52910;
+    --gold: #D4943A;
+    --muted: #8B6A40;
+    --tan-border: #DCCBA8;
+    --green: #2BA85F;
+    --green-dark: #1F8049;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--sand);
+    line-height: 1.55;
+    font-size: 16px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 28px 64px; }
+
+  h1, h2, h3, h4 {
+    font-family: 'Inter Tight', 'Segoe UI', system-ui, sans-serif;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.1; margin: 0 0 6px; font-weight: 800; }
+  h2 {
+    font-size: 1.7rem; margin: 48px 0 14px; font-weight: 700;
+    padding-bottom: 6px; border-bottom: 3px solid var(--rust);
+  }
+  h3 { font-size: 1.25rem; margin: 30px 0 10px; font-weight: 700; color: var(--rust); }
+  h4 { font-size: 1.05rem; margin: 20px 0 8px; font-weight: 700; }
+
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 16px; padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--rust); text-decoration: underline; }
+
+  /* Cover */
+  .cover {
+    background: var(--ink); color: var(--sand);
+    padding: 48px 44px; border-radius: 18px; margin-bottom: 36px;
+    border: 3px solid var(--gold);
+  }
+  .cover h1 { color: var(--sand); margin: 0 0 10px; font-size: 2.6rem; }
+  .cover .subtitle { color: var(--gold); font-size: 1.15rem; margin-bottom: 18px; font-weight: 600; }
+  .cover .meta { color: rgba(244, 237, 224, 0.7); font-size: 0.92rem; margin-top: 24px; line-height: 1.7; }
+  .cover .cover-new {
+    color: #5FE6C0;
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 14px rgba(95, 230, 192, 0.35);
+  }
+  .cover .seq-mark {
+    display: inline-block; padding: 5px 14px;
+    background: var(--rust); color: #fff; border-radius: 999px;
+    font-weight: 700; font-size: 0.78rem; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+
+  /* TOC */
+  .toc {
+    background: #fff; border: 1px solid var(--tan-border);
+    border-radius: 14px; padding: 22px 28px; margin-bottom: 36px;
+  }
+  .toc h3 { color: var(--ink); margin-top: 0; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin-bottom: 8px; font-size: 1.02rem; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .toc a:hover { color: var(--rust); }
+
+  /* Section card */
+  .card {
+    background: #fff; border: 1px solid var(--tan-border);
+    border-radius: 14px; padding: 22px 28px; margin-bottom: 22px;
+  }
+  .card-warn { border-color: var(--rust); background: #FFF7EC; }
+  .card-tip {
+    border-color: var(--green); background: #F2FBF5;
+  }
+
+  /* Step / instruction list */
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: 8px 0 8px 46px;
+    margin-bottom: 4px;
+    line-height: 1.55;
+  }
+  .steps > li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 7px;
+    width: 32px; height: 32px;
+    background: var(--rust); color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 800; font-size: 0.95rem;
+  }
+
+  /* Inline UI labels */
+  .ui {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--sand-deep); border: 1px solid var(--tan-border);
+    border-radius: 5px;
+    font-family: 'Inter Tight', sans-serif; font-weight: 600;
+    font-size: 0.92em;
+    color: var(--ink);
+  }
+  .nav-path { font-family: 'Inter Tight', sans-serif; font-weight: 600; color: var(--rust); }
+  .nav-path::before { content: '➜  '; }
+
+  /* Boxes for callouts */
+  .box {
+    padding: 14px 18px; border-radius: 10px; margin: 14px 0;
+    border-left: 4px solid var(--rust);
+    background: var(--sand-deep);
+  }
+  .box-good { border-left-color: var(--green); background: #EFF8F1; }
+  .box-warn { border-left-color: var(--gold); background: #FFF7EC; }
+  .box strong { color: var(--rust); }
+  .box-good strong { color: var(--green-dark); }
+  .box-warn strong { color: var(--gold); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.96rem; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--tan-border); }
+  th { background: var(--sand-deep); font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 0.92rem; }
+
+  /* Inline code style for clarity */
+  code, .field {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.92em;
+    background: var(--sand-deep); padding: 1px 6px; border-radius: 4px;
+    color: var(--ink);
+  }
+
+  /* Visual diagram blocks */
+  .diagram {
+    background: #fff; border: 1px solid var(--tan-border);
+    border-radius: 10px; padding: 18px 22px; margin: 14px 0;
+    font-family: 'Inter Tight', sans-serif;
+  }
+  .diagram .arrow { color: var(--rust); font-weight: 700; padding: 0 8px; }
+
+  hr { border: 0; border-top: 1px solid var(--tan-border); margin: 40px 0; }
+
+  /* Print rules - make it a clean PDF. Per Bart 18 Jun: short sections
+     should FLOW onto the same printed page as the previous one instead
+     of each H2 forcing a new page (was wasting pages on small sections
+     like Stock/Videos/Service). Only the cover + TOC get forced page
+     breaks; section headings just avoid leaving orphan headings at the
+     bottom and avoid breaking individual blocks. */
+  @media print {
+    body { background: #fff; font-size: 10pt; line-height: 1.45; }
+    .wrap { padding: 0; max-width: 100%; }
+
+    /* Page 1 - the cover, ALONE. Force a break-after and pad it up so
+       it visually fills the page. */
+    .cover {
+      padding: 40px 32px;
+      margin-bottom: 0;
+      min-height: 80vh;
+      box-sizing: border-box;
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .cover h1 { font-size: 2.2rem; }
+    .cover .subtitle { font-size: 1.1rem; }
+    .cover .meta { margin-top: 36px; }
+
+    /* Page 2 - the Table of Contents, ALONE. */
+    .toc {
+      page-break-before: always;
+      break-before: page;
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      padding: 22px 28px;
+      margin-bottom: 0;
+    }
+    .toc h3 { font-size: 0.95rem; }
+    .toc li { margin-bottom: 6px; font-size: 1rem; }
+
+    /* Default: each section H2 starts a new page (per Bart 18 Jun -
+       most sections deserve their own page). The only exceptions are
+       the very short sections marked with .flow which let them stack
+       with the previous section on the same page. */
+    h2 {
+      margin: 18px 0 8px;
+      font-size: 1.3rem;
+      page-break-before: always;
+      break-before: page;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    h2.flow {
+      page-break-before: auto !important;
+      break-before: auto !important;
+    }
+    h3 {
+      margin: 14px 0 6px;
+      font-size: 1rem;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    h4 {
+      margin: 10px 0 4px;
+      font-size: 0.95rem;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Tighter blocks to maximise content density */
+    p { margin: 0 0 8px; }
+    ul, ol { margin: 0 0 10px; padding-left: 22px; }
+    li { margin-bottom: 3px; }
+    .card { padding: 14px 18px; margin-bottom: 12px; }
+    .box { margin: 8px 0; padding: 10px 14px; }
+    .diagram { padding: 12px 16px; font-size: 0.9rem; line-height: 1.4; margin: 10px 0; }
+    table { margin: 10px 0; font-size: 0.88rem; }
+    th, td { padding: 6px 9px; }
+
+    /* Blocks stay together as a unit - no splitting mid-block */
+    .card, .box, .diagram, table, .steps > li {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Prevent single lines stranded at top/bottom of a page */
+    p, li { orphans: 3; widows: 3; }
+
+    /* Keep links readable on paper */
+    a { color: var(--ink); text-decoration: underline; }
+
+    /* Page margins for clean printable A4 */
+    @page { margin: 1.4cm 1.3cm; }
+  }
+
+  /* Quick anchor links at top of each section */
+  .back-top {
+    display: inline-block; font-size: 0.85rem;
+    color: var(--muted); margin-bottom: 4px;
+    text-decoration: none;
+  }
+  .back-top:hover { color: var(--rust); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- COVER -->
+  <div class="cover">
+    <span class="seq-mark">User guide</span>
+    <h1>Your <span class="cover-new">NEW</span> SEQ Campers website</h1>
+    <div class="subtitle">A simple, page-by-page guide to updating everything yourself</div>
+    <p style="color:rgba(244,237,224,0.92); font-size:1.02rem; max-width:560px;">
+      Welcome Maud and Shane. This guide walks you through every part of your new website - what each page does, how to edit it,
+      and how changes you make in Sanity Studio reach the live site.
+    </p>
+    <div class="meta">
+      (07) 5300 2344 &middot; hello@blueseas.ai
+      <br>
+      Built by Blue Seas AI &middot; June 2026 &middot; v1.0
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>What's inside</h3>
+    <ol>
+      <li><a href="#start">Getting started - login &amp; the sidebar</a></li>
+      <li><a href="#caravans">Caravans - add, edit, mark sold, delete</a></li>
+      <li><a href="#home">Home page - hero video, Shane's Pick, pathway tiles</a></li>
+      <li><a href="#new">New caravans page - tile videos &amp; build-page videos</a></li>
+      <li><a href="#stock">Stock page (used caravans)</a></li>
+      <li><a href="#videos">Videos page (Kimberley Kingdom + Stockman Convoy)</a></li>
+      <li><a href="#service">Service &amp; workshop page</a></li>
+      <li><a href="#shows">Shows page - events &amp; compilation video</a></li>
+      <li><a href="#blog">Blog posts</a></li>
+      <li><a href="#faqs">FAQs</a></li>
+      <li><a href="#aeo">AEO keywords (search strategy)</a></li>
+      <li><a href="#handover">Handover pages (UNLISTED) - for new owners</a></li>
+      <li><a href="#sitewide">Site-wide settings - banner &amp; Reserve CTA</a></li>
+      <li><a href="#publish">What happens when you save? How changes go live</a></li>
+      <li><a href="#forms">Web forms - where your leads go</a></li>
+      <li><a href="#help">Getting help</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. GETTING STARTED -->
+  <h2 id="start">1. Getting started</h2>
+
+  <h3>Where to log in</h3>
+  <div class="card">
+    <p>Your content lives in <strong>Sanity Studio</strong> - a private control panel for the website. Open this link in any browser:</p>
+    <div class="box box-good">
+      <strong>Studio URL:</strong> <a href="https://seqcampers.sanity.studio/">https://seqcampers.sanity.studio/</a>
+    </div>
+    <p>Use the email address Bart added when the studio was set up. If you ever can't log in, ping Bart.</p>
+  </div>
+
+  <h3>The sidebar map</h3>
+  <p>The left-hand menu is laid out to match the website page-by-page. Click a menu item to edit that page.</p>
+  <div class="diagram">
+    🏷️ <strong>Caravans</strong> - the used caravan listings (and any new stock you sell)<br>
+    🏠 <strong>Home page</strong> - hero video, Shane's Pick, three pathway videos<br>
+    🚛 <strong>New caravans page</strong> - the 8 model tiles + the build-page intro videos<br>
+    🚐 <strong>Stock (used caravans) page</strong> - a list of every used caravan for sale<br>
+    🎥 <strong>Videos page</strong> - Kimberley Kingdom + Stockman Convoy video slots<br>
+    🔧 <strong>Service &amp; workshop page</strong> - meet-the-crew videos + this week in the workshop<br>
+    🎪 <strong>Shows page</strong> - caravan shows + the compilation video at the top<br>
+    📝 <strong>Blog posts</strong> - news, stories, customer trips<br>
+    ❓ <strong>FAQs</strong> - common questions for the website + AI search engines<br>
+    🎯 <strong>AEO Keywords</strong> - the search-strategy reference list (read-mostly)<br>
+    🎁 <strong>Handover pages (UNLISTED)</strong> - the videos you send to new owners<br>
+    📚 <strong>Brands</strong> - Kimberley Kampers, Stockman Products<br>
+    ⚙️ <strong>Site-wide settings</strong> - show banner + Reserve $1,000 CTA
+  </div>
+
+  <h3>Two things to remember</h3>
+  <div class="card card-tip">
+    <p><strong>1. Always click Publish.</strong> After any edit, look bottom-right for the green <span class="ui">Publish</span> button. If you don't click it, the change doesn't go live.</p>
+    <p><strong>2. The live website updates ~2 minutes after Publish.</strong> Refresh seqcampers.com.au in your browser to see your change.</p>
+  </div>
+
+  <!-- 2. CARAVANS -->
+  <h2 id="caravans">2. Caravans - the most-edited section</h2>
+
+  <h3>Add a new used caravan</h3>
+  <ol class="steps">
+    <li>In the sidebar click <span class="ui">🏷️ Caravans</span> &rarr; <span class="ui">For Sale</span></li>
+    <li>Top-right, click the <span class="ui">+ Create new</span> button</li>
+    <li>Fill in:
+      <ul>
+        <li><span class="field">Caravan name</span> - e.g. "2025 Kimberley Kruiser S Class S3"</li>
+        <li><span class="field">URL slug</span> - click the blue <span class="ui">Generate</span> button to auto-fill from the name</li>
+        <li><span class="field">Brand</span> - pick from the dropdown (Kimberley Kampers or Stockman Products)</li>
+        <li><span class="field">Price</span> - whole dollars only (no comma)</li>
+        <li><span class="field">Status</span> - <span class="ui">For Sale</span></li>
+        <li><span class="field">New or Used</span> - <span class="ui">USED</span></li>
+        <li><span class="field">SEQ stock number</span> - free text, can be letters + numbers (e.g. <code>S3</code> or <code>1234</code>)</li>
+        <li><span class="field">Photos</span> - see the next section for bulk upload</li>
+        <li><span class="field">Description</span> - use the toolbar for headings + bullets</li>
+        <li><span class="field">Specifications</span> - length, water capacity, ATM, Tare, etc.</li>
+        <li><span class="field">Top 5 features</span> - the "Is this right for you?" bullets shown on the listing</li>
+      </ul>
+    </li>
+    <li>Click <span class="ui">Publish</span> bottom-right</li>
+    <li>The caravan is live at <code>seqcampers.com.au/stock/your-url-slug</code> within ~2 minutes</li>
+  </ol>
+
+  <h3>Upload many photos at once</h3>
+  <div class="box box-warn">
+    <strong>Important:</strong> The <span class="ui">Add item</span> button only adds ONE photo at a time. To upload many, use drag-and-drop - it's the only way.
+  </div>
+  <ol class="steps">
+    <li>Open File Explorer (Windows) or Finder (Mac) in a separate window</li>
+    <li>Navigate to your caravan photo folder</li>
+    <li>Select multiple photos:
+      <ul>
+        <li><strong>Windows:</strong> Ctrl + click each photo, or Shift + click for a range, or Ctrl + A to select all</li>
+        <li><strong>Mac:</strong> Cmd + click each photo, or Shift + click for a range, or Cmd + A to select all</li>
+      </ul>
+    </li>
+    <li>With them all highlighted, drag the selection into the dashed drop zone in the Photos field</li>
+    <li>Sanity uploads them all in parallel</li>
+    <li>Click each thumbnail after upload to add an <span class="field">Alt text</span> (good for SEO)</li>
+    <li>Drag thumbnails to reorder - the first photo is the main image on the listing</li>
+  </ol>
+
+  <h3>Mark a caravan as Sold</h3>
+  <ol class="steps">
+    <li>Open the caravan</li>
+    <li>Scroll to the <span class="field">Status</span> field</li>
+    <li>Change from <span class="ui">For Sale</span> to <span class="ui">Sold</span></li>
+    <li>Click <span class="ui">Publish</span></li>
+    <li>The listing automatically moves from /stock/ to the /sold/ archive within ~2 minutes</li>
+  </ol>
+
+  <h3>Delete a caravan</h3>
+  <ol class="steps">
+    <li>Open the caravan you want to delete</li>
+    <li>Click the actions menu (the three dots ⋮ near the Publish button, top-right)</li>
+    <li>Click the prominent red <span class="ui">🗑 Delete this listing</span></li>
+    <li>Confirm</li>
+    <li>The caravan disappears from the website within ~2 minutes</li>
+  </ol>
+
+  <div class="box">
+    <strong>Tip:</strong> Prefer marking as <span class="ui">Sold</span> instead of deleting. Sold caravans move to the /sold/ archive and act as social proof for future buyers.
+  </div>
+
+  <!-- 3. HOME PAGE -->
+  <h2 id="home">3. Home page</h2>
+
+  <p>Click <span class="ui">🏠 Home page</span> in the sidebar. You'll see three editable sections.</p>
+
+  <h3>Hero video (the looping video that plays full-screen at the top)</h3>
+  <ol class="steps">
+    <li>Find the <span class="field">Hero video</span> section</li>
+    <li>Paste the YouTube URL into <span class="field">YouTube URL</span> (e.g. <code>https://www.youtube.com/watch?v=XYZ</code>)</li>
+    <li>Click <span class="ui">Publish</span></li>
+    <li>Live within ~2 minutes</li>
+  </ol>
+  <p>Leave the URL blank to fall back to the default video.</p>
+
+  <h3>Shane's Pick of the week</h3>
+  <ol class="steps">
+    <li>Find the <span class="field">Shane's Pick</span> section</li>
+    <li><span class="field">Caravan to feature</span> - click and type to pick from your existing caravans. This caravan must already exist as a published listing.</li>
+    <li><span class="field">Original price</span> (optional) - if you want a strike-through "was $X, now $Y" effect</li>
+    <li><span class="field">Shane's quote</span> - a few sentences from Shane on why this one is special</li>
+    <li><span class="field">Status pill</span> - pick <span class="ui">Coming soon (orange)</span> or <span class="ui">Available now (green)</span>, or <span class="ui">Hidden</span> if no pill should show</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <h3>Three pathway videos (Watch / Visit / Adventure)</h3>
+  <p>The three boxes under "Three steps to your next off-road adventure". Each has its own video.</p>
+  <ol class="steps">
+    <li>Find <span class="field">1. Watch</span>, <span class="field">2. Visit</span>, or <span class="field">3. Adventure</span></li>
+    <li>Paste the YouTube URL in each</li>
+    <li>Optionally write a one-line sub-text shown under the label</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <!-- 4. NEW PAGE -->
+  <h2 id="new">4. New caravans page</h2>
+
+  <p>The page where customers see the 8-tile grid of models. Click <span class="ui">🚛 New caravans page</span> in the sidebar.</p>
+
+  <h3>The 8 video tiles (one per model)</h3>
+  <p>The 8 tiles are locked in a fixed 4&times;2 layout. Each tile has a YouTube video that loops behind the model name + price.</p>
+  <table>
+    <thead><tr><th>Tile</th><th>Position</th><th>Model</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Row 1 left</td><td>Kruiswagen (Kimberley)</td></tr>
+      <tr><td>2</td><td>Row 1 right</td><td>Kruiser (Kimberley)</td></tr>
+      <tr><td>3</td><td>Row 2 left</td><td>Karavan (Kimberley)</td></tr>
+      <tr><td>4</td><td>Row 2 right</td><td>Kube (Kimberley)</td></tr>
+      <tr><td>5</td><td>Row 3 left</td><td>Trekka (Stockman)</td></tr>
+      <tr><td>6</td><td>Row 3 right</td><td>Rover (Stockman)</td></tr>
+      <tr><td>7</td><td>Row 4 left</td><td>Pod (Stockman)</td></tr>
+      <tr><td>8</td><td>Row 4 right</td><td>Accessories</td></tr>
+    </tbody>
+  </table>
+
+  <ol class="steps">
+    <li>Click into the tile you want to update</li>
+    <li><span class="field">YouTube URL</span> - paste a YouTube link (leave blank to use the default)</li>
+    <li><span class="field">Brand label override</span>, <span class="field">Model label override</span>, <span class="field">Price label override</span> - leave these blank to use the default. Only fill in if you want to override what's shown on the tile (e.g. when a price changes).</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <h3>Build-page intro videos</h3>
+  <p>Each model has its own configurator page at <code>/quote/{model}</code>. Each gets a video at the top.</p>
+  <ol class="steps">
+    <li>Inside the New caravans page, click <span class="ui">Build pages (intro videos per model)</span></li>
+    <li>For each model, paste a YouTube URL + optional caption</li>
+    <li>Leave blank to use the default video</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <!-- 5. STOCK PAGE -->
+  <h2 id="stock">5. Stock (used caravans) page</h2>
+
+  <p>This menu is a shortcut to your used caravans. Same as Caravans &rarr; For Sale, but filtered to just the used ones.</p>
+  <p>Click <span class="ui">🚐 Stock (used caravans) page</span> - a list of every used caravan currently for sale, sorted most expensive first.</p>
+  <p>Click any caravan to edit. See <a href="#caravans">Section 2 (Caravans)</a> for the full edit guide.</p>
+
+  <div class="box">
+    <strong>Tip:</strong> The list shows the price and stock number on each row, so you can spot a van at a glance - for example <code>$159,995 - For Sale &middot; #S3</code>.
+  </div>
+
+  <!-- 6. VIDEOS PAGE -->
+  <h2 id="videos" class="flow">6. Videos page</h2>
+
+  <p>Click <span class="ui">🎥 Videos page</span>. Two sections: <strong>Kimberley Kingdom</strong> (6 slots) and <strong>Stockman Convoy</strong> (6 slots).</p>
+
+  <ol class="steps">
+    <li>Click a slot (e.g. <span class="ui">Kimberley Kingdom - slot 1</span>)</li>
+    <li>Paste a YouTube URL into <span class="field">YouTube URL</span></li>
+    <li>Add a <span class="field">Tile title</span> (8-12 words ideal)</li>
+    <li>Add a one-line <span class="field">Short description</span></li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+  <p>Leave a slot blank to hide that tile completely on the live page.</p>
+
+  <!-- 7. SERVICE PAGE -->
+  <h2 id="service" class="flow">7. Service &amp; workshop page</h2>
+
+  <p>Click <span class="ui">🔧 Service &amp; workshop page</span>. Two sections.</p>
+
+  <h3>Meet the crew (3 video tiles)</h3>
+  <ol class="steps">
+    <li>For each of the 3 tiles (slot 1, 2, 3), paste a YouTube URL</li>
+    <li>Add a short <span class="field">Caption</span> shown under the tile (e.g. "Meet Grant in the workshop")</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+  <p>Tiles 4-6 exist in the schema as unused carry-overs - you can ignore them.</p>
+
+  <h3>This week in the workshop</h3>
+  <p>One video, refreshed weekly, showing what's happening in the workshop right now.</p>
+  <ol class="steps">
+    <li>Find the <span class="field">This week in the workshop</span> section</li>
+    <li>Paste a fresh YouTube URL</li>
+    <li>Add a <span class="field">Caption</span> (e.g. "Mike fitting a lithium upgrade on a 2023 Karavan")</li>
+    <li>Click <span class="ui">Publish</span></li>
+    <li>Repeat weekly - just overwrite the URL with the new clip</li>
+  </ol>
+
+  <!-- 8. SHOWS PAGE -->
+  <h2 id="shows">8. Shows page</h2>
+
+  <p>Click <span class="ui">🎪 Shows page</span>. Two sub-sections.</p>
+
+  <h3>Add a new show (caravan show or event)</h3>
+  <ol class="steps">
+    <li>Click <span class="ui">Shows (caravan shows + events)</span></li>
+    <li>Top-right click <span class="ui">+ Create new</span></li>
+    <li>Fill in:
+      <ul>
+        <li><span class="field">Title</span> - e.g. "Brisbane Caravan Show 2027"</li>
+        <li><span class="field">Slug</span> - auto-generated, just click Generate</li>
+        <li><span class="field">Status</span> - <span class="ui">Upcoming</span>, <span class="ui">Active</span> (during the show), or <span class="ui">Archived</span></li>
+        <li><span class="field">Start date</span> / <span class="field">End date</span></li>
+        <li><span class="field">Venue name</span> + <span class="field">Venue address</span></li>
+        <li><span class="field">Stand number</span></li>
+        <li>Any show-special offers / on-stand caravans / etc.</li>
+      </ul>
+    </li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <h3>Shows page settings (intro + compilation video)</h3>
+  <ol class="steps">
+    <li>Inside Shows page, click <span class="ui">Shows page settings (intro + compilation video)</span></li>
+    <li><span class="field">Intro paragraph</span> (optional) - shown above the list of upcoming shows</li>
+    <li><span class="field">Compilation video</span> - the YouTube video shown at the top. Use it for a "highlights from past shows" reel</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <!-- 9. BLOG -->
+  <h2 id="blog">9. Blog posts</h2>
+
+  <p>Click <span class="ui">📝 Blog posts</span> in the sidebar.</p>
+
+  <h3>Write a new post</h3>
+  <ol class="steps">
+    <li>Top-right click <span class="ui">+ Create new</span></li>
+    <li>Fill in:
+      <ul>
+        <li><span class="field">Title</span> - the post headline. Keep under ~70 characters.</li>
+        <li><span class="field">URL slug</span> - click Generate</li>
+        <li><span class="field">Published date</span> - pick a date</li>
+        <li><span class="field">Published?</span> - tick when you're ready to go live. Untick to keep as a draft.</li>
+        <li><span class="field">Cover image</span> - upload one photo. Shown on the index tile + top of the post.</li>
+        <li><span class="field">Excerpt</span> - 1-2 sentences shown on the index page</li>
+        <li><span class="field">Body</span> - the full post text. Use the toolbar for headings, bullets, links, photos.</li>
+        <li><span class="field">Author</span> - defaults to "Shane &amp; Maud"</li>
+      </ul>
+    </li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <div class="box">
+    <strong>Tip:</strong> The placeholder lorem-ipsum post disappears automatically the moment you publish your first real post.
+  </div>
+
+  <!-- 10. FAQs -->
+  <h2 id="faqs">10. FAQs</h2>
+
+  <p>Click <span class="ui">❓ FAQs</span>. There are 16 starter FAQs already in place, written specifically for AI search engines (ChatGPT, Perplexity, Google AI Overviews) so that when someone asks "best off-road caravan dealer Sunshine Coast", SEQ Campers gets cited.</p>
+
+  <h3>Add a new FAQ</h3>
+  <ol class="steps">
+    <li>Top-right click <span class="ui">+ Create new</span></li>
+    <li><span class="field">Question</span> - phrase it exactly how a customer would ask it</li>
+    <li><span class="field">Answer</span> - 1-3 sentences. First sentence should answer the question directly.</li>
+    <li><span class="field">Category</span> - pick from the dropdown</li>
+    <li><span class="field">Display order</span> - lower numbers appear first (use 10, 20, 30 so you can insert between)</li>
+    <li><span class="field">Published?</span> - tick to make it live</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <h3>Edit an existing FAQ</h3>
+  <ol class="steps">
+    <li>Click the FAQ in the list</li>
+    <li>Edit the answer / wording</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <!-- 11. AEO KEYWORDS -->
+  <h2 id="aeo" class="flow">11. AEO Keywords (search strategy)</h2>
+
+  <p>Click <span class="ui">🎯 AEO Keywords</span>. This is a <strong>reference table</strong>, not a live wiring - changing a keyword here doesn't automatically rewrite the website. It exists so you can see, sort and prioritise the search-strategy alongside the other content.</p>
+
+  <p>52 high-priority keywords are pre-loaded (30 Core + 22 Branded). They live under 5 sub-views:</p>
+  <ul>
+    <li>🔥 <strong>High priority</strong> - only the keywords flagged as priority 3</li>
+    <li><strong>All keywords</strong> - the full sortable table</li>
+    <li><strong>Not yet live on site</strong> - the ones still to be woven into the page copy</li>
+    <li><strong>Branded only</strong> - brand + model name keywords</li>
+    <li><strong>Core only</strong> - the primary intent keywords</li>
+  </ul>
+
+  <p>When a keyword is added or marked high-priority here, the development team folds it into the relevant page copy on the next content pass. As keywords go live, click the <span class="field">Already live on site?</span> tick on that keyword.</p>
+
+  <!-- 12. HANDOVER PAGES -->
+  <h2 id="handover">12. Handover pages (UNLISTED)</h2>
+
+  <p>Click <span class="ui">🎁 Handover pages (UNLISTED)</span>. These pages are for new owners after they've bought a van. They show walk-through videos to watch before pickup.</p>
+
+  <div class="box box-warn">
+    <strong>UNLISTED means:</strong> these pages are NOT in the website menu. They're only accessible by direct URL - you share them via your printed handover letter or follow-up email. They don't appear in search engines.
+  </div>
+
+  <p>Two pages exist:</p>
+  <ul>
+    <li><strong>Kimberley Kampers</strong> - at <code>seqcampers.com.au/handover/kimberley</code>. Sections for Karavan + Kruiswagen.</li>
+    <li><strong>Stockman Products</strong> - at <code>seqcampers.com.au/handover/stockman</code>. Section for Rover 02.</li>
+  </ul>
+
+  <h3>Add or update videos</h3>
+  <ol class="steps">
+    <li>Open a handover page (e.g. <span class="ui">Kimberley Kampers</span>)</li>
+    <li>Scroll to <span class="field">Model sections</span></li>
+    <li>Click a section to expand (e.g. <span class="ui">Kimberley Karavan</span>)</li>
+    <li>Inside, click <span class="field">Videos</span> &rarr; <span class="ui">Add item</span> to add a new video</li>
+    <li>Fill in:
+      <ul>
+        <li><span class="field">Video title</span> - e.g. "Karavan setup walkthrough"</li>
+        <li><span class="field">YouTube URL</span></li>
+        <li><span class="field">Short description</span> (optional)</li>
+      </ul>
+    </li>
+    <li>Drag to reorder if needed</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <h3>Add a new model section</h3>
+  <ol class="steps">
+    <li>Open the handover page</li>
+    <li>Scroll to <span class="field">Model sections</span></li>
+    <li>Click <span class="ui">Add item</span></li>
+    <li>Fill in <span class="field">Model name</span> + <span class="field">Section intro heading</span></li>
+    <li>Add videos as above</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <!-- 13. SITE-WIDE -->
+  <h2 id="sitewide">13. Site-wide settings</h2>
+
+  <p>Click <span class="ui">⚙️ Site-wide settings</span>. Two sections.</p>
+
+  <h3>Show Special banner</h3>
+  <p>The thin coloured strip that runs across the very top of every page (e.g. "Get it before the Brisbane Caravan Show ends Sun 8 June").</p>
+  <ol class="steps">
+    <li><span class="field">Banner headline</span> - short, urgency-led. Leave blank to hide the banner entirely.</li>
+    <li><span class="field">Banner end date</span> (optional) - when this date passes the banner auto-hides, so you don't have to remember to switch it off</li>
+    <li><span class="field">CTA link text</span> + <span class="field">CTA link URL</span> - an optional clickable link after the headline</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <h3>Reserve $1,000 CTA</h3>
+  <p>The "Reserve this van for $1,000" Stripe button shown on the New Caravans page.</p>
+  <ol class="steps">
+    <li><span class="field">Show the Reserve button?</span> - tick to enable</li>
+    <li><span class="field">Stripe payment link URL</span> - paste the Stripe link from your Stripe dashboard</li>
+    <li>Click <span class="ui">Publish</span></li>
+  </ol>
+
+  <!-- 14. PUBLISHING -->
+  <h2 id="publish">14. What happens when you save?</h2>
+
+  <div class="diagram">
+    <strong>You click Publish in Sanity</strong>
+    <span class="arrow">&rarr;</span>
+    <strong>Netlify rebuilds the website</strong>
+    <span class="arrow">&rarr;</span>
+    <strong>Live at seqcampers.com.au</strong>
+    <br><br>
+    Total time: <strong>~2 minutes</strong>
+  </div>
+
+  <p>Refresh your browser at <a href="https://seqcampers.com.au">seqcampers.com.au</a> to see the change. If you don't see it after 5 minutes, try a hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac) - sometimes your browser shows a cached version.</p>
+
+  <div class="box box-good">
+    <strong>Good to know:</strong> Edits don't go live until you click <span class="ui">Publish</span>. You can save drafts and come back later - nothing on the live website changes until you publish.
+  </div>
+
+  <!-- 15. WEB FORMS -->
+  <h2 id="forms">15. Web forms - where your leads go</h2>
+
+  <p>Every form on the website sends an email to <code>sales@seqcampers.com.au</code>. There are 7 forms:</p>
+
+  <table>
+    <thead>
+      <tr><th>Form</th><th>Where on the site</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>enquiry</code></td>
+        <td>/contact</td>
+        <td>Main contact form (name, email, phone, message)</td>
+      </tr>
+      <tr>
+        <td><code>used-caravan-enquiry</code></td>
+        <td>Every used caravan detail page</td>
+        <td>"Enquire about this caravan" form on each used van</td>
+      </tr>
+      <tr>
+        <td><code>brochure-download</code></td>
+        <td>/new</td>
+        <td>Brochure / catalogue request</td>
+      </tr>
+      <tr>
+        <td><code>workshop-booking</code></td>
+        <td>/service</td>
+        <td>Workshop booking</td>
+      </tr>
+      <tr>
+        <td><code>build-page-lead-capture</code></td>
+        <td>Every /quote/{model} build page (the pop-up)</td>
+        <td>"Tell us who you are first" overlay before they configure</td>
+      </tr>
+      <tr>
+        <td><code>build-page-quote-request</code></td>
+        <td>Every /quote/{model} build page (the final step)</td>
+        <td>The final "Email me my quote" submission with the full spec</td>
+      </tr>
+      <tr>
+        <td><code>reserve-slot</code></td>
+        <td>/reserve</td>
+        <td>"Reserve your slot" showroom booking</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Every form email shows you which exact page the lead came from in a <code>Source Page Url</code> field at the bottom of the body - so when a "used-caravan-enquiry" arrives, you know which van.</p>
+
+  <h3>To change form recipients</h3>
+  <p>Form recipients are managed in Netlify (not Sanity). Ping Bart if you want to add or change one.</p>
+
+  <!-- 16. GETTING HELP -->
+  <h2 id="help">16. Getting help</h2>
+
+  <div class="card">
+    <p><strong>For website updates, content, video swaps, layout tweaks:</strong></p>
+    <p>Bart Puszko - Blue Seas AI</p>
+    <p>📞 <a href="tel:0753002344">(07) 5300 2344</a><br>
+       ✉️ <a href="mailto:hello@blueseas.ai">hello@blueseas.ai</a></p>
+    <br>
+    <p><strong>For Sanity Studio login issues, login resets:</strong></p>
+    <p>Same as above - Bart can reset your Sanity access in a few minutes.</p>
+    <br>
+    <p><strong>For Netlify Forms (where the leads go):</strong></p>
+    <p>Bart manages the Netlify dashboard. Forward any "I'm not getting form emails" question to Bart and he'll sort it.</p>
+  </div>
+
+  <hr>
+
+  <p style="text-align:center; color:var(--muted); font-size:0.92rem; margin-top:32px;">
+    SEQ Campers website user guide &middot; Built by Blue Seas AI &middot; June 2026 &middot; v1.0
+  </p>
+
+</div>
+</body>
+</html>
