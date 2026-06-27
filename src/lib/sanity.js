@@ -407,14 +407,25 @@ export async function getAccessoriesPage() {
   return client.fetch(`
     *[_id == "accessoriesPageSettings"][0] {
       intro,
-      heroVideo,
-      items[] {
-        title,
-        description,
-        priceLabel,
-        "imageUrl": image.asset->url,
-        "imageAlt": image.alt
-      }
+      heroVideo
+    }
+  `)
+}
+
+/**
+ * All accessory documents (one per product/category), ordered. Each has a
+ * photo gallery + products. Used by /accessories and to build the order form's
+ * product dropdown.
+ */
+export async function getAccessories() {
+  return client.fetch(`
+    *[_type == "accessory"] | order(orderRank asc, title asc) {
+      _id, title, eyebrow, badges, intro, orderRank,
+      "photos": photos[]{ "url": asset->url, alt },
+      products[]{ name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs },
+      compareHeading, compareIntro,
+      compareColumns[]{ heading, body, note },
+      compareNote
     }
   `)
 }

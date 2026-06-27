@@ -166,11 +166,31 @@ export default defineConfig({
               .title('🧰 Accessories page')
               .icon(TagIcon)
               .child(
-                S.editor()
-                  .id('accessoriesPageSettings')
-                  .schemaType('accessoriesPageSettings')
-                  .documentId('accessoriesPageSettings')
+                S.list()
                   .title('Accessories page')
+                  .items([
+                    S.listItem()
+                      .title('Accessories (one per product/category)')
+                      .icon(TagIcon)
+                      .schemaType('accessory')
+                      .child(
+                        S.documentList()
+                          .title('Accessories')
+                          .schemaType('accessory')
+                          .filter('_type == "accessory"')
+                          .defaultOrdering([{ field: 'orderRank', direction: 'asc' }])
+                      ),
+                    S.listItem()
+                      .title('Page settings (intro + video)')
+                      .icon(EditIcon)
+                      .child(
+                        S.editor()
+                          .id('accessoriesPageSettings')
+                          .schemaType('accessoriesPageSettings')
+                          .documentId('accessoriesPageSettings')
+                          .title('Accessories page settings')
+                      ),
+                  ])
               ),
 
             S.listItem()
