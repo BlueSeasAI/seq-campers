@@ -31,7 +31,8 @@ const MOVER_DIR = 'C:/Users/bartp/OneDrive - Blue Seas AI Consulting/Blue Seas A
 
 const TOILET_PHOTOS = ['CuddyExplodedX3_2.jpg.avif', 's1_low_angle_regular_lid.jpg.webp', 'S1-inside.webp', 'S1_Sealing_Toilet_-_Heat_seal.webp', 'nirvana-upfitters_2784.jpg.webp']
 // 329A5121 = blue-button (2500kg), 329A5151 = red-button (4500kg) per Bart.
-const MOVER_PHOTOS = ['329A5121.jpg', '329A5151.jpg', 'Screenshot 2026-06-25 at 6.57.58 pm.png', 'Screenshot 2026-06-25 at 7.15.08 pm.png']
+// (Screenshots dropped from the seed - add them in Studio later if wanted.)
+const MOVER_PHOTOS = ['329A5121.jpg', '329A5151.jpg']
 
 let keyN = 0
 const k = () => 'k' + (keyN++)
@@ -40,8 +41,14 @@ const withKeys = (arr) => arr.map((o) => ({ _key: k(), ...o }))
 async function uploadPhotos(dir, files) {
   const out = []
   for (const f of files) {
+    const fp = path.join(dir, f)
     try {
-      const asset = await client.assets.upload('image', fs.createReadStream(path.join(dir, f)), { filename: f })
+      if (!fs.existsSync(fp)) { console.warn('  MISSING (skipped):', f); continue }
+      // readFileSync (not createReadStream) so a missing/cloud-only/locked file
+      // throws synchronously here and is CAUGHT - it can no longer crash the
+      // whole run and stop the documents being created.
+      const buf = fs.readFileSync(fp)
+      const asset = await client.assets.upload('image', buf, { filename: f })
       out.push({ _type: 'image', _key: k(), asset: { _type: 'reference', _ref: asset._id } })
       console.log('  uploaded', f)
     } catch (e) {
