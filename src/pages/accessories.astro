@@ -100,11 +100,8 @@ for (const a of accessories) {
   }
 }
 
-function orderBtnText(p) {
-  if (p?.price && /pre-?order/i.test(p.price)) return 'Pre-order this'
-  if (!p?.price || /enquire/i.test(p.price)) return 'Enquire'
-  return 'Order this'
-}
+// Every product uses the SAME simple flow: one button -> one form -> SEQ
+// emails an invoice. No "orderable vs enquiry-only" distinction to manage.
 
 const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshine Coast - composting and sealing toilets and more. Certified installer. Order online, we invoice before delivery or fitting.'
 ---
@@ -194,7 +191,7 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
                       {p.specs.map((s) => <span>{s}</span>)}
                     </div>
                   )}
-                  <a href="#order" class="btn-primary pcard-cta order-btn" data-product={p.name}>{orderBtnText(p)}</a>
+                  <a href="#order" class="btn-primary pcard-cta order-btn" data-product={p.name}>Order this</a>
                 </div>
               </div>
             ))}
