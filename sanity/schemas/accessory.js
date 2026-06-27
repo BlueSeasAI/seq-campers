@@ -52,22 +52,6 @@ export default {
       validation: (Rule) => Rule.max(600),
     },
     {
-      name: 'photos',
-      title: 'Photos (gallery)',
-      type: 'array',
-      group: 'main',
-      description:
-        'Upload as many as you like - drag a whole selection in at once. They ALL show in the gallery, and customers can tap any photo to enlarge it.',
-      options: { layout: 'grid' },
-      of: [
-        {
-          type: 'image',
-          options: { hotspot: true },
-          fields: [{ name: 'alt', title: 'Alt text (for SEO)', type: 'string' }],
-        },
-      ],
-    },
-    {
       name: 'products',
       title: 'Products / options',
       type: 'array',
@@ -80,6 +64,14 @@ export default {
           name: 'product',
           fields: [
             { name: 'name', title: 'Product name', type: 'string', validation: (Rule) => Rule.required().max(80) },
+            {
+              name: 'photos',
+              title: 'Photos of THIS product',
+              type: 'array',
+              description: 'Photos of this specific product. The first is the main image; customers can tap any to enlarge. Drag several in at once.',
+              options: { layout: 'grid' },
+              of: [{ type: 'image', options: { hotspot: true }, fields: [{ name: 'alt', title: 'Alt text', type: 'string' }] }],
+            },
             { name: 'brand', title: 'Brand', type: 'string', validation: (Rule) => Rule.max(40) },
             { name: 'type', title: 'Type line', type: 'string', description: 'e.g. "Composting · waterless · smell-free".', validation: (Rule) => Rule.max(80) },
             { name: 'tag', title: 'Tag (small coloured pill)', type: 'string', description: 'Short label shown on the card, e.g. "In stock", "Pre-order", "On-road", "Off-road".', validation: (Rule) => Rule.max(20) },
@@ -164,7 +156,7 @@ export default {
   ],
 
   preview: {
-    select: { title: 'title', media: 'photos.0' },
+    select: { title: 'title', media: 'products.0.photos.0' },
     prepare({ title, media }) {
       return { title: title || 'Accessory', media }
     },
