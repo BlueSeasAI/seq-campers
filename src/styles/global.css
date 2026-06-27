@@ -3157,6 +3157,18 @@ a:focus-visible, button:focus-visible {
   padding-top: 8px;
 }
 .qb-weight-payload-row strong { color: var(--gold); }
+.qb-weight-deductions {
+  font-size: 0.78rem;
+  color: rgba(244, 237, 224, 0.62);
+  line-height: 1.45;
+  padding: 4px 0 2px;
+}
+.qb-weight-note {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  color: rgba(244, 237, 224, 0.45);
+  line-height: 1.4;
+}
 .qb-weight-status {
   margin-top: 10px;
   padding: 9px 12px;

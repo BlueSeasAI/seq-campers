@@ -24,9 +24,12 @@ export default {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
-      description: 'The web address ending for this caravan. Click the blue Generate button to auto-fill it from the Caravan name - that is the easiest way to get it right. If you type your own, use only lowercase letters, numbers and hyphens.',
+      description: 'The web address ending for this caravan. Fill in the SEQ stock number below FIRST, then click the blue Generate button - it auto-builds the URL from the Caravan name PLUS the stock number (e.g. ...kimberley-karavan-7455). The stock number on the end keeps every URL unique and easy to identify. If you type your own, use only lowercase letters, numbers and hyphens.',
       options: {
-        source: 'title',
+        // Build the slug from the title + the SEQ stock number, so two vans
+        // with the same year/make/model never collide (Kyle, Jun 2026) and the
+        // URL is self-identifying. Fill the stock number in first, then Generate.
+        source: (doc) => [doc?.title, doc?.compliance?.stockNumber].filter(Boolean).join(' '),
         maxLength: 96,
         slugify: (input) =>
           String(input)
