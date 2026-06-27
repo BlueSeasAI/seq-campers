@@ -89,10 +89,11 @@ export default {
     },
     {
       name: 'status',
-      title: 'Status',
+      title: 'Status (automatic - leave as Upcoming)',
       type: 'string',
       group: 'basics',
-      description: 'Upcoming = on the /shows index. Active = highlighted now. Archived = below the fold.',
+      description:
+        "You don't need to change this. The On now / Upcoming / Past label is worked out automatically from the Start and End dates - a show flips to 'On now' on its start date and to 'Past' the day after it ends. This field is only used as a fallback if the dates are left blank.",
       options: {
         list: [
           { title: 'Upcoming', value: 'upcoming' },
