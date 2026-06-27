@@ -64,7 +64,9 @@ const allCards = shows
   })
 
 const activeAndUpcoming = allCards.filter((c) => c.phase !== 'past')
-const past = allCards.filter((c) => c.phase === 'past')
+// Keep the public Past shows list short - the 3 most recent (already sorted
+// most-recent-first). Older shows stay in Sanity but drop off the page.
+const past = allCards.filter((c) => c.phase === 'past').slice(0, 3)
 
 const description = intro
   || 'Where to see SEQ Campers in person. Caravan shows, expos and events across Queensland.'

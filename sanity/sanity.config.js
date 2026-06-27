@@ -163,6 +163,17 @@ export default defineConfig({
               ),
 
             S.listItem()
+              .title('🧰 Accessories page')
+              .icon(TagIcon)
+              .child(
+                S.editor()
+                  .id('accessoriesPageSettings')
+                  .schemaType('accessoriesPageSettings')
+                  .documentId('accessoriesPageSettings')
+                  .title('Accessories page')
+              ),
+
+            S.listItem()
               .title('🎥 Videos page')
               .icon(PlayIcon)
               .child(

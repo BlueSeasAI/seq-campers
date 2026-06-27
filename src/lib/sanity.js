@@ -169,9 +169,16 @@ export async function getCaravan(slug) {
 }
 
 export async function getSoldCaravans() {
+  // Show at most the 6 most recently sold vans that are still "Listed"
+  // (soldListed). The [0...6] slice is the hard cap - it can NEVER show more
+  // than 6, no matter how many sold records exist. As new vans sell, the
+  // oldest drops off automatically. Maud can also switch a specific one to
+  // Unlisted to hide it early; records pre-dating the field default to listed
+  // (undefined != false), so nothing vanishes from the data. To change the
+  // count later, edit the 6 in [0...6].
   return client.fetch(`
-    *[_type == "caravan" && status == "sold"]
-    | order(_updatedAt desc) {
+    *[_type == "caravan" && status == "sold" && soldListed != false]
+    | order(_updatedAt desc) [0...6] {
       _id, title, price, condition,
       "brand": brand->name,
       "mainImage": photos[0].asset->url
@@ -385,6 +392,31 @@ export function flattenVideosPage(settings) {
     kimberley: pull('kimberley', 'kimberley'),
     stockman: pull('stockman', 'stockman'),
   }
+}
+
+// ---------------------------------------------------------------------------
+// Accessories page
+// ---------------------------------------------------------------------------
+
+/**
+ * Accessories page singleton: intro, the moved-over accessories video, and the
+ * list of accessory items (photo + name + description, optional price).
+ * Returns null if the document does not exist yet.
+ */
+export async function getAccessoriesPage() {
+  return client.fetch(`
+    *[_id == "accessoriesPageSettings"][0] {
+      intro,
+      heroVideo,
+      items[] {
+        title,
+        description,
+        priceLabel,
+        "imageUrl": image.asset->url,
+        "imageAlt": image.alt
+      }
+    }
+  `)
 }
 
 // ---------------------------------------------------------------------------
