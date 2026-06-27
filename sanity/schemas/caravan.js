@@ -21,6 +21,52 @@ export default {
     },
 
     {
+      name: 'compliance',
+      title: 'Stock identifiers',
+      type: 'object',
+      description: 'Fill the SEQ stock number here FIRST, then click Generate on the URL slug below - the stock number gets added to the web address so URLs never clash. VIN + registration state are optional.',
+      options: { columns: 2 },
+      fields: [
+        {
+          name: 'stockNumber',
+          title: 'SEQ stock number',
+          type: 'string',
+          description: 'The SEQ Campers stock number. Free text - can include letters and numbers (e.g. 1234, K1234, SC-2024-001). Shown on the listing AND added to the end of the URL slug.',
+        },
+        {
+          name: 'vin',
+          title: 'VIN (optional, 17 characters)',
+          type: 'string',
+          description: 'Vehicle Identification Number. Optional - skip for consignment / older stock where VIN is not available. If you do enter one, it must be exactly 17 characters.',
+          validation: (Rule) =>
+            Rule.custom((v) => {
+              if (!v) return true
+              if (v.length !== 17) return 'Should be exactly 17 characters'
+              return true
+            }),
+        },
+        {
+          name: 'registrationState',
+          title: 'Registration state (optional)',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'QLD - Queensland', value: 'QLD' },
+              { title: 'NSW - New South Wales', value: 'NSW' },
+              { title: 'VIC - Victoria', value: 'VIC' },
+              { title: 'WA - Western Australia', value: 'WA' },
+              { title: 'SA - South Australia', value: 'SA' },
+              { title: 'TAS - Tasmania', value: 'TAS' },
+              { title: 'ACT - Australian Capital Territory', value: 'ACT' },
+              { title: 'NT - Northern Territory', value: 'NT' },
+            ],
+            layout: 'dropdown',
+          },
+        },
+      ],
+    },
+
+    {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
@@ -287,52 +333,6 @@ export default {
       of: [{ type: 'string' }],
       description: 'The five biggest selling points of this caravan. Per Shane (16 Jun): "what are the five benefits of this van? Is this right for you?" Each one should be a short, specific benefit (e.g. "Tows behind a mid-size SUV - 1,800kg ATM"). Aim for 5 lines.',
       validation: (Rule) => Rule.max(7).warning('Aim for exactly 5'),
-    },
-
-    {
-      name: 'compliance',
-      title: 'Stock identifiers',
-      type: 'object',
-      description: 'Only the SEQ stock number is required. VIN + registration state are optional - fill them in if you have them (helps buyers trust the listing and enables PPSR/NEVDIS lookups).',
-      options: { columns: 2 },
-      fields: [
-        {
-          name: 'stockNumber',
-          title: 'SEQ stock number',
-          type: 'string',
-          description: 'The SEQ Campers stock number. Free text - can include letters and numbers (e.g. 1234, K1234, SC-2024-001). Shown on the listing for internal reference.',
-        },
-        {
-          name: 'vin',
-          title: 'VIN (optional, 17 characters)',
-          type: 'string',
-          description: 'Vehicle Identification Number. Optional - skip for consignment / older stock where VIN is not available. If you do enter one, it must be exactly 17 characters.',
-          validation: (Rule) =>
-            Rule.custom((v) => {
-              if (!v) return true
-              if (v.length !== 17) return 'Should be exactly 17 characters'
-              return true
-            }),
-        },
-        {
-          name: 'registrationState',
-          title: 'Registration state (optional)',
-          type: 'string',
-          options: {
-            list: [
-              { title: 'QLD - Queensland', value: 'QLD' },
-              { title: 'NSW - New South Wales', value: 'NSW' },
-              { title: 'VIC - Victoria', value: 'VIC' },
-              { title: 'WA - Western Australia', value: 'WA' },
-              { title: 'SA - South Australia', value: 'SA' },
-              { title: 'TAS - Tasmania', value: 'TAS' },
-              { title: 'ACT - Australian Capital Territory', value: 'ACT' },
-              { title: 'NT - Northern Territory', value: 'NT' },
-            ],
-            layout: 'dropdown',
-          },
-        },
-      ],
     },
 
     {
