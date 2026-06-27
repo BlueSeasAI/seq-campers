@@ -421,8 +421,10 @@ export async function getAccessories() {
   return client.fetch(`
     *[_type == "accessory"] | order(orderRank asc, title asc) {
       _id, title, eyebrow, badges, intro, orderRank,
-      "photos": photos[]{ "url": asset->url, alt },
-      products[]{ name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs },
+      products[]{
+        name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs,
+        "photos": photos[]{ "url": asset->url, alt }
+      },
       compareHeading, compareIntro,
       compareColumns[]{ heading, body, note },
       compareNote

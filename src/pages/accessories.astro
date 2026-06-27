@@ -146,32 +146,36 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
           {a.intro && <p class="acc-intro">{a.intro}</p>}
         </div>
 
-        {a.photos?.length > 0 ? (
-          <div class="acc-gallery">
-            {a.photos.map((ph, i) => ph?.url && (
-              <img
-                class="gallery-img"
-                src={sanityImage(ph.url, { w: 600 })}
-                srcset={sanitySrcset(ph.url, [320, 480, 640])}
-                sizes="(max-width: 720px) 50vw, 240px"
-                alt={ph.alt || `${a.title} photo ${i + 1}`}
-                loading="lazy"
-                data-full={sanityImage(ph.url, { w: 1600 })}
-              />
-            ))}
-          </div>
-        ) : (
-          <div class="acc-gallery">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div class="acc-photo-ph"><span>Photo {n}</span></div>
-            ))}
-          </div>
-        )}
-
         {a.products?.length > 0 && (
           <div class="acc-prods">
             {a.products.map((p) => (
               <div class="pcard">
+                {p.photos?.length > 0 && (
+                  <div class="pcard-media">
+                    <img
+                      class="gallery-img pcard-hero"
+                      src={sanityImage(p.photos[0].url, { w: 800 })}
+                      srcset={sanitySrcset(p.photos[0].url, [320, 480, 640, 800])}
+                      sizes="(max-width: 760px) 100vw, 500px"
+                      alt={p.photos[0].alt || p.name}
+                      loading="lazy"
+                      data-full={sanityImage(p.photos[0].url, { w: 1600 })}
+                    />
+                    {p.photos.length > 1 && (
+                      <div class="pcard-thumbs">
+                        {p.photos.slice(1).map((ph) => ph?.url && (
+                          <img
+                            class="gallery-img pcard-thumb"
+                            src={sanityImage(ph.url, { w: 200 })}
+                            alt={ph.alt || p.name}
+                            loading="lazy"
+                            data-full={sanityImage(ph.url, { w: 1600 })}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div class="pcard-body">
                   <div class="pcard-top">
                     {p.brand && <span class="pcard-brand">{p.brand}</span>}
@@ -316,7 +320,7 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
       function close() { box.hidden = true; box.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; lbImg.src = '' }
       document.querySelectorAll('.gallery-img').forEach(function (im) {
         im.addEventListener('click', function () {
-          var gallery = im.closest('.acc-gallery') || document
+          var gallery = im.closest('.pcard-media') || document
           var imgs = Array.prototype.slice.call(gallery.querySelectorAll('.gallery-img'))
           urls = imgs.map(function (x) { return x.getAttribute('data-full') || x.src })
           alts = imgs.map(function (x) { return x.alt || '' })
@@ -357,6 +361,10 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
     .acc-prods { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
     @media (max-width: 760px) { .acc-prods { grid-template-columns: 1fr; } }
     .pcard { background: #fff; border: 1px solid var(--tan-border); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 18px rgba(42,22,8,0.07); display: flex; flex-direction: column; }
+    .pcard-media { background: linear-gradient(150deg, #eee4d2, #f7f0e4); padding: 16px; }
+    .pcard-hero { width: 100%; max-height: 280px; object-fit: contain; display: block; cursor: zoom-in; }
+    .pcard-thumbs { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .pcard-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--tan-border); cursor: zoom-in; background: #fff; }
     .pcard-body { padding: 22px 24px 24px; display: flex; flex-direction: column; flex: 1; }
     .pcard-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .pcard-brand { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold, #D4943A); }

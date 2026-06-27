@@ -29,12 +29,15 @@ const client = createClient({ projectId: 'ttam87n8', dataset: 'production', apiV
 const TOILET_DIR = 'C:/Users/bartp/OneDrive - Blue Seas AI Consulting/Blue Seas AI Consulting/Clients/SEQ Campers/New potential website/Accessories/off-grid toilets'
 const MOVER_DIR = 'C:/Users/bartp/OneDrive - Blue Seas AI Consulting/Blue Seas AI Consulting/Clients/SEQ Campers/New potential website/Accessories/optimiser - caravan movers'
 
-const TOILET_PHOTOS = ['CuddyExplodedX3_2.jpg.avif', 's1_low_angle_regular_lid.jpg.webp', 'S1-inside.webp', 'S1_Sealing_Toilet_-_Heat_seal.webp', 'nirvana-upfitters_2784.jpg.webp']
-// 329A5121 = blue-button (2500kg), 329A5151 = red-button (4500kg) per Bart.
-// The 2 screenshots are OneDrive "cloud-only" by default - right-click them in
-// File Explorer -> "Always keep on this device" to download, THEN re-run, or
-// they'll skip. (They upload fine once downloaded.)
-const MOVER_PHOTOS = ['329A5121.jpg', '329A5151.jpg', 'Screenshot 2026-06-25 at 6.57.58 pm.png', 'Screenshot 2026-06-25 at 7.15.08 pm.png']
+// Per-product photo files (my best-guess mapping; Maud can re-sort in Studio):
+//   Cuddy = exploded diagram + the inside-mechanism shot (its inside label reads
+//           "Cuddy Composting Toilet") + the bathroom lifestyle shot
+//   S1    = the heat-seal (blue bag) shot + the low-angle external shot
+//   2500  = 329A5121 (blue button), 4500 = 329A5151 (red button), V3 = none yet
+const CUDDY_FILES = ['CuddyExplodedX3_2.jpg.avif', 'S1-inside.webp', 'nirvana-upfitters_2784.jpg.webp']
+const S1_FILES = ['s1_low_angle_regular_lid.jpg.webp', 'S1_Sealing_Toilet_-_Heat_seal.webp']
+const AT2500_FILES = ['329A5121.jpg']
+const AT4500_FILES = ['329A5151.jpg']
 
 let keyN = 0
 const k = () => 'k' + (keyN++)
@@ -61,10 +64,14 @@ async function uploadPhotos(dir, files) {
 }
 
 async function run() {
-  console.log('Uploading Off-Grid Toilets photos...')
-  const toiletPhotos = await uploadPhotos(TOILET_DIR, TOILET_PHOTOS)
-  console.log('Uploading Optitec Movers photos...')
-  const moverPhotos = await uploadPhotos(MOVER_DIR, MOVER_PHOTOS)
+  console.log('Uploading Cuddy photos...')
+  const cuddyPhotos = await uploadPhotos(TOILET_DIR, CUDDY_FILES)
+  console.log('Uploading S1 photos...')
+  const s1Photos = await uploadPhotos(TOILET_DIR, S1_FILES)
+  console.log('Uploading All Terrain 2500 photo...')
+  const at2500Photos = await uploadPhotos(MOVER_DIR, AT2500_FILES)
+  console.log('Uploading All Terrain 4500 photo...')
+  const at4500Photos = await uploadPhotos(MOVER_DIR, AT4500_FILES)
 
   const toilets = {
     _id: 'accessory-off-grid-toilets',
@@ -74,10 +81,9 @@ async function run() {
     eyebrow: 'Composting & sealing',
     badges: ['Certified Installer', 'Waterless', 'Chemical-free', 'No dump points'],
     intro: 'SEQ Campers is a certified installer of CompoCloset off-grid toilets. Two ways to ditch the chemical cassette: the Cuddy composting toilet (in stock now) and the new S1 dry-flush sealing toilet (pre-order). Come and see both at our Marcoola showroom, or order below.',
-    photos: toiletPhotos,
     products: withKeys([
-      { name: 'Cuddy Composting Toilet', brand: 'CompoCloset', type: 'Composting · waterless · smell-free', tag: 'In stock', tagColor: 'green', price: '$1,795', priceNote: 'Indicative - confirm with SEQ · 24-month warranty', pitch: 'The best-value true composting toilet on the market. Separates liquids and solids, composts with a natural bulking agent, and stays odour-free with a carbon filter and fan.', features: ['No water, chemicals or dump points', '"Pee Full" LED level indicator', 'Manual agitator + carbon filter', 'Portable or wall-mount installable'], specs: ['422×385×432mm', '9.5kg', 'Solids 14.7L', 'Liquids 6.5L'] },
-      { name: 'S1 Dry Flush Sealing Toilet', brand: 'CompoCloset', type: 'Sealing · waterless · push-button', tag: 'Pre-order', tagColor: 'rust', price: 'Pre-order', priceNote: 'On display at our showroom - see it, then pre-order', pitch: "The world's first separating sealing toilet. Push a button and solids are automatically heat-sealed in a bag - no composting, no layering, no smell. Urine diverts separately.", features: ['Automatic battery heat-seal - 50+ per charge', 'Built-in urine diversion, LED indicator', '~25 uses per liner roll · backup mode', 'On display at SEQ Campers to view before you pre-order'], specs: ['432×386×419mm', '13.2kg', 'Solids 15.7L', 'Urine 6.4L'] },
+      { name: 'Cuddy Composting Toilet', photos: cuddyPhotos, brand: 'CompoCloset', type: 'Composting · waterless · smell-free', tag: 'In stock', tagColor: 'green', price: '$1,795', priceNote: 'Indicative - confirm with SEQ · 24-month warranty', pitch: 'The best-value true composting toilet on the market. Separates liquids and solids, composts with a natural bulking agent, and stays odour-free with a carbon filter and fan.', features: ['No water, chemicals or dump points', '"Pee Full" LED level indicator', 'Manual agitator + carbon filter', 'Portable or wall-mount installable'], specs: ['422×385×432mm', '9.5kg', 'Solids 14.7L', 'Liquids 6.5L'] },
+      { name: 'S1 Dry Flush Sealing Toilet', photos: s1Photos, brand: 'CompoCloset', type: 'Sealing · waterless · push-button', tag: 'Pre-order', tagColor: 'rust', price: 'Pre-order', priceNote: 'On display at our showroom - see it, then pre-order', pitch: "The world's first separating sealing toilet. Push a button and solids are automatically heat-sealed in a bag - no composting, no layering, no smell. Urine diverts separately.", features: ['Automatic battery heat-seal - 50+ per charge', 'Built-in urine diversion, LED indicator', '~25 uses per liner roll · backup mode', 'On display at SEQ Campers to view before you pre-order'], specs: ['432×386×419mm', '13.2kg', 'Solids 15.7L', 'Urine 6.4L'] },
     ]),
     compareHeading: 'Composting or sealing - which suits you?',
     compareIntro: 'Both are waterless, chemical-free and divert urine separately. The difference is what happens to the solids.',
@@ -95,11 +101,10 @@ async function run() {
     eyebrow: 'Remote-control movers',
     badges: ['Remote control', 'Fully portable', 'Free shipping', 'No underbody install'],
     intro: "Reverse your van into any spot at the push of a button - no yelling, no stress, no expensive underbody install. Three Optitec movers: the wheeled Optimover V3 for hard surfaces, and the tracked All-Terrain 2500 and 4500 for grass, gravel and off-road. Not sure which? Use the quick guide below, or order online and we'll confirm the right fit.",
-    photos: moverPhotos,
     products: withKeys([
-      { name: 'Optimover V3', brand: 'Optitec', type: 'Wheeled remote jockey wheel', tag: 'On-road', tagColor: 'olive', price: '$2,625', priceNote: 'Moves up to 3,500kg · hard surfaces · + clamp from $180', pitch: "The original remote-control jockey wheel - drives your van's own wheels to reverse and park it anywhere on firm ground.", features: ['12V DC, 50A high-torque motor', 'Single or double axle · tow-ball to 350kg', '3-year motor & transmission warranty', 'Clamp $180: OW14 (100-130mm) or OW15 (150mm)', 'Optional carry & storage bag - $140'], specs: ['22kg', 'Remote + cables incl.'] },
-      { name: 'All Terrain 2500', brand: 'Optitec', type: 'Tracked off-road mover', tag: 'Off-road', tagColor: 'rust', price: '$4,500-$4,550', priceNote: 'Up to 2,500kg off-road · price depends on bracket', pitch: 'Track tyres built to go off-road. Ready for challenging sites with small to medium vans and trailers.', features: ['2 motors (288W each)', 'Moves 10m per minute under load', 'Fast-charging long-life battery as standard', 'Standard bracket (50mm) $4,500, or Universal $4,550'], specs: ['34kg', '540×470×210mm', '2yr warranty'] },
-      { name: 'All Terrain 4500', brand: 'Optitec', type: 'Tracked off-road mover', tag: 'Off-road · HD', tagColor: 'gold', price: '$5,400-$5,450', priceNote: 'Up to 4,500kg off-road · price depends on bracket', pitch: 'The most powerful Optitec. Four motors and rubber tracks for the heaviest vans in the most challenging scenarios.', features: ['4 motors (288W each)', 'Moves 7m per minute under load', 'Fast-charging long-life battery as standard', 'Standard bracket (50mm) $5,400, or Universal $5,450'], specs: ['42kg', '540×470×210mm', '2yr warranty'] },
+      { name: 'Optimover V3', photos: [], brand: 'Optitec', type: 'Wheeled remote jockey wheel', tag: 'On-road', tagColor: 'olive', price: '$2,625', priceNote: 'Moves up to 3,500kg · hard surfaces · + clamp from $180', pitch: "The original remote-control jockey wheel - drives your van's own wheels to reverse and park it anywhere on firm ground.", features: ['12V DC, 50A high-torque motor', 'Single or double axle · tow-ball to 350kg', '3-year motor & transmission warranty', 'Clamp $180: OW14 (100-130mm) or OW15 (150mm)', 'Optional carry & storage bag - $140'], specs: ['22kg', 'Remote + cables incl.'] },
+      { name: 'All Terrain 2500', photos: at2500Photos, brand: 'Optitec', type: 'Tracked off-road mover', tag: 'Off-road', tagColor: 'rust', price: '$4,500-$4,550', priceNote: 'Up to 2,500kg off-road · price depends on bracket', pitch: 'Track tyres built to go off-road. Ready for challenging sites with small to medium vans and trailers.', features: ['2 motors (288W each)', 'Moves 10m per minute under load', 'Fast-charging long-life battery as standard', 'Standard bracket (50mm) $4,500, or Universal $4,550'], specs: ['34kg', '540×470×210mm', '2yr warranty'] },
+      { name: 'All Terrain 4500', photos: at4500Photos, brand: 'Optitec', type: 'Tracked off-road mover', tag: 'Off-road · HD', tagColor: 'gold', price: '$5,400-$5,450', priceNote: 'Up to 4,500kg off-road · price depends on bracket', pitch: 'The most powerful Optitec. Four motors and rubber tracks for the heaviest vans in the most challenging scenarios.', features: ['4 motors (288W each)', 'Moves 7m per minute under load', 'Fast-charging long-life battery as standard', 'Standard bracket (50mm) $5,400, or Universal $5,450'], specs: ['42kg', '540×470×210mm', '2yr warranty'] },
     ]),
     compareHeading: 'Which mover do I need?',
     compareIntro: "Two quick questions sort it - what you'll drive it on, and how heavy your rig is.",
