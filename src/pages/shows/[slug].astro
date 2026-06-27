@@ -83,6 +83,16 @@ const showCantMakeItHtml = portableTextToHtml(show.cantMakeItBody)
           {show.venueName}
         </p>
       )}
+      {show.eventWebsiteUrl && (
+        <p style="margin-top:10px;">
+          <a
+            href={show.eventWebsiteUrl}
+            rel="noopener"
+            target="_blank"
+            style="color:var(--gold); font-weight:600; text-decoration:underline;"
+          >Visit the official show website ↗</a>
+        </p>
+      )}
     </div>
   </div>
 

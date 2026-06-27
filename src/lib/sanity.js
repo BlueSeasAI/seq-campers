@@ -392,7 +392,7 @@ export function flattenVideosPage(settings) {
 // ---------------------------------------------------------------------------
 
 const SHOW_PROJECTION = `{
-  _id, title, "slug": slug.current, status,
+  _id, title, "slug": slug.current, status, eventWebsiteUrl,
   startDate, endDate, datesLabel, daysLabel,
   venueName, venueAddress, standNumber, standArea, podiumNumber,
   heroEyebrow, heroH1, seoDescription,
@@ -411,7 +411,7 @@ const SHOW_PROJECTION = `{
  * Every show ordered with upcoming/active first, then archived. Used by /shows index.
  */
 export async function getShows() {
-  return client.fetch(`
+  const raw = await client.fetch(`
     *[_type == "show"]
     | order(
         select(status == "active" => 0, status == "upcoming" => 1, 2),
@@ -419,21 +419,58 @@ export async function getShows() {
       )
     ${SHOW_PROJECTION}
   `)
+  // Normalise slug to the same safe form getAllShowPaths produces so the
+  // /shows index cards link to URLs that actually exist in the build output.
+  return (raw || []).map((s) => ({
+    ...s,
+    slug: safeSlug(s.slug) || safeSlug(s.title),
+  }))
 }
 
 /** Single show by slug. Returns null when not found. */
 export async function getShow(slug) {
-  return client.fetch(
-    `*[_type == "show" && slug.current == $slug][0] ${SHOW_PROJECTION}`,
-    { slug }
-  )
+  // Match against the safe-slugified form so an editor-entered slug with
+  // spaces/capitals/URL characters still resolves to the right document
+  // (mirrors getCaravan - shows used to assume a clean slug, which let a
+  // pasted website URL in the slug field crash the whole static build).
+  const all = await client.fetch(`
+    *[_type == "show"] { _id, title, "slug": slug.current }
+  `)
+  const match = (all || []).find((s) => {
+    const fromSlug = safeSlug(s.slug)
+    const fromTitle = safeSlug(s.title)
+    return fromSlug === slug || fromTitle === slug
+  })
+  if (!match) return null
+
+  return client.fetch(`*[_id == $id][0] ${SHOW_PROJECTION}`, { id: match._id })
 }
 
 /** Slug list for /shows/[slug] dynamic route generation. */
 export async function getAllShowPaths() {
-  return client.fetch(`
-    *[_type == "show" && defined(slug.current)] { "slug": slug.current }
+  const raw = await client.fetch(`
+    *[_type == "show" && defined(slug.current)] { _id, title, "slug": slug.current }
   `)
+  // Auto-clean any slug that has spaces, capitals or invalid characters (e.g.
+  // a website URL pasted into the slug field). Skip any show whose slug AND
+  // title both fail to produce something usable so one bad doc can never take
+  // down the build - it just drops that single page.
+  const seen = new Set()
+  const unique = []
+  for (const s of raw) {
+    const slug = safeSlug(s.slug) || safeSlug(s.title)
+    if (!slug) {
+      console.warn(`Show ${s._id} skipped: cannot produce a valid slug from "${s.slug}" or "${s.title}"`)
+      continue
+    }
+    if (seen.has(slug)) {
+      console.warn(`Show ${s._id} skipped: slug "${slug}" already used by another show`)
+      continue
+    }
+    seen.add(slug)
+    unique.push({ slug, _id: s._id })
+  }
+  return unique
 }
 
 /**
@@ -444,6 +481,81 @@ export async function getDistinctBrands() {
     array::unique(*[_type == "caravan" && status == "for-sale" && defined(brand)].brand->name)
     | order(@ asc)
   `)
+}
+
+// ---------------------------------------------------------------------------
+// What's Happening feed (homepage + /whats-happening)
+// ---------------------------------------------------------------------------
+
+/**
+ * Format a YYYY-MM-DD date string as a short "D MMM" label (e.g. "10 May").
+ * Parses the ISO string directly (no Date object) to avoid timezone drift.
+ */
+export function shortDate(isoDate) {
+  if (!isoDate) return ''
+  const [y, m, d] = String(isoDate).split('-').map(Number)
+  if (!y || !m || !d) return String(isoDate)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${d} ${months[m - 1]}`
+}
+
+/**
+ * The unified "What's Happening" feed. Merges editor-managed `happening`
+ * documents with upcoming/active `show` documents (so adding a show surfaces
+ * it on the homepage + /whats-happening automatically - no duplicate doc).
+ *
+ * Each item: { _id, date, type, title, body, link, showOnHomepage, source }.
+ * Sorted newest first by date. Returns [] if Sanity is unreachable.
+ */
+export async function getHappeningsFeed() {
+  let happenings = []
+  let shows = []
+  try {
+    ;[happenings, shows] = await Promise.all([
+      client.fetch(`
+        *[_type == "happening" && defined(date)] | order(date desc) {
+          _id, title, type, date, body, link, showOnHomepage
+        }
+      `),
+      client.fetch(`
+        *[_type == "show" && status in ["upcoming", "active"] && defined(startDate)] {
+          _id, title, "slug": slug.current, startDate, datesLabel, venueName, seoDescription
+        }
+      `),
+    ])
+  } catch (err) {
+    console.warn('getHappeningsFeed: Sanity unreachable:', err.message)
+    return []
+  }
+
+  const showItems = (shows || []).map((s) => {
+    const slug = safeSlug(s.slug) || safeSlug(s.title)
+    return {
+      _id: s._id,
+      date: s.startDate,
+      type: 'Event',
+      title: s.title,
+      body: s.seoDescription || [s.datesLabel, s.venueName].filter(Boolean).join(' · '),
+      link: slug ? `/shows/${slug}` : '/shows',
+      showOnHomepage: true,
+      source: 'show',
+    }
+  })
+
+  const newsItems = (happenings || []).map((h) => ({
+    _id: h._id,
+    date: h.date,
+    type: h.type || 'News',
+    title: h.title,
+    body: h.body,
+    link: h.link || null,
+    showOnHomepage: h.showOnHomepage !== false,
+    source: 'happening',
+  }))
+
+  return [...showItems, ...newsItems]
+    .filter((i) => i.date && i.title)
+    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
 }
 
 // ---------------------------------------------------------------------------

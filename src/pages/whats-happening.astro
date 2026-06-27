@@ -1,19 +1,22 @@
 ---
 import Site from '../layouts/Site.astro'
+import { getHappeningsFeed, shortDate } from '../lib/sanity.js'
 
-// Placeholder timeline items - move to Sanity post-Maud-feedback
+// The full feed (editor "What's Happening" items + upcoming/active shows),
+// newest first, from Sanity. Maud adds items in Studio and they appear here
+// automatically. Shows fold in on their own - no duplicate doc needed.
+let feed = []
+try {
+  feed = await getHappeningsFeed()
+} catch (err) {
+  console.warn('Sanity unreachable for /whats-happening:', err.message)
+}
+
+// Featured story - still hardcoded for now (move to Sanity later if wanted).
 const featured = {
   title: 'The 2026 Stockman Rover 02 is in the showroom',
   body: 'The wait is over. Stockman\'s flagship slide-on camper has been completely redesigned for 2026 - stronger chassis, updated kitchen layout, and a new electrical system that makes off-grid living even easier. Come see it for yourself.',
 }
-
-const news = [
-  { date: '10 May', type: 'New Arrival', title: 'Rover 02 open day at the showroom', body: 'Come see the 2026 Stockman Rover 02 up close. Shane will be running walkthroughs throughout the day - no appointment needed, just rock up. Tea and coffee on us.' },
-  { date: '17 May', type: 'Handover', title: 'Mitchell family handover', body: 'Another family heading out on their first big trip. The Mitchells picked up their Kimberley Karavan and they\'re heading north for three months. Safe travels and happy trails.' },
-  { date: '07 Jun', type: 'Event', title: 'Suncoast Outdoor Adventure Expo', body: 'Find us at the expo with live walkthroughs of the full Kimberley Kampers and Stockman Products range. Exclusive show pricing on selected models. Bring the family - it\'s a great day out.' },
-  { date: '15 Jun', type: 'New Video', title: 'Karavan kitchen deep-dive uploaded', body: 'Our latest YouTube upload breaks down every detail of the Kimberley Karavan kitchen - from the Corian benchtops to the hidden storage that makes camp cooking actually enjoyable.' },
-  { date: '05 Jul', type: 'Workshop', title: 'Winter service special - free electrical check', body: 'Book a pre-trip inspection before July and we\'ll throw in a free electrical system check. Peace of mind before you leave the driveway.' },
-]
 
 const happyCampers = [
   { name: 'Mitchell Family', detail: 'Kimberley Karavan', story: 'Heading north for three months. First big trip with the kids.' },
@@ -28,6 +31,7 @@ const typeColors = {
   'Event': 'gold',
   'New Video': 'blue',
   'Workshop': 'muted',
+  'News': 'muted',
 }
 ---
 
@@ -54,25 +58,33 @@ const typeColors = {
     </div>
   </section>
 
-  <!-- Timeline -->
+  <!-- Timeline (from Sanity) -->
   <section class="section" style="background:var(--sand-deep); padding-top:64px; padding-bottom:64px;">
     <div class="container" style="max-width:880px;">
       <h2 class="section-title" style="margin-bottom:32px;">From the showroom floor</h2>
-      <div class="news-timeline">
-        {news.map((n) => (
-          <article class="news-item">
-            <div class="news-date">{n.date}</div>
-            <div class="news-body">
-              <span class={`news-type news-type-${typeColors[n.type] || 'muted'}`}>{n.type}</span>
-              <h3>{n.title}</h3>
-              <p>{n.body}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-      <div class="configurator-placeholder-note" style="margin-top:32px;">
-        Sample news items shown. Maud and Shane: send through real upcoming events / handovers / new arrivals and we'll move the list to Sanity so you can update it as it happens.
-      </div>
+      {feed.length > 0 ? (
+        <div class="news-timeline">
+          {feed.map((n) => (
+            <article class="news-item">
+              <div class="news-date">{shortDate(n.date)}</div>
+              <div class="news-body">
+                <span class={`news-type news-type-${typeColors[n.type] || 'muted'}`}>{n.type}</span>
+                <h3>{n.title}</h3>
+                <p>{n.body}</p>
+                {n.link && (
+                  <a
+                    href={n.link}
+                    {...(/^https?:\/\//i.test(n.link) ? { rel: 'noopener', target: '_blank' } : {})}
+                    style="color:var(--rust); font-weight:600; text-decoration:none;"
+                  >Read more →</a>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p style="color:var(--muted);">Nothing to report just now - check back soon, or see our <a href="/shows" style="color:var(--rust); font-weight:600;">upcoming shows</a>.</p>
+      )}
     </div>
   </section>
 

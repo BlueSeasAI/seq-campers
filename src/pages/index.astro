@@ -5,7 +5,7 @@ import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
 import ReserveCta from '../components/ReserveCta.astro'
 import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
-import { getSiteSettings, sanityImage, conditionLabel, youtubeId } from '../lib/sanity.js'
+import { getSiteSettings, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
 
 let settings = null
 try {
@@ -98,11 +98,25 @@ const testimonials = [
   },
 ]
 
-const upcomingNews = [
-  { date: '10 May', type: 'New Arrival', title: 'New Stockman Rover 02 arrival', body: 'The 2026 model is in the showroom. Come see the upgrades in person.' },
-  { date: '17 May', type: 'Handover', title: 'Mitchell family handover', body: 'Another family heading out on their first big trip. Safe travels!' },
-  { date: '03 Jun', type: 'Event', title: 'Brisbane Caravan, Camping & Touring Supershow', body: 'Five days at the Brisbane Showgrounds, stand 2693 in the Main Oval. Come and find us at the show - or book a chat before we go.', href: '/brisbane-show-2026' },
-]
+// What's Happening (homepage view). Pulls from Sanity - getHappeningsFeed
+// merges editor "What's Happening" items with upcoming/active shows so a show
+// added in Studio appears here automatically. Newest 3 flagged for homepage.
+let happeningsFeed = []
+try {
+  happeningsFeed = await getHappeningsFeed()
+} catch (err) {
+  console.warn('Sanity unreachable for homepage feed:', err.message)
+}
+const homeFeed = happeningsFeed.filter((i) => i.showOnHomepage).slice(0, 3)
+
+const typeColors = {
+  'New Arrival': 'rust',
+  'Handover': 'green',
+  'Event': 'gold',
+  'New Video': 'blue',
+  'Workshop': 'muted',
+  'News': 'muted',
+}
 
 // LocalBusiness schema - tells Google/AI "we are an Australian caravan dealer"
 const localBusiness = {
@@ -566,6 +580,41 @@ const faqSchema = {
       </div>
     </div>
   </section>
+
+  <!-- What's Happening - shows + editor news from Sanity (newest 3). Hidden
+       when the feed is empty. Full list lives at /whats-happening. -->
+  {homeFeed.length > 0 && (
+    <section class="section" style="background:var(--sand-deep); padding-top:56px; padding-bottom:56px;">
+      <div class="container" style="max-width:880px;">
+        <div class="section-header" style="margin-bottom:28px;">
+          <div>
+            <div class="page-eyebrow" style="color:var(--rust);">What's happening</div>
+            <h2 class="section-title">News from the showroom floor</h2>
+          </div>
+          <a href="/whats-happening" class="section-link">See all →</a>
+        </div>
+        <div class="news-timeline">
+          {homeFeed.map((n) => (
+            <article class="news-item">
+              <div class="news-date">{shortDate(n.date)}</div>
+              <div class="news-body">
+                <span class={`news-type news-type-${typeColors[n.type] || 'muted'}`}>{n.type}</span>
+                <h3>{n.title}</h3>
+                <p>{n.body}</p>
+                {n.link && (
+                  <a
+                    href={n.link}
+                    {...(/^https?:\/\//i.test(n.link) ? { rel: 'noopener', target: '_blank' } : {})}
+                    style="color:var(--rust); font-weight:600; text-decoration:none;"
+                  >Read more →</a>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <YoutubeSubscribeBar variant="bar" />
   <ReserveCta variant="band" />
