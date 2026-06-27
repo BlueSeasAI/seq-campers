@@ -1,6 +1,6 @@
 ---
 import Site from '../../layouts/Site.astro'
-import { getShow, getAllShowPaths, portableTextToHtml } from '../../lib/sanity.js'
+import { getShow, getAllShowPaths, portableTextToHtml, showPhase } from '../../lib/sanity.js'
 
 export async function getStaticPaths() {
   const list = await getAllShowPaths()
@@ -46,7 +46,7 @@ const eventSchema = show.startDate && show.endDate
       startDate: show.startDate,
       endDate: show.endDate,
       eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-      eventStatus: show.status === 'archived'
+      eventStatus: showPhase(show) === 'past'
         ? 'https://schema.org/EventCompleted'
         : 'https://schema.org/EventScheduled',
       location: {

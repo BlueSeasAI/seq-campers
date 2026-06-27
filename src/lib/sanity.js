@@ -391,6 +391,34 @@ export function flattenVideosPage(settings) {
 // Shows
 // ---------------------------------------------------------------------------
 
+/** Brisbane (AEST = UTC+10, no daylight saving) date as YYYY-MM-DD. */
+export function brisbaneToday() {
+  const nowBrisbane = new Date(Date.now() + 10 * 60 * 60 * 1000)
+  return nowBrisbane.toISOString().slice(0, 10)
+}
+
+/**
+ * Work out a show's phase from its dates so the "On now / Upcoming / Past"
+ * label changes itself - nobody has to flip a status field. Falls back to the
+ * manual `status` field only when dates are missing.
+ * Returns 'active' | 'upcoming' | 'past'.
+ *
+ * NOTE: the site is static, so this is evaluated at BUILD time. It's correct
+ * as of the last build; a daily scheduled rebuild keeps it fresh between
+ * content edits (otherwise a show won't flip to "past" until the next deploy).
+ */
+export function showPhase(show, today = brisbaneToday()) {
+  const start = show?.startDate
+  const end = show?.endDate
+  if (end && today > end) return 'past'
+  if (start && today < start) return 'upcoming'
+  if (start && end && today >= start && today <= end) return 'active'
+  // No usable dates - fall back to the manual status field.
+  if (show?.status === 'active') return 'active'
+  if (show?.status === 'archived') return 'past'
+  return 'upcoming'
+}
+
 const SHOW_PROJECTION = `{
   _id, title, "slug": slug.current, status, eventWebsiteUrl,
   startDate, endDate, datesLabel, daysLabel,
@@ -420,10 +448,12 @@ export async function getShows() {
     ${SHOW_PROJECTION}
   `)
   // Normalise slug to the same safe form getAllShowPaths produces so the
-  // /shows index cards link to URLs that actually exist in the build output.
+  // /shows index cards link to URLs that actually exist in the build output,
+  // and attach the date-derived phase so the pill is automatic.
   return (raw || []).map((s) => ({
     ...s,
     slug: safeSlug(s.slug) || safeSlug(s.title),
+    phase: showPhase(s),
   }))
 }
 
@@ -518,8 +548,8 @@ export async function getHappeningsFeed() {
         }
       `),
       client.fetch(`
-        *[_type == "show" && status in ["upcoming", "active"] && defined(startDate)] {
-          _id, title, "slug": slug.current, startDate, datesLabel, venueName, seoDescription
+        *[_type == "show" && defined(startDate)] {
+          _id, title, "slug": slug.current, startDate, endDate, status, datesLabel, venueName, seoDescription
         }
       `),
     ])
@@ -528,7 +558,9 @@ export async function getHappeningsFeed() {
     return []
   }
 
-  const showItems = (shows || []).map((s) => {
+  // Only current/upcoming shows belong in the feed - past shows drop off
+  // automatically (they live in the /shows "Past shows" archive).
+  const showItems = (shows || []).filter((s) => showPhase(s) !== 'past').map((s) => {
     const slug = safeSlug(s.slug) || safeSlug(s.title)
     return {
       _id: s._id,

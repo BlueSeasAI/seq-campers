@@ -37,13 +37,15 @@ try {
 // URL stays as a hardcoded page so printed QR codes / Facebook posts
 // keep working, but it does not appear on this /shows index.
 
-const statusOrder = { active: 0, upcoming: 1, archived: 2 }
+// Phase is derived from the show's dates in getShows() (showPhase) so the
+// On now / Upcoming / Past label changes itself - no manual status flipping.
+const phaseOrder = { active: 0, upcoming: 1, past: 2 }
 const allCards = shows
   .map((s) => ({
     _id: s._id,
     title: s.title,
     href: s.slug ? `/shows/${s.slug}` : '#',
-    status: s.status,
+    phase: s.phase,
     startDate: s.startDate,
     endDate: s.endDate,
     datesLabel: s.datesLabel,
@@ -53,14 +55,16 @@ const allCards = shows
     blurb: s.heroH1 || s.seoDescription || '',
   }))
   .sort((a, b) => {
-    const sa = statusOrder[a.status] ?? 9
-    const sb = statusOrder[b.status] ?? 9
+    const sa = phaseOrder[a.phase] ?? 9
+    const sb = phaseOrder[b.phase] ?? 9
     if (sa !== sb) return sa - sb
+    // Upcoming: soonest first. Active/past: most recent first.
+    if (a.phase === 'upcoming') return (a.startDate || '').localeCompare(b.startDate || '')
     return (b.startDate || '').localeCompare(a.startDate || '')
   })
 
-const activeAndUpcoming = allCards.filter((c) => c.status !== 'archived')
-const archived = allCards.filter((c) => c.status === 'archived')
+const activeAndUpcoming = allCards.filter((c) => c.phase !== 'past')
+const past = allCards.filter((c) => c.phase === 'past')
 
 const description = intro
   || 'Where to see SEQ Campers in person. Caravan shows, expos and events across Queensland.'
@@ -112,9 +116,9 @@ const description = intro
 
         <div class="shows-grid">
           {activeAndUpcoming.map((s) => (
-            <a href={s.href} class={`show-card show-card-${s.status}`}>
-              {s.status === 'active' && <div class="show-card-badge show-card-badge-active">On now</div>}
-              {s.status === 'upcoming' && <div class="show-card-badge show-card-badge-upcoming">Upcoming</div>}
+            <a href={s.href} class={`show-card show-card-${s.phase}`}>
+              {s.phase === 'active' && <div class="show-card-badge show-card-badge-active">On now</div>}
+              {s.phase === 'upcoming' && <div class="show-card-badge show-card-badge-upcoming">Upcoming</div>}
               <h3 class="show-card-title">{s.title}</h3>
               <div class="show-card-dates">{s.datesLabel || ''}</div>
               <div class="show-card-venue">{s.venueName || ''}</div>
@@ -134,14 +138,15 @@ const description = intro
     </section>
   )}
 
-  {archived.length > 0 && (
+  {past.length > 0 && (
     <section class="section" style="background:var(--sand-deep); padding-top:32px; padding-bottom:32px;">
       <div class="container">
         <div class="page-eyebrow" style="color:var(--muted); margin-bottom:8px;">Past shows</div>
         <h2 class="section-title" style="margin-bottom:18px; color:var(--muted);">Where you've seen us before.</h2>
         <div class="shows-grid shows-grid-archive">
-          {archived.map((s) => (
+          {past.map((s) => (
             <a href={s.href} class="show-card show-card-archived">
+              <div class="show-card-badge show-card-badge-past">Past</div>
               <h3 class="show-card-title">{s.title}</h3>
               <div class="show-card-dates">{s.datesLabel || ''}</div>
               <div class="show-card-venue">{s.venueName || ''}</div>
@@ -236,6 +241,7 @@ const description = intro
     }
     .show-card-badge-active { background: linear-gradient(135deg, #2BA85F 0%, #1F8049 100%); }
     .show-card-badge-upcoming { background: linear-gradient(135deg, #C0341A 0%, #8B2410 100%); }
+    .show-card-badge-past { background: linear-gradient(135deg, #8B6A40 0%, #6b5230 100%); }
     .show-card-title {
       font-family: 'Inter Tight', sans-serif;
       font-size: 1.3rem;
