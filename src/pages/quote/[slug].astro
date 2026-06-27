@@ -206,11 +206,17 @@ try {
                   <span>GVM limit</span>
                   <strong data-weight-gvm>&mdash;</strong>
                 </div>
+                <div class="qb-weight-row">
+                  <span>Gross payload</span>
+                  <strong data-weight-gross>&mdash;</strong>
+                </div>
+                <div class="qb-weight-deductions" data-weight-deductions></div>
                 <div class="qb-weight-row qb-weight-payload-row">
-                  <span>Payload, ready to travel</span>
+                  <span>Ready-to-travel payload</span>
                   <strong data-weight-payload>&mdash;</strong>
                 </div>
                 <div class="qb-weight-status" data-weight-status></div>
+                <p class="qb-weight-note">Weights are indicative only &mdash; confirm with your dealer.</p>
               </div>
               <p class="qb-summary-fineprint" data-fineprint>
                 Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST.
@@ -556,6 +562,9 @@ try {
         const kg = (n) => Math.round(n).toLocaleString('en-AU') + 'kg'
         $('[data-weight-tare]').textContent = kg(estTare)
         $('[data-weight-gvm]').textContent = kg(gvm) + (hasGvmKit ? ' (upgraded)' : '')
+        $('[data-weight-gross]').textContent = (grossPayload < 0 ? '-' : '') + kg(Math.abs(grossPayload))
+        $('[data-weight-deductions]').textContent =
+          'less 2 passengers (' + Math.round(w.passengers) + 'kg), full fuel (' + Math.round(fuel) + 'kg), full water (' + Math.round(water) + 'kg)'
         $('[data-weight-payload]').textContent = (readyPayload < 0 ? '-' : '') + kg(Math.abs(readyPayload))
 
         const statusEl = $('[data-weight-status]')
