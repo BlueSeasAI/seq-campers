@@ -98,6 +98,16 @@ export default {
     },
 
     {
+      name: 'soldListed',
+      title: 'Show in the public Sold archive?',
+      type: 'boolean',
+      description:
+        'Only matters once Status is Sold. On = this sold van shows in the public Sold Caravans archive (on /sold). Off = kept in the system but hidden from the website. Tip: keep the most recent handful On and switch older ones Off - nothing is ever deleted.',
+      initialValue: true,
+      hidden: ({ document }) => document?.status !== 'sold',
+    },
+
+    {
       name: 'stockType',
       title: 'New or Used',
       type: 'string',

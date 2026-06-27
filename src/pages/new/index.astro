@@ -27,11 +27,10 @@ caravans = [...caravans].sort((a, b) => (b.price || 0) - (a.price || 0))
 const brands = [...new Set(caravans.map((c) => c.brand).filter(Boolean))].sort()
 
 // ---------------------------------------------------------------------------
-// 8 video tiles - the locked layout per Bart's 16 Jun meeting + 8 Jun
-// clarification. Order is FIXED in code (most expensive top-left, cheapest
-// bottom-right, with Accessories as the 8th non-priced tile). Each tile
-// has sensible defaults; Maud can override any field via Sanity Studio at
-// Site Settings -> "New page video tiles (8 slots)".
+// 7 video tiles - one per new model. Order is FIXED in code (most expensive
+// top-left, cheapest bottom-right). Each tile has sensible defaults; Maud can
+// override any field via Sanity Studio at "New caravans page -> Tile videos".
+// (The Accessories tile moved to its own /accessories page, Jun 2026.)
 // ---------------------------------------------------------------------------
 const NEW_TILE_DEFAULTS = [
   { youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg', brandLabel: 'Kimberley Kampers', modelLabel: 'Kruiswagen', priceLabel: 'From $203,350', ctaHref: '/quote/kruiswagen' },
@@ -41,7 +40,6 @@ const NEW_TILE_DEFAULTS = [
   { youtubeUrl: 'https://www.youtube.com/watch?v=xYf81xUZtNE', brandLabel: 'Stockman Products', modelLabel: 'Trekka',     priceLabel: 'From $65,500',  ctaHref: '/quote/trekka' },
   { youtubeUrl: 'https://www.youtube.com/watch?v=WwgapQt3xO4', brandLabel: 'Stockman Products', modelLabel: 'Rover',      priceLabel: 'From $63,490',  ctaHref: '/quote/rover' },
   { youtubeUrl: 'https://www.youtube.com/watch?v=tozC7prVbOg', brandLabel: 'Stockman Products', modelLabel: 'Pod',        priceLabel: 'Enquire',       ctaHref: '/contact' },
-  { youtubeUrl: 'https://www.youtube.com/watch?v=xYf81xUZtNE', brandLabel: '',                  modelLabel: 'Accessories', priceLabel: 'Enquire',      ctaHref: '/contact' },
 ]
 
 function resolveTile(idx) {
@@ -103,13 +101,12 @@ const description = `New off-road caravans, off-grid hybrids and 4x4 camper vans
     </section>
   )}
 
-  <!-- 8 video tiles - the locked /new layout per 16 Jun + 8 Jun. -->
+  <!-- 7 model video tiles - the locked /new layout (Accessories moved to /accessories). -->
   <section class="section" style={`padding-top:${caravans.length > 0 ? '24px' : '32px'}; padding-bottom:32px; ${caravans.length > 0 ? 'background:var(--sand-deep);' : ''}`}>
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
         <div class="page-eyebrow" style="color:var(--rust);">SEQ your match</div>
         <h2 class="section-title">{caravans.length > 0 ? 'Or pick a model and build from scratch.' : 'Pick a model and build your spec.'}</h2>
-        <p style="color:var(--muted); font-size:0.95rem; margin-top:4px; max-width:560px; margin-left:auto; margin-right:auto;">Seven off-road models. One match for you.</p>
       </div>
 
       <div class="new-tile-grid">
