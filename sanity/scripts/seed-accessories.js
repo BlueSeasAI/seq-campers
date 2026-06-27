@@ -31,8 +31,10 @@ const MOVER_DIR = 'C:/Users/bartp/OneDrive - Blue Seas AI Consulting/Blue Seas A
 
 const TOILET_PHOTOS = ['CuddyExplodedX3_2.jpg.avif', 's1_low_angle_regular_lid.jpg.webp', 'S1-inside.webp', 'S1_Sealing_Toilet_-_Heat_seal.webp', 'nirvana-upfitters_2784.jpg.webp']
 // 329A5121 = blue-button (2500kg), 329A5151 = red-button (4500kg) per Bart.
-// (Screenshots dropped from the seed - add them in Studio later if wanted.)
-const MOVER_PHOTOS = ['329A5121.jpg', '329A5151.jpg']
+// The 2 screenshots are OneDrive "cloud-only" by default - right-click them in
+// File Explorer -> "Always keep on this device" to download, THEN re-run, or
+// they'll skip. (They upload fine once downloaded.)
+const MOVER_PHOTOS = ['329A5121.jpg', '329A5151.jpg', 'Screenshot 2026-06-25 at 6.57.58 pm.png', 'Screenshot 2026-06-25 at 7.15.08 pm.png']
 
 let keyN = 0
 const k = () => 'k' + (keyN++)
