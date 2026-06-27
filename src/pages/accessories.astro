@@ -1,39 +1,112 @@
 ---
 import Site from '../layouts/Site.astro'
 import ReserveCta from '../components/ReserveCta.astro'
-import { getAccessoriesPage, youtubeId } from '../lib/sanity.js'
+import { getAccessoriesPage, getAccessories, sanityImage, sanitySrcset, youtubeId } from '../lib/sanity.js'
 
 let page = null
+let realAccessories = []
 try {
   page = await getAccessoriesPage()
+  realAccessories = await getAccessories()
 } catch (err) {
   console.warn('Sanity unreachable for /accessories:', err.message)
 }
 
 const intro = (page?.intro && page.intro.trim())
-  || 'Genuine off-road accessories, fitted by our workshop and shipped Australia-wide. Tell us what you are after and we will sort it out.'
+  || 'Genuine off-grid gear, fitted by our workshop and shipped Australia-wide. Browse below and order or register your interest - we confirm and invoice before delivery or fitting.'
 const videoUrl = (page?.heroVideo?.youtubeUrl && page.heroVideo.youtubeUrl.trim())
   || 'https://www.youtube.com/watch?v=gq72bwiG-eI'
 const videoId = youtubeId(videoUrl)
 const videoCaption = page?.heroVideo?.caption || ''
 
-// Real accessories from Sanity. If there are none yet, fall back to a set of
-// SAMPLE items so Maud + Shane can see the page layout. These are a WIREFRAME
-// only - they vanish automatically the moment a real accessory is added in
-// Sanity, so there's no lingering placeholder to forget to remove.
-const realItems = Array.isArray(page?.items) ? page.items.filter((i) => i?.title) : []
-const usingSamples = realItems.length === 0
-const SAMPLE_ITEMS = [
-  { title: 'Recovery Tracks (pair)', description: 'Heavy-duty recovery boards for sand, mud and ruts. Mount to the toolbox or A-frame.' },
-  { title: '270 Degree Awning', description: 'Wraparound shade off the door side - sets up in under a minute, no poles.' },
-  { title: 'Dual Battery + DC-DC Kit', description: 'Charges your van batteries off the car as you drive. Lithium-ready.' },
-  { title: 'Slide-Out Kitchen', description: 'Stainless slide for the rear toolbox - stove, prep space and storage in one.' },
-  { title: 'Portable Solar Blanket', description: '200W folding blanket to top up off-grid. Packs flat under a seat.' },
-  { title: 'Water Tank Upgrade', description: 'Extra poly tank with a stone guard - more days between fills when you are remote.' },
+// SAMPLE accessory (Off-Grid Toilets) - shown ONLY while no real accessory
+// documents exist in Sanity, so it disappears automatically the moment SEQ
+// adds the first real one. Lets us preview the exact rich layout now.
+const SAMPLE_ACCESSORIES = [
+  {
+    _id: 'sample-toilets',
+    title: 'Off-Grid Toilets',
+    eyebrow: 'Composting & sealing',
+    badges: ['Certified Installer', 'Waterless', 'Chemical-free', 'No dump points'],
+    intro:
+      'SEQ Campers is a certified installer of CompoCloset off-grid toilets. Two ways to ditch the chemical cassette: the Cuddy composting toilet (in stock now) and the new S1 dry-flush sealing toilet (pre-order). Come and see both at our Marcoola showroom, or order below.',
+    photos: [],
+    products: [
+      {
+        name: 'Cuddy Composting Toilet',
+        brand: 'CompoCloset',
+        type: 'Composting · waterless · smell-free',
+        tag: 'In stock',
+        tagColor: 'green',
+        price: '$1,795',
+        priceNote: 'Indicative - confirm with SEQ · 24-month warranty',
+        pitch:
+          'The best-value true composting toilet on the market. Separates liquids and solids, composts with a natural bulking agent, and stays odour-free with a carbon filter and fan.',
+        features: ['No water, chemicals or dump points', '"Pee Full" LED level indicator', 'Manual agitator + carbon filter', 'Portable or wall-mount installable'],
+        specs: ['422×385×432mm', '9.5kg', 'Solids 14.7L', 'Liquids 6.5L'],
+      },
+      {
+        name: 'S1 Dry Flush Sealing Toilet',
+        brand: 'CompoCloset',
+        type: 'Sealing · waterless · push-button',
+        tag: 'Pre-order',
+        tagColor: 'rust',
+        price: 'Pre-order',
+        priceNote: 'On display at our showroom - see it, then pre-order',
+        pitch:
+          "The world's first separating sealing toilet. Push a button and solids are automatically heat-sealed in a bag - no composting, no layering, no smell. Urine diverts separately.",
+        features: ['Automatic battery heat-seal - 50+ per charge', 'Built-in urine diversion, LED indicator', '~25 uses per liner roll · backup mode', 'On display at SEQ Campers to view before you pre-order'],
+        specs: ['432×386×419mm', '13.2kg', 'Solids 15.7L', 'Urine 6.4L'],
+      },
+    ],
+    compareHeading: 'Composting or sealing - which suits you?',
+    compareIntro: 'Both are waterless, chemical-free and divert urine separately. The difference is what happens to the solids.',
+    compareColumns: [
+      { heading: 'Cuddy - Composting', body: 'Solids drop onto a natural bulking agent and break down over time. A front crank agitator mixes it; a carbon filter and fan keep it fresh.', note: 'Empty the solids bin roughly every 2-3 weeks for two. No power, no consumables, lowest running cost. In stock now.' },
+      { heading: 'S1 - Sealing', body: 'Each solid use is hermetically heat-sealed in a bag at the push of a button - nothing to compost, nothing to see or smell.', note: 'Battery sealer (50+ seals/charge), ~25 uses per liner roll, with a backup diverting mode if you run out. Pre-order - with one on display at SEQ Campers to view first.' },
+    ],
+    compareNote: '',
+  },
+  {
+    _id: 'sample-movers',
+    title: 'Optitec Caravan Movers',
+    eyebrow: 'Remote-control movers',
+    badges: ['Remote control', 'Fully portable', 'Free shipping', 'No underbody install'],
+    intro: "Reverse your van into any spot at the push of a button - no yelling, no stress, no expensive underbody install. Three Optitec movers: the wheeled Optimover V3 for hard surfaces, and the tracked All-Terrain 2500 and 4500 for grass, gravel and off-road. Not sure which? Use the quick guide below, or order online and we'll confirm the right fit.",
+    photos: [],
+    products: [
+      { name: 'Optimover V3', brand: 'Optitec', type: 'Wheeled remote jockey wheel', tag: 'On-road', tagColor: 'olive', price: '$2,625', priceNote: 'Moves up to 3,500kg · hard surfaces · + clamp from $180', pitch: "The original remote-control jockey wheel - drives your van's own wheels to reverse and park it anywhere on firm ground.", features: ['12V DC, 50A high-torque motor', 'Single or double axle · tow-ball to 350kg', '3-year motor & transmission warranty', 'Clamp $180: OW14 (100-130mm) or OW15 (150mm)', 'Optional carry & storage bag - $140'], specs: ['22kg', 'Remote + cables incl.'] },
+      { name: 'All Terrain 2500', brand: 'Optitec', type: 'Tracked off-road mover', tag: 'Off-road', tagColor: 'rust', price: '$4,500-$4,550', priceNote: 'Up to 2,500kg off-road · price depends on bracket', pitch: 'Track tyres built to go off-road. Ready for challenging sites with small to medium vans and trailers.', features: ['2 motors (288W each)', 'Moves 10m per minute under load', 'Fast-charging long-life battery as standard', 'Standard bracket (50mm) $4,500, or Universal $4,550'], specs: ['34kg', '540×470×210mm', '2yr warranty'] },
+      { name: 'All Terrain 4500', brand: 'Optitec', type: 'Tracked off-road mover', tag: 'Off-road · HD', tagColor: 'gold', price: '$5,400-$5,450', priceNote: 'Up to 4,500kg off-road · price depends on bracket', pitch: 'The most powerful Optitec. Four motors and rubber tracks for the heaviest vans in the most challenging scenarios.', features: ['4 motors (288W each)', 'Moves 7m per minute under load', 'Fast-charging long-life battery as standard', 'Standard bracket (50mm) $5,400, or Universal $5,450'], specs: ['42kg', '540×470×210mm', '2yr warranty'] },
+    ],
+    compareHeading: 'Which mover do I need?',
+    compareIntro: "Two quick questions sort it - what you'll drive it on, and how heavy your rig is.",
+    compareColumns: [
+      { heading: '1. What surface?', body: 'Hard & paved (concrete, bitumen, pavers, firm ground): the Optimover V3.', note: 'Grass, gravel, dirt, sand or inclines: a tracked All-Terrain mover.' },
+      { heading: '2. How heavy is your rig?', body: 'Up to 3,500kg on firm ground: Optimover V3. Up to 2,500kg off-road: All Terrain 2500.', note: 'Up to 4,500kg / heaviest vans: All Terrain 4500.' },
+    ],
+    compareNote: "The short version: the V3 is a wheeled remote jockey wheel for hard ground; the All-Terrain 2500 and 4500 are tracked units that clamp to the drawbar and grip off-road. All three are remote-controlled and fully portable. The V3 takes an OW14 (100-130mm) or OW15 (150mm) clamp ($180), with an optional carry & storage bag ($140). The All-Terrain movers include a Standard (50mm) or Universal (50/75/100/130mm, +$50) bracket - that's the only reason for their price range. Still unsure? Tell us your van and we'll match it.",
+  },
 ]
-const items = usingSamples ? SAMPLE_ITEMS : realItems
 
-const description = 'Off-road caravan accessories from SEQ Campers on the Sunshine Coast - fitted by our workshop and shipped Australia-wide. Enquire about any item.'
+const usingSample = realAccessories.length === 0
+const accessories = usingSample ? SAMPLE_ACCESSORIES : realAccessories
+
+// Flatten every product name into the order form's dropdown.
+const productOptions = []
+for (const a of accessories) {
+  for (const p of (a.products || [])) {
+    if (p?.name) productOptions.push({ name: p.name, price: p.price })
+  }
+}
+
+function orderBtnText(p) {
+  if (p?.price && /pre-?order/i.test(p.price)) return 'Pre-order this'
+  if (!p?.price || /enquire/i.test(p.price)) return 'Enquire'
+  return 'Order this'
+}
+
+const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshine Coast - composting and sealing toilets and more. Certified installer. Order online, we invoice before delivery or fitting.'
 ---
 
 <Site title="Accessories" description={description}>
@@ -62,253 +135,274 @@ const description = 'Off-road caravan accessories from SEQ Campers on the Sunshi
     </section>
   )}
 
-  {items.length > 0 ? (
-    <section class="section" style="padding-top:28px; padding-bottom:32px;">
-      <div class="container">
-        <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:18px;">
-          <div class="page-eyebrow" style="color:var(--rust);">What we stock</div>
-          <h2 class="section-title">Off-road accessories.</h2>
+  {accessories.map((a) => (
+    <section class="section acc-section" style="padding-top:32px; padding-bottom:8px;">
+      <div class="container" style="max-width:1040px;">
+        <div class="acc-head">
+          {a.eyebrow && <div class="acc-eyebrow">{a.eyebrow}</div>}
+          <h2 class="acc-title">{a.title}</h2>
+          {a.badges?.length > 0 && (
+            <div class="acc-badges">
+              {a.badges.map((b) => <span class="acc-pill">{b}</span>)}
+            </div>
+          )}
+          {a.intro && <p class="acc-intro">{a.intro}</p>}
         </div>
-        {usingSamples && (
-          <div class="acc-sample-note">
-            <strong>Sample layout (preview only).</strong> These example accessories show how the page will look with five or six items. They disappear automatically the moment a real accessory is added in Sanity - there is no placeholder to remember to remove.
+
+        {a.photos?.length > 0 ? (
+          <div class="acc-gallery">
+            {a.photos.map((ph, i) => ph?.url && (
+              <img
+                class="gallery-img"
+                src={sanityImage(ph.url, { w: 600 })}
+                srcset={sanitySrcset(ph.url, [320, 480, 640])}
+                sizes="(max-width: 720px) 50vw, 240px"
+                alt={ph.alt || `${a.title} photo ${i + 1}`}
+                loading="lazy"
+                data-full={sanityImage(ph.url, { w: 1600 })}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="acc-gallery">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <div class="acc-photo-ph"><span>Photo {n}</span></div>
+            ))}
           </div>
         )}
-        <div class="acc-grid">
-          {items.map((a) => (
-            <div class="acc-card">
-              <div class="acc-media">
-                {a.imageUrl ? (
-                  <img src={`${a.imageUrl}?w=640&auto=format`} alt={a.imageAlt || a.title} loading="lazy" />
-                ) : (
-                  <div class="acc-noimg">
-                    <span class="acc-play" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    </span>
-                    <span>Photo or video</span>
+
+        {a.products?.length > 0 && (
+          <div class="acc-prods">
+            {a.products.map((p) => (
+              <div class="pcard">
+                <div class="pcard-body">
+                  <div class="pcard-top">
+                    {p.brand && <span class="pcard-brand">{p.brand}</span>}
+                    {p.tag && <span class={`pcard-state tag-${p.tagColor || 'rust'}`}>{p.tag}</span>}
                   </div>
-                )}
-              </div>
-              <div class="acc-meta">
-                <h3 class="acc-title">{a.title}</h3>
-                {a.description && <p class="acc-desc">{a.description}</p>}
-                <div class="acc-foot">
-                  {a.priceLabel && <span class="acc-price">{a.priceLabel}</span>}
-                  <a href="#accessories-enquiry" class="acc-cta" data-accessory={a.title}>Enquire →</a>
+                  <h3 class="pcard-name">{p.name}</h3>
+                  {p.type && <div class="pcard-type">{p.type}</div>}
+                  <div class="pcard-price">{p.price || 'Enquire'}{p.priceNote && <small>{p.priceNote}</small>}</div>
+                  {p.pitch && <p class="pcard-pitch">{p.pitch}</p>}
+                  {p.features?.length > 0 && (
+                    <ul class="pcard-ticks">
+                      {p.features.map((f) => <li>{f}</li>)}
+                    </ul>
+                  )}
+                  {p.specs?.length > 0 && (
+                    <div class="pcard-specs">
+                      {p.specs.map((s) => <span>{s}</span>)}
+                    </div>
+                  )}
+                  <a href="#order" class="btn-primary pcard-cta order-btn" data-product={p.name}>{orderBtnText(p)}</a>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  ) : (
-    <section class="section" style="padding-top:28px;">
-      <div class="container" style="max-width:720px; text-align:center;">
-        <p style="color:var(--muted); line-height:1.65;">Our accessories range is being added shortly. In the meantime, get in touch below and we will help you out.</p>
-      </div>
-    </section>
-  )}
+            ))}
+          </div>
+        )}
 
-  <!-- Enquiry form - no buying flow yet, this emails SEQ so they can follow up. -->
-  <section class="section" id="accessories-enquiry" style="padding-top:8px; padding-bottom:48px;">
-    <div class="container" style="max-width:720px;">
+        {a.compareHeading && a.compareColumns?.length > 0 && (
+          <div class="acc-compare">
+            <h3>{a.compareHeading}</h3>
+            {a.compareIntro && <p class="acc-compare-sub">{a.compareIntro}</p>}
+            <div class="acc-compare-cols">
+              {a.compareColumns.map((c) => (
+                <div class="acc-compare-col">
+                  {c.heading && <h4>{c.heading}</h4>}
+                  {c.body && <p>{c.body}</p>}
+                  {c.note && <p class="acc-compare-note">{c.note}</p>}
+                </div>
+              ))}
+            </div>
+            {a.compareNote && <p class="acc-compare-fullnote">{a.compareNote}</p>}
+          </div>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <!-- ONE order form for all accessories. The product dropdown is built from
+       every accessory's products, so SEQ never needs a new form. -->
+  <section class="section" id="order" style="padding-top:24px; padding-bottom:48px;">
+    <div class="container" style="max-width:760px;">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:6px; margin-bottom:14px;">
-        <div class="page-eyebrow" style="color:var(--rust);">Get in touch</div>
-        <h2 class="section-title">Enquire about an accessory.</h2>
+        <div class="page-eyebrow" style="color:var(--rust);">Order or register interest</div>
+        <h2 class="section-title">Order an accessory.</h2>
         <p style="color:var(--muted); margin-top:6px; line-height:1.65;">
-          Tell us what you are after and we will come back with availability and a price. You can also call us on <a href="tel:0753707933" style="color:var(--rust); font-weight:600;">(07) 5370 7933</a>.
+          No payment is taken here - we confirm and email you an invoice to pay, then arrange delivery or fitting. Pre-order items are taken as a pre-order. Or call us on <a href="tel:0753707933" style="color:var(--rust); font-weight:600;">(07) 5370 7933</a>.
         </p>
       </div>
 
       <form
         class="enquiry-form"
-        name="accessories-enquiry"
+        name="accessory-order"
         method="POST"
         data-netlify="true"
         netlify-honeypot="bot-field"
         action="/thanks/"
       >
-        <input type="hidden" name="form-name" value="accessories-enquiry" />
+        <input type="hidden" name="form-name" value="accessory-order" />
         <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
 
-        <div class="form-row">
-          <label>
-            Your name
-            <input type="text" name="customer_name" required autocomplete="name" />
-          </label>
-          <label>
-            Email
-            <input type="email" name="customer_email" required autocomplete="email" />
-          </label>
-        </div>
+        <label>
+          Product
+          <select name="product" required>
+            <option value="">-- Choose a product --</option>
+            {productOptions.map((p) => (
+              <option value={p.name}>{p.name}{p.price && p.price !== 'Pre-order' ? ` - ${p.price}` : ''}</option>
+            ))}
+            <option value="Not sure yet - please advise">Not sure yet - please advise</option>
+          </select>
+        </label>
 
         <div class="form-row">
-          <label>
-            Phone (optional)
-            <input type="tel" name="customer_phone" autocomplete="tel" placeholder="04xx xxx xxx" />
-          </label>
-          <label>
-            Which accessory?
-            <input type="text" name="accessory_interest" placeholder="e.g. recovery kit, awning..." />
-          </label>
+          <label>Your name<input type="text" name="customer_name" required autocomplete="name" /></label>
+          <label>Phone<input type="tel" name="customer_phone" required autocomplete="tel" placeholder="04xx xxx xxx" /></label>
+        </div>
+        <div class="form-row">
+          <label>Email<input type="email" name="customer_email" required autocomplete="email" /></label>
+          <label>Quantity<input type="number" name="quantity" min="1" value="1" /></label>
         </div>
 
         <label>
-          Anything else? (optional)
-          <textarea name="message" placeholder="Quantity, your van model, delivery address..."></textarea>
+          Delivery or collection
+          <select name="fulfilment" required>
+            <option value="">-- Choose one --</option>
+            <option value="Deliver to my address">Deliver to my address</option>
+            <option value="Pick up from SEQ Campers (Marcoola)">Pick up from SEQ Campers (Marcoola)</option>
+            <option value="Fit to my van/camper at SEQ Campers">Fit to my van/camper at SEQ Campers</option>
+          </select>
         </label>
 
-        <button type="submit" class="btn-primary">Send my enquiry</button>
+        <label>Delivery address (if delivering)<input type="text" name="address" autocomplete="street-address" /></label>
+        <label>Notes (optional)<textarea name="message" placeholder="Anything we should know..."></textarea></label>
+
+        <button type="submit" class="btn-primary">Submit order / enquiry</button>
+        <p class="form-policy-note" style="font-size:0.82rem; color:var(--muted); margin: 10px 0 0;">
+          SEQ Campers is a certified installer. We'll confirm your order and email an invoice to pay.
+        </p>
       </form>
     </div>
   </section>
 
+  <!-- Photo lightbox (shared) -->
+  <div id="lightbox" class="lightbox" hidden aria-hidden="true">
+    <button class="lb-btn lb-close" aria-label="Close">&times;</button>
+    <button class="lb-btn lb-prev" aria-label="Previous photo">&#8249;</button>
+    <img class="lb-img" src="" alt="" />
+    <button class="lb-btn lb-next" aria-label="Next photo">&#8250;</button>
+    <div class="lb-counter"></div>
+  </div>
+
   <script is:inline>
-    /* When a visitor clicks "Enquire" on an accessory, prefill the
-       "Which accessory?" field so SEQ knows which item they mean. */
     (function () {
-      document.querySelectorAll('.acc-cta[data-accessory]').forEach(function (a) {
-        a.addEventListener('click', function () {
-          var field = document.querySelector('input[name="accessory_interest"]')
-          if (field) field.value = a.getAttribute('data-accessory') || ''
+      // Pre-select the product in the order form when a card button is clicked.
+      document.querySelectorAll('.order-btn[data-product]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var sel = document.querySelector('select[name="product"]')
+          if (sel) {
+            var want = b.getAttribute('data-product')
+            for (var i = 0; i < sel.options.length; i++) {
+              if (sel.options[i].value === want) { sel.selectedIndex = i; break }
+            }
+          }
         })
+      })
+
+      // Lightbox - scoped to the gallery the clicked photo belongs to.
+      var box = document.getElementById('lightbox')
+      if (!box) return
+      var lbImg = box.querySelector('.lb-img')
+      var counter = box.querySelector('.lb-counter')
+      var urls = [], alts = [], idx = 0
+      function show(i) { idx = (i + urls.length) % urls.length; lbImg.src = urls[idx]; lbImg.alt = alts[idx]; counter.textContent = (idx + 1) + ' / ' + urls.length }
+      function close() { box.hidden = true; box.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; lbImg.src = '' }
+      document.querySelectorAll('.gallery-img').forEach(function (im) {
+        im.addEventListener('click', function () {
+          var gallery = im.closest('.acc-gallery') || document
+          var imgs = Array.prototype.slice.call(gallery.querySelectorAll('.gallery-img'))
+          urls = imgs.map(function (x) { return x.getAttribute('data-full') || x.src })
+          alts = imgs.map(function (x) { return x.alt || '' })
+          show(imgs.indexOf(im))
+          box.hidden = false; box.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'
+        })
+      })
+      box.querySelector('.lb-close').addEventListener('click', close)
+      box.querySelector('.lb-prev').addEventListener('click', function (e) { e.stopPropagation(); show(idx - 1) })
+      box.querySelector('.lb-next').addEventListener('click', function (e) { e.stopPropagation(); show(idx + 1) })
+      box.addEventListener('click', function (e) { if (e.target === box) close() })
+      document.addEventListener('keydown', function (e) {
+        if (box.hidden) return
+        if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft') show(idx - 1); else if (e.key === 'ArrowRight') show(idx + 1)
       })
     })()
   </script>
 
   <style>
-    .acc-video {
-      position: relative;
-      aspect-ratio: 16 / 9;
-      background: #1a1a1c;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 14px 36px rgba(42, 22, 8, 0.16);
-    }
-    .acc-video iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-    .acc-video-caption {
-      margin: 12px 0 0;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
+    .acc-video { position: relative; aspect-ratio: 16 / 9; background: #1a1a1c; border-radius: 14px; overflow: hidden; box-shadow: 0 14px 36px rgba(42,22,8,0.16); }
+    .acc-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .acc-video-caption { margin: 12px 0 0; text-align: center; color: var(--muted); font-size: 0.95rem; }
 
-    .acc-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 18px;
-    }
-    @media (max-width: 640px) {
-      .acc-grid { grid-template-columns: 1fr; gap: 14px; }
-    }
-    .acc-card {
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      border: 1px solid var(--tan-border);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    }
-    .acc-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--rust);
-      box-shadow: 0 10px 28px rgba(42, 22, 8, 0.12);
-    }
-    .acc-media {
-      position: relative;
-      aspect-ratio: 4 / 3;
-      background: var(--sand-deep);
-    }
-    .acc-media img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .acc-noimg {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      color: var(--muted);
-      font-size: 0.85rem;
-      background: repeating-linear-gradient(45deg, var(--sand-deep) 0 10px, #ece3d2 10px 20px);
-    }
-    .acc-play {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      background: rgba(192, 52, 26, 0.92);
-      color: #fff;
-      padding-left: 3px;
-      box-shadow: 0 4px 12px rgba(42, 22, 8, 0.2);
-    }
-    .acc-sample-note {
-      max-width: 760px;
-      margin: 0 auto 18px;
-      background: #FFF5EC;
-      border: 1px solid #F0CDA8;
-      border-left: 4px solid var(--gold, #D4943A);
-      border-radius: 8px;
-      padding: 12px 16px;
-      color: #5A3818;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    .acc-meta {
-      padding: 16px 18px 18px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-    .acc-title {
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1.2;
-    }
-    .acc-desc {
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin-top: 8px;
-    }
-    .acc-foot {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: auto;
-      padding-top: 14px;
-    }
-    .acc-price {
-      font-family: 'Inter Tight', sans-serif;
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .acc-cta {
-      color: var(--rust);
-      font-weight: 700;
-      font-size: 0.95rem;
-      text-decoration: none;
-      margin-left: auto;
-    }
-    .acc-cta:hover { text-decoration: underline; }
+    .acc-sample-note { background: #FFF5EC; border: 1px solid #F0CDA8; border-left: 4px solid var(--gold, #D4943A); border-radius: 8px; padding: 12px 16px; color: #5A3818; font-size: 0.9rem; line-height: 1.5; }
+
+    .acc-section + .acc-section { border-top: 1px solid var(--tan-border); }
+    .acc-head { text-align: center; max-width: 760px; margin: 0 auto 18px; }
+    .acc-eyebrow { font-family: 'Inter Tight', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold, #D4943A); margin-bottom: 6px; }
+    .acc-title { font-family: 'Inter Tight', sans-serif; font-size: 1.9rem; font-weight: 800; color: var(--ink); line-height: 1.1; }
+    .acc-badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 12px 0 0; }
+    .acc-pill { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; padding: 5px 13px; border-radius: 999px; background: var(--sand-deep); color: var(--ink); border: 1px solid var(--tan-border); }
+    .acc-intro { color: var(--muted); line-height: 1.65; margin-top: 12px; }
+
+    .acc-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 0 auto 22px; }
+    .acc-gallery .gallery-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; border: 1px solid var(--tan-border); cursor: zoom-in; background: var(--sand-deep); }
+    .acc-photo-ph { aspect-ratio: 4 / 3; border-radius: 10px; border: 1px dashed var(--tan-border); background: repeating-linear-gradient(45deg, var(--sand-deep) 0 10px, #ece3d2 10px 20px); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.8rem; }
+
+    .acc-prods { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    @media (max-width: 760px) { .acc-prods { grid-template-columns: 1fr; } }
+    .pcard { background: #fff; border: 1px solid var(--tan-border); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 18px rgba(42,22,8,0.07); display: flex; flex-direction: column; }
+    .pcard-body { padding: 22px 24px 24px; display: flex; flex-direction: column; flex: 1; }
+    .pcard-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .pcard-brand { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold, #D4943A); }
+    .pcard-state { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; color: #fff; }
+    .tag-green { background: var(--green, #2BA85F); }
+    .tag-rust { background: var(--rust); }
+    .tag-gold { background: var(--gold, #D4943A); color: var(--ink); }
+    .tag-olive { background: #6B7A3A; }
+    .tag-muted { background: var(--muted); }
+    .pcard-name { font-family: 'Inter Tight', sans-serif; font-size: 1.35rem; font-weight: 700; color: var(--ink); margin: 6px 0 3px; line-height: 1.15; }
+    .pcard-type { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+    .pcard-price { font-family: 'Inter Tight', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--rust); line-height: 1.1; }
+    .pcard-price small { display: block; font-family: 'Inter', sans-serif; font-size: 0.74rem; font-weight: 400; color: var(--muted); margin-top: 3px; }
+    .pcard-pitch { font-size: 0.92rem; color: var(--ink); line-height: 1.55; margin: 12px 0; }
+    .pcard-ticks { list-style: none; margin: 4px 0 12px; padding: 0; }
+    .pcard-ticks li { padding-left: 20px; position: relative; margin-bottom: 7px; font-size: 0.88rem; color: var(--ink); line-height: 1.45; }
+    .pcard-ticks li::before { content: ""; position: absolute; left: 0; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold, #D4943A); }
+    .pcard-specs { border-top: 1px solid var(--tan-border); padding-top: 12px; font-size: 0.8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; }
+    .pcard-specs span { font-weight: 600; color: var(--ink); }
+    .pcard-cta { margin-top: 16px; text-align: center; }
+
+    .acc-compare { background: var(--ink); color: var(--sand); border-radius: 14px; border-top: 4px solid var(--gold, #D4943A); padding: 26px 28px; margin-top: 24px; }
+    .acc-compare h3 { color: var(--sand); font-family: 'Inter Tight', sans-serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+    .acc-compare-sub { color: var(--tan-border); font-size: 0.92rem; margin-bottom: 18px; }
+    .acc-compare-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 640px) { .acc-compare-cols { grid-template-columns: 1fr; } }
+    .acc-compare-col { background: rgba(255,255,255,0.05); border: 1px solid rgba(212,148,58,0.25); border-radius: 10px; padding: 18px; }
+    .acc-compare-col h4 { color: var(--gold, #D4943A); font-family: 'Inter Tight', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .acc-compare-col p { color: rgba(244,237,224,0.9); font-size: 0.9rem; line-height: 1.55; margin-bottom: 8px; }
+    .acc-compare-note { font-size: 0.82rem !important; color: var(--tan-border) !important; }
+    .acc-compare-fullnote { color: rgba(244,237,224,0.85); font-size: 0.85rem; line-height: 1.6; margin-top: 16px; border-top: 1px solid rgba(212,148,58,0.25); padding-top: 14px; }
+
+    /* lightbox (shared with stock listings) */
+    .lightbox { position: fixed; inset: 0; z-index: 200; background: rgba(10,6,2,0.92); display: flex; align-items: center; justify-content: center; }
+    .lightbox[hidden] { display: none; }
+    .lb-img { max-width: 92vw; max-height: 88vh; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .lb-btn { position: absolute; background: rgba(255,255,255,0.12); color: #fff; border: 0; cursor: pointer; width: 48px; height: 48px; border-radius: 50%; font-size: 1.8rem; line-height: 1; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+    .lb-btn:hover { background: rgba(255,255,255,0.25); }
+    .lb-close { top: 18px; right: 18px; font-size: 2rem; }
+    .lb-prev { left: 16px; top: 50%; transform: translateY(-50%); }
+    .lb-next { right: 16px; top: 50%; transform: translateY(-50%); }
+    .lb-counter { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+    @media (max-width: 560px) { .lb-prev { left: 8px; } .lb-next { right: 8px; } .lb-btn { width: 42px; height: 42px; } }
   </style>
 
   <ReserveCta variant="band" />
