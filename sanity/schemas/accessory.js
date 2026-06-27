@@ -72,6 +72,12 @@ export default {
               options: { layout: 'grid' },
               of: [{ type: 'image', options: { hotspot: true }, fields: [{ name: 'alt', title: 'Alt text', type: 'string' }] }],
             },
+            {
+              name: 'videoUrl',
+              title: 'Video URL (optional)',
+              type: 'url',
+              description: 'Optional YouTube link for a walkthrough of this product. It shows as a video player on the product card, just under the description.',
+            },
             { name: 'brand', title: 'Brand', type: 'string', validation: (Rule) => Rule.max(40) },
             { name: 'type', title: 'Type line', type: 'string', description: 'e.g. "Composting · waterless · smell-free".', validation: (Rule) => Rule.max(80) },
             { name: 'tag', title: 'Tag (small coloured pill)', type: 'string', description: 'Short label shown on the card, e.g. "In stock", "Pre-order", "On-road", "Off-road".', validation: (Rule) => Rule.max(20) },

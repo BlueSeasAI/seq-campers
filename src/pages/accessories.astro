@@ -185,6 +185,18 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
                   {p.type && <div class="pcard-type">{p.type}</div>}
                   <div class="pcard-price">{p.price || 'Enquire'}{p.priceNote && <small>{p.priceNote}</small>}</div>
                   {p.pitch && <p class="pcard-pitch">{p.pitch}</p>}
+                  {p.videoUrl && youtubeId(p.videoUrl) && (
+                    <div class="pcard-video">
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${youtubeId(p.videoUrl)}?rel=0&modestbranding=1&playsinline=1`}
+                        title={`${p.name} walkthrough`}
+                        frameborder="0"
+                        allow="encrypted-media; fullscreen"
+                        allowfullscreen
+                        loading="lazy"
+                      ></iframe>
+                    </div>
+                  )}
                   {p.features?.length > 0 && (
                     <ul class="pcard-ticks">
                       {p.features.map((f) => <li>{f}</li>)}
@@ -379,6 +391,8 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
     .pcard-price { font-family: 'Inter Tight', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--rust); line-height: 1.1; }
     .pcard-price small { display: block; font-family: 'Inter', sans-serif; font-size: 0.74rem; font-weight: 400; color: var(--muted); margin-top: 3px; }
     .pcard-pitch { font-size: 0.92rem; color: var(--ink); line-height: 1.55; margin: 12px 0; }
+    .pcard-video { position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; margin: 4px 0 14px; background: #1a1a1c; border: 1px solid var(--tan-border); }
+    .pcard-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .pcard-ticks { list-style: none; margin: 4px 0 12px; padding: 0; }
     .pcard-ticks li { padding-left: 20px; position: relative; margin-bottom: 7px; font-size: 0.88rem; color: var(--ink); line-height: 1.45; }
     .pcard-ticks li::before { content: ""; position: absolute; left: 0; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold, #D4943A); }

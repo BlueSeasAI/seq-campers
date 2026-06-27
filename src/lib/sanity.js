@@ -422,7 +422,7 @@ export async function getAccessories() {
     *[_type == "accessory"] | order(orderRank asc, title asc) {
       _id, title, eyebrow, badges, intro, orderRank,
       products[]{
-        name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs,
+        name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs, videoUrl,
         "photos": photos[]{ "url": asset->url, alt }
       },
       compareHeading, compareIntro,
