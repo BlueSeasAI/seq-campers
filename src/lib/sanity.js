@@ -662,7 +662,7 @@ export async function getPublishedBlogPosts() {
 export async function getBlogPostBySlug(slug) {
   return client.fetch(
     `*[_type == "blogPost" && slug.current == $slug && isPublished == true][0] {
-      _id, title, "slug": slug.current, publishedAt, excerpt, author, body,
+      _id, title, "slug": slug.current, publishedAt, "updatedAt": _updatedAt, excerpt, author, body,
       "coverImage": coverImage.asset->url
     }`,
     { slug }

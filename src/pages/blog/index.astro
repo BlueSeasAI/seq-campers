@@ -9,23 +9,6 @@ try {
   console.warn('Sanity unreachable on /blog:', err.message)
 }
 
-// Placeholder shown when no posts are published yet so the page isn't blank.
-// Maud removes this the moment she publishes a real post in Studio.
-const PLACEHOLDER_POSTS = [
-  {
-    _id: 'placeholder-1',
-    title: 'Lorem ipsum: your first off-road adventure starts here',
-    slug: 'placeholder-lorem-ipsum',
-    publishedAt: '2026-06-16T00:00:00Z',
-    author: 'Shane & Maud',
-    excerpt: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua - ready for the real thing.',
-    coverImage: '/pathway-new.png',
-  },
-]
-
-const display = posts.length ? posts : PLACEHOLDER_POSTS
-const isPlaceholder = !posts.length
-
 const fmtDate = (iso) => {
   if (!iso) return ''
   try { return new Date(iso).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' }) }
@@ -44,37 +27,61 @@ const fmtDate = (iso) => {
     </div>
   </div>
 
-  {isPlaceholder && (
-    <section style="background:#FFF7EC; border-bottom:1px solid #E8D5A8; padding:14px 0;">
+  {posts.length === 0 ? (
+    <section class="section" style="padding-top:48px; padding-bottom:64px;">
       <div class="container">
-        <p style="margin:0; color:#7A4F1A; font-size:0.92rem; line-height:1.5;">
-          <strong>Placeholder content.</strong> Maud - publish your first post in Sanity Studio (Blog post) and this notice will disappear.
-        </p>
+        <div class="blog-empty">
+          <h2>Our first stories are on the way.</h2>
+          <p>We're out on the road gathering trip reports, model deep-dives and honest owner write-ups. Check back soon - or follow along on YouTube in the meantime.</p>
+          <a class="btn-ghost" href="https://www.youtube.com/@seqcampers9450?sub_confirmation=1" target="_blank" rel="noopener">Watch on YouTube →</a>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="section" style="padding-top:32px; padding-bottom:48px;">
+      <div class="container">
+        <div class="blog-grid">
+          {posts.map((p) => (
+            <a class="blog-card" href={`/blog/${p.slug}`}>
+              <div class="blog-card-media">
+                {p.coverImage && <img src={p.coverImage} alt={p.title} loading="lazy" />}
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">{fmtDate(p.publishedAt)}{p.author && ` · ${p.author}`}</div>
+                <h2 class="blog-card-title">{p.title}</h2>
+                <p class="blog-card-excerpt">{p.excerpt}</p>
+                <span class="blog-card-cta">Read more →</span>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   )}
 
-  <section class="section" style="padding-top:32px; padding-bottom:48px;">
-    <div class="container">
-      <div class="blog-grid">
-        {display.map((p) => (
-          <a class="blog-card" href={`/blog/${p.slug}`}>
-            <div class="blog-card-media">
-              {p.coverImage && <img src={p.coverImage} alt={p.title} loading="lazy" />}
-            </div>
-            <div class="blog-card-body">
-              <div class="blog-card-meta">{fmtDate(p.publishedAt)}{p.author && ` · ${p.author}`}</div>
-              <h2 class="blog-card-title">{p.title}</h2>
-              <p class="blog-card-excerpt">{p.excerpt}</p>
-              <span class="blog-card-cta">Read more →</span>
-            </div>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
   <style>
+    .blog-empty {
+      max-width: 620px;
+      background: #fff;
+      border: 1px solid var(--tan-border, #DCCBA8);
+      border-radius: 14px;
+      padding: 40px 36px;
+      text-align: center;
+    }
+    .blog-empty h2 {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--ink, #2A1608);
+      margin: 0 0 12px;
+      line-height: 1.2;
+    }
+    .blog-empty p {
+      color: var(--ink, #2A1608);
+      font-size: 1.02rem;
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
     .blog-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

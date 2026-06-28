@@ -5,32 +5,15 @@ import { getAllBlogSlugs, getBlogPostBySlug } from '../../lib/sanity.js'
 export async function getStaticPaths() {
   let slugs = []
   try { slugs = await getAllBlogSlugs() } catch (err) { /* ignore */ }
-  const live = slugs.map((s) => ({ params: { slug: s.slug } }))
-  // Always include the placeholder so the index card resolves even when
-  // there is no Sanity data yet.
-  if (!live.find((l) => l.params.slug === 'placeholder-lorem-ipsum')) {
-    live.push({ params: { slug: 'placeholder-lorem-ipsum' } })
-  }
-  return live
+  // Only real, published Sanity posts get a page. A force-built
+  // 'placeholder-lorem-ipsum' route used to live here and was being crawled by
+  // AI search engines, which dragged down the site's AEO freshness signals.
+  return slugs.filter((s) => s.slug).map((s) => ({ params: { slug: s.slug } }))
 }
 
 const { slug } = Astro.params
 let post = null
 try { post = await getBlogPostBySlug(slug) } catch (err) { /* ignore */ }
-
-// Placeholder fallback so the URL renders something useful even before
-// Maud publishes the first real post in Studio.
-if (!post && slug === 'placeholder-lorem-ipsum') {
-  post = {
-    title: 'Lorem ipsum: your first off-road adventure starts here',
-    publishedAt: '2026-06-16T00:00:00Z',
-    author: 'Shane & Maud',
-    excerpt: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    coverImage: '/pathway-new.png',
-    body: null,
-    isPlaceholder: true,
-  }
-}
 
 if (!post) return Astro.redirect('/blog')
 
@@ -40,18 +23,35 @@ const fmtDate = (iso) => {
   catch { return '' }
 }
 
-// Lorem ipsum body for the placeholder so the post still feels real.
-const placeholderBody = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+// Show an "Updated" date only when it is genuinely a different day to the
+// published date - keeps the freshness signal honest, never a fake bump.
+const showUpdated = post.updatedAt && fmtDate(post.updatedAt) !== fmtDate(post.publishedAt)
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-
-Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
-
-Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.
-
-At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.`
+// BlogPosting structured data for AI search + rich results. Every field is
+// driven from the real Sanity document: datePublished from publishedAt,
+// dateModified from the document's own _updatedAt - so the freshness signal
+// AI engines read is accurate, never invented.
+const siteBase = Astro.site ?? new URL('https://seqcampers.com.au')
+const postUrl = new URL(`/blog/${slug}/`, siteBase).href
+const absImage = post.coverImage
+  ? (String(post.coverImage).startsWith('http') ? post.coverImage : new URL(post.coverImage, siteBase).href)
+  : undefined
+const blogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.excerpt,
+  datePublished: post.publishedAt,
+  dateModified: post.updatedAt || post.publishedAt,
+  author: { '@type': 'Organization', name: post.author || 'SEQ Campers' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'SEQ Campers',
+    logo: { '@type': 'ImageObject', url: new URL('/seq-logo-new.png', siteBase).href },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+  ...(absImage ? { image: absImage } : {}),
+}
 ---
 
 <Site
@@ -60,10 +60,12 @@ At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praese
   ogImage={post.coverImage}
   ogType="article"
 >
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(blogSchema)} />
+
   <article class="blog-post">
     <header class="blog-post-header">
       <div class="container" style="max-width:780px;">
-        <div class="blog-post-meta">{fmtDate(post.publishedAt)}{post.author && ` · ${post.author}`}</div>
+        <div class="blog-post-meta">{fmtDate(post.publishedAt)}{post.author && ` · ${post.author}`}{showUpdated && ` · Updated ${fmtDate(post.updatedAt)}`}</div>
         <h1 class="blog-post-title">{post.title}</h1>
         <p class="blog-post-excerpt">{post.excerpt}</p>
       </div>
@@ -79,9 +81,7 @@ At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praese
 
     <div class="container" style="max-width:780px;">
       <div class="blog-post-body">
-        {post.isPlaceholder ? (
-          placeholderBody.split('\n\n').map((para) => <p>{para}</p>)
-        ) : Array.isArray(post.body) ? (
+        {Array.isArray(post.body) ? (
           post.body
             .filter((b) => b._type === 'block' && Array.isArray(b.children))
             .map((b) => <p>{b.children.map((c) => c.text).join('')}</p>)
