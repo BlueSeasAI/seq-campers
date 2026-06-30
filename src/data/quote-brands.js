@@ -90,7 +90,7 @@ export const quoteBrands = [
     intro:
       'A more compact off-road caravan that doesn\'t compromise on build quality. Easier to tow, easier to manoeuvre into tight bush camps. Same Kimberley build standard as the Karavan in a friendlier footprint.',
     showSpecial: 'Show package - lock in 2026 pricing before July rise',
-    indicativePrice: 'From $80,365',
+    indicativePrice: 'From $76,865',
     inclusions: withBrandExtra([
       { label: '$3,000 accessory credit (Kimberley factory)', value: 3000 },
     ]),
@@ -110,7 +110,7 @@ export const quoteBrands = [
     intro:
       'Not a caravan - the Kruiswagen is a motorhome built on a serious 4WD chassis. Drive it, sleep in it, live out of it. The closest thing to a Unimog camper available in Australia today.',
     showSpecial: 'Show special - ask Shane on the stand',
-    indicativePrice: 'From $203,350',
+    indicativePrice: 'From $199,850',
     inclusions: STANDARD_SHOW_INCLUSIONS,
     keyChoices: [
       { id: 'chassis', label: 'Base chassis', options: ['Iveco Daily 4x4', 'Mercedes Sprinter 4x4', 'Other (discuss with Shane)'] },

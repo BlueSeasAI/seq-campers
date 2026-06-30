@@ -816,7 +816,7 @@ export const modelPages = [
     name: 'Kimberley Kube',
     meta: {
       title: 'Kimberley Kube Off-Road Camper | Sunshine Coast QLD | SEQ Campers',
-      description: 'The Kimberley Kube off-road hybrid camper at SEQ Campers, Sunshine Coast. From $80,365. King bed, lithium power, slide-out kitchen, air suspension. Go where others can\'t.',
+      description: 'The Kimberley Kube off-road hybrid camper at SEQ Campers, Sunshine Coast. From $76,865. King bed, lithium power, slide-out kitchen, air suspension. Go where others can\'t.',
       ogImage: '/models/kube/showcase.webp',
     },
     hero: {
@@ -824,7 +824,7 @@ export const modelPages = [
       pill: 'Kimberley Kampers · Off-Road Hybrid Camper',
       h1: 'Kimberley Kube',
       lead: 'A compact, go-anywhere teardrop camper built for the rough stuff, with a real king bed, lithium power and a slide-out kitchen. Set up in minutes and stay out longer.',
-      priceFrom: '$80,365',
+      priceFrom: '$76,865',
       priceNote: 'Driveaway pricing & finance available at SEQ Campers',
     },
     intro: {
@@ -898,9 +898,9 @@ export const modelPages = [
     ],
     pricing: {
       eyebrow: 'Pricing & ownership',
-      heading: 'Priced from $80,365.',
+      heading: 'Priced from $76,865.',
       body: [
-        'The Kimberley Kube starts from $80,365 at SEQ Campers. Final pricing depends on the options you choose, such as the 85L fridge, cooker setup and solar, and we are happy to walk you through every choice before you commit.',
+        'The Kimberley Kube starts from $76,865 at SEQ Campers. Final pricing depends on the options you choose, such as the 85L fridge, cooker setup and solar, and we are happy to walk you through every choice before you commit.',
         'We are your local Sunshine Coast guide for Kimberley Kampers. Come and see the Kube in person, talk through how you travel, and we will help you land on the right build. Driveaway pricing and finance are available.',
       ],
       includedHeading: "What's included as standard",
@@ -920,7 +920,7 @@ export const modelPages = [
       eyebrow: 'Common questions',
       heading: 'Kimberley Kube FAQ.',
       items: [
-        { q: 'How much does the Kimberley Kube cost?', a: 'The Kube starts from $80,365 at SEQ Campers. Your final price depends on the options you add, and we will give you clear driveaway pricing before you decide.' },
+        { q: 'How much does the Kimberley Kube cost?', a: 'The Kube starts from $76,865 at SEQ Campers. Your final price depends on the options you add, and we will give you clear driveaway pricing before you decide.' },
         { q: 'What can tow the Kube?', a: 'With a tare weight from 1,110kg and an ATM of 1,950kg, the Kube tows comfortably behind most mid-size and larger 4WDs. We can check it against your specific vehicle when you visit.' },
         { q: 'Is it genuinely off-road capable?', a: 'Yes. The Kube rides on 2.5" mono-tube off-road racing shocks with an air-glide system, has electronic vented disc brakes and is built from alloy, marine-grade stainless steel and hot-dipped galvanised steel to handle the rough stuff.' },
         { q: 'How many people does it sleep?', a: 'The Kube sleeps two-plus on a full king bed, with large windows for a panoramic view from inside.' },
@@ -940,8 +940,8 @@ export const modelPages = [
         description: 'The Kimberley Kube is an Australian-built off-road hybrid teardrop camper with a king bed, lithium power, slide-out stainless kitchen and air-glide suspension, available from SEQ Campers on the Sunshine Coast.',
         brand: 'Kimberley Kampers',
         category: 'Off-road hybrid camper',
-        lowPrice: '80365',
-        highPrice: '80365',
+        lowPrice: '76865',
+        highPrice: '76865',
         offerCount: '1',
       },
     },
@@ -953,7 +953,7 @@ export const modelPages = [
     name: 'Kimberley Kruiswagen',
     meta: {
       title: 'Kimberley Kruiswagen 4x4 Motorhome | Sunshine Coast QLD | SEQ Campers',
-      description: 'The Kimberley Kruiswagen is a 4x4 off-road motorhome you drive, not tow. From $203,350 driveaway. See it on the Sunshine Coast at SEQ Campers.',
+      description: 'The Kimberley Kruiswagen is a 4x4 off-road motorhome you drive, not tow. From $199,850 driveaway. See it on the Sunshine Coast at SEQ Campers.',
       ogImage: '/models/kruiswagen/showcase.webp',
     },
     hero: {
@@ -961,7 +961,7 @@ export const modelPages = [
       pill: 'Kimberley Kampers · Off-Road Motorhome',
       h1: 'Kimberley Kruiswagen',
       lead: 'A self-contained 4x4 off-road motorhome you drive straight to the campsite - no towing, no reversing a van, just turn up and live. Full home comforts in a body built for the rough stuff.',
-      priceFrom: '$203,350',
+      priceFrom: '$199,850',
       priceNote: 'Driveaway pricing & finance available at SEQ Campers',
     },
     intro: {
@@ -1031,9 +1031,9 @@ export const modelPages = [
     ],
     pricing: {
       eyebrow: 'Pricing & ownership',
-      heading: 'Priced from $203,350.',
+      heading: 'Priced from $199,850.',
       body: [
-        'The Kimberley Kruiswagen starts from $203,350 at SEQ Campers on the Sunshine Coast. Because it is a complete motorhome rather than a caravan, that one figure covers the vehicle, the build and the off-grid living systems together - there is no separate tow vehicle to budget for.',
+        'The Kimberley Kruiswagen starts from $199,850 at SEQ Campers on the Sunshine Coast. Because it is a complete motorhome rather than a caravan, that one figure covers the vehicle, the build and the off-grid living systems together - there is no separate tow vehicle to budget for.',
         'Final driveaway pricing depends on your chosen variant and options. Come and see us on the Sunshine Coast, walk through the layout in person, and we will put together honest driveaway numbers and finance options that suit you.',
       ],
       includedHeading: "What's included as standard",
@@ -1072,8 +1072,8 @@ export const modelPages = [
         description: 'A self-contained 4x4 off-road motorhome with a full kitchen, moulded ensuite, PowerGlide loft bed and a 48V lithium off-grid power system - driven, not towed.',
         brand: 'Kimberley Kampers',
         category: 'Off-road motorhome',
-        lowPrice: '203350',
-        highPrice: '203350',
+        lowPrice: '199850',
+        highPrice: '199850',
         offerCount: '1',
       },
     },
