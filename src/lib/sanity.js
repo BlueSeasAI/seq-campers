@@ -155,6 +155,7 @@ export async function getCaravan(slug) {
       _id, title, price, status, condition, description, features, topFeatures,
       "brand": brand->name,
       "photos": photos[].asset->url,
+      heroVideo,
       "videos": videos[],
       specs,
       compliance,

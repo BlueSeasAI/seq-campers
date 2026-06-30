@@ -453,11 +453,19 @@ export default {
     },
 
     {
+      name: 'heroVideo',
+      title: 'Hero video (top of listing)',
+      type: 'url',
+      description:
+        'Optional. A YouTube link shown as the FIRST thing on the listing, ABOVE the photos. Leave it blank and the photos show first as normal. Paste the full YouTube URL, e.g. https://www.youtube.com/watch?v=abc123',
+    },
+
+    {
       name: 'videos',
-      title: 'Videos (YouTube)',
+      title: 'Videos (lower down the page)',
       type: 'array',
       description:
-        'Paste up to 3 YouTube links. The first 3 display in a row on the listing page.',
+        'Optional. Paste up to 3 YouTube links shown LOWER DOWN the listing, below the photos. For the video at the very TOP of the listing, use the "Hero video" field above. The first 3 display in a row.',
       of: [
         {
           type: 'object',
