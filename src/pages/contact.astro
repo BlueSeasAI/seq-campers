@@ -1,7 +1,22 @@
 ---
 import Site from '../layouts/Site.astro'
+import { getBusinessDetails } from '../lib/sanity.js'
 
-const mapQuery = encodeURIComponent('SEQ Campers, 3B/6 Bonanza Court, Marcoola QLD 4564, Australia')
+// Contact details, editable in one spot (Studio -> Business details). Every
+// value keeps the current hardcoded literal as a fallback so nothing changes
+// until the record exists and nothing breaks if Sanity is unreachable.
+const biz = await getBusinessDetails()
+const phoneDisplay = biz?.phoneDisplay || '(07) 5370 7933'
+const phoneHref = biz?.phoneHref || '0753707933'
+const textDisplay = biz?.textDisplay || '0422 624 920'
+const textHref = biz?.textHref || '0422624920'
+const emailOffice = biz?.emailOffice || 'office@seqcampers.com.au'
+const addressStreet = biz?.addressStreet || '3B/6 Bonanza Court'
+const addressSuburb = biz?.addressSuburb || 'Marcoola'
+const addressState = biz?.addressState || 'QLD'
+const addressPostcode = biz?.addressPostcode || '4564'
+
+const mapQuery = encodeURIComponent(biz?.mapQuery || 'SEQ Campers, 3B/6 Bonanza Court, Marcoola QLD 4564, Australia')
 const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
 ---
 
@@ -21,28 +36,28 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
 
       <!-- Three quick-contact cards (same height so they line up cleanly) -->
       <div class="contact-cards">
-        <a href="tel:0753707933" class="contact-card">
+        <a href={`tel:${phoneHref}`} class="contact-card">
           <div class="page-eyebrow" style="color:#C0341A;">Phone</div>
-          <div class="contact-card-value">(07) 5370 7933</div>
+          <div class="contact-card-value">{phoneDisplay}</div>
           <div class="contact-card-foot">Online enquiries 7am - 4:30pm</div>
         </a>
 
-        <a href="sms:0422624920" class="contact-card">
+        <a href={`sms:${textHref}`} class="contact-card">
           <div class="page-eyebrow" style="color:#C0341A;">Text us</div>
-          <div class="contact-card-value">0422 624 920</div>
+          <div class="contact-card-value">{textDisplay}</div>
           <div class="contact-card-foot">After-hours text replies welcome.</div>
         </a>
 
-        <a href="mailto:office@seqcampers.com.au" class="contact-card">
+        <a href={`mailto:${emailOffice}`} class="contact-card">
           <div class="page-eyebrow" style="color:#C0341A;">Email</div>
-          <div class="contact-card-value" style="font-size:1.05rem; word-break:break-word;">office@seqcampers.com.au</div>
+          <div class="contact-card-value" style="font-size:1.05rem; word-break:break-word;">{emailOffice}</div>
           <div class="contact-card-foot">Please get in touch if you haven't heard back.</div>
         </a>
 
         <div class="contact-card contact-card-static">
           <div class="page-eyebrow" style="color:#C0341A;">Showroom</div>
           <div class="contact-card-value" style="font-size:1.05rem; line-height:1.35;">
-            3B/6 Bonanza Court<br />Marcoola QLD 4564
+            {addressStreet}<br />{addressSuburb} {addressState} {addressPostcode}
           </div>
           <div class="contact-card-foot">Appointments preferred - after-hours always welcome.</div>
         </div>
@@ -128,7 +143,7 @@ const mapSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`
         <div>
           <h2 style="font-family:'Inter Tight', sans-serif; font-size:1.4rem; font-weight:600; color:#2A1608; margin-bottom:16px;">Find us</h2>
           <p style="color:#8B6A40; margin-bottom:20px;">
-            We are at <strong style="color:var(--ink);">3B/6 Bonanza Court, Marcoola</strong>, ten minutes north of Maroochydore.
+            We are at <strong style="color:var(--ink);">{addressStreet}, {addressSuburb}</strong>, ten minutes north of Maroochydore.
           </p>
           <div class="map-embed map-embed-small">
             <iframe

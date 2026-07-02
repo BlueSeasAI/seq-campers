@@ -1,7 +1,7 @@
 ---
 import Site from '../layouts/Site.astro'
 import { modelPages, getModelPage } from '../data/model-pages.js'
-import { getModelPricing } from '../lib/sanity.js'
+import { getModelPricing, getBusinessDetails } from '../lib/sanity.js'
 
 export async function getStaticPaths() {
   return modelPages.map((m) => ({ params: { model: m.slug } }))
@@ -94,14 +94,29 @@ const productLd = {
     seller: { '@type': 'AutoDealer', name: 'SEQ Campers', url: siteBase },
   },
 }
+// Business details for the AutoDealer JSON-LD. Each value keeps the current
+// hardcoded literal as a fallback so the structured data is unchanged until the
+// Business details record exists and never breaks if Sanity is unreachable.
+// (email stays as the sales@ literal - there is no sales-email field to map.)
+let biz = null
+try { biz = await getBusinessDetails() } catch (err) {
+  console.warn(`Sanity business details unreachable for ${m.slug}:`, err.message)
+}
 const dealerLd = {
   '@context': 'https://schema.org',
   '@type': 'AutoDealer',
   name: 'SEQ Campers',
   url: siteBase,
-  telephone: '+61753707933',
+  telephone: biz?.phoneHref || '+61753707933',
   email: 'sales@seqcampers.com.au',
-  address: { '@type': 'PostalAddress', streetAddress: 'Unit 3, 6 Bonanza Court', addressLocality: 'Marcoola', addressRegion: 'QLD', postalCode: '4564', addressCountry: 'AU' },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: biz?.addressStreet || 'Unit 3, 6 Bonanza Court',
+    addressLocality: biz?.addressSuburb || 'Marcoola',
+    addressRegion: biz?.addressState || 'QLD',
+    postalCode: biz?.addressPostcode || '4564',
+    addressCountry: 'AU',
+  },
   areaServed: ['Sunshine Coast', 'Brisbane', 'Gold Coast', 'Toowoomba', 'South East Queensland'],
   brand: ['Stockman', 'Kimberley Kampers'],
 }

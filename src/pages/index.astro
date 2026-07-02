@@ -5,7 +5,7 @@ import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
 import ReserveCta from '../components/ReserveCta.astro'
 import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
-import { getSiteSettings, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
+import { getSiteSettings, getBusinessDetails, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
 
 let settings = null
 try {
@@ -13,6 +13,17 @@ try {
 } catch (err) {
   console.warn('Sanity unreachable on build:', err.message)
 }
+
+// Business details for the LocalBusiness / AutoDealer JSON-LD below. Each value
+// keeps the current hardcoded literal as a fallback so the structured data is
+// unchanged until Maud creates the record and never breaks if Sanity is down.
+const biz = await getBusinessDetails()
+const ldTelephone = biz?.phoneHref || '+61-7-5370-7933'
+const ldEmail = biz?.emailOffice || 'office@seqcampers.com.au'
+const ldStreet = biz?.addressStreet || '3B/6 Bonanza Court'
+const ldLocality = biz?.addressSuburb || 'Marcoola'
+const ldRegion = biz?.addressState || 'QLD'
+const ldPostcode = biz?.addressPostcode || '4564'
 
 // Hero video resolution: Sanity siteSettings.heroVideo.youtubeUrl wins when
 // set. Falls back to the self-hosted /hero-video.mp4 so the page still works
@@ -126,15 +137,15 @@ const localBusiness = {
   name: 'SEQ Campers',
   description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman Products stock. Off-road camping experts since 2013.",
   url: 'https://seqcampers.com.au',
-  telephone: '+61-7-5370-7933',
-  email: 'office@seqcampers.com.au',
+  telephone: ldTelephone,
+  email: ldEmail,
   areaServed: { '@type': 'State', name: 'Queensland, Australia' },
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '3B/6 Bonanza Court',
-    addressLocality: 'Marcoola',
-    addressRegion: 'QLD',
-    postalCode: '4564',
+    streetAddress: ldStreet,
+    addressLocality: ldLocality,
+    addressRegion: ldRegion,
+    postalCode: ldPostcode,
     addressCountry: 'AU',
   },
   openingHoursSpecification: [

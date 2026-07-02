@@ -1,5 +1,17 @@
 ---
 import Site from '../layouts/Site.astro'
+import { getBusinessDetails } from '../lib/sanity.js'
+
+// Contact details, editable in one spot (Studio -> Business details). Each
+// value falls back to the current hardcoded literal so nothing changes until
+// the record exists and nothing breaks if Sanity is unreachable.
+const biz = await getBusinessDetails()
+const phoneDisplay = biz?.phoneDisplay || '(07) 5370 7933'
+const phoneHref = biz?.phoneHref || '0753707933'
+const addressStreet = biz?.addressStreet || '3B/6 Bonanza Court'
+const addressSuburb = biz?.addressSuburb || 'Marcoola'
+const addressState = biz?.addressState || 'QLD'
+const addressPostcode = biz?.addressPostcode || '4564'
 ---
 
 <Site
@@ -92,10 +104,10 @@ import Site from '../layouts/Site.astro'
 
         <div class="reserve-side-card">
           <div class="page-eyebrow" style="color:var(--rust);">Where we are</div>
-          <p style="margin:6px 0;"><strong>3B/6 Bonanza Court</strong></p>
-          <p style="margin:0; color:var(--muted);">Marcoola QLD 4564<br/>Sunshine Coast - 4 minutes from the airport.</p>
+          <p style="margin:6px 0;"><strong>{addressStreet}</strong></p>
+          <p style="margin:0; color:var(--muted);">{addressSuburb} {addressState} {addressPostcode}<br/>Sunshine Coast - 4 minutes from the airport.</p>
           <p style="margin-top:14px;">
-            <a href="tel:0753707933" style="color:var(--rust); font-weight:600;">(07) 5370 7933</a>
+            <a href={`tel:${phoneHref}`} style="color:var(--rust); font-weight:600;">{phoneDisplay}</a>
           </p>
         </div>
 

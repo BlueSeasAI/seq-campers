@@ -361,6 +361,17 @@ export default defineConfig({
 
             S.divider(),
 
+            // ─── BUSINESS DETAILS (phone, email, address, hours, ABN) ─
+            S.listItem()
+              .title('📇 Business details (phone, email, address, hours)')
+              .child(
+                S.editor()
+                  .id('businessDetails')
+                  .schemaType('businessDetails')
+                  .documentId('businessDetails')
+                  .title('Business details')
+              ),
+
             // ─── SITE-WIDE SETTINGS (banner + Reserve Stripe CTA) ─────
             S.listItem()
               .title('⚙️ Site-wide settings (banner + Reserve CTA)')

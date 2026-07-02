@@ -350,6 +350,39 @@ export async function getSiteSettings() {
   return raw
 }
 
+// ---------------------------------------------------------------------------
+// Business details singleton (phone, email, address, hours, ABN, socials, map)
+// ---------------------------------------------------------------------------
+
+/**
+ * The single "Business details" record (Studio -> Business details). One spot
+ * for the contact info that used to be hardcoded in ~8 places (contact bar +
+ * footer in the layout, /contact, /reserve, the LocalBusiness / AutoDealer
+ * JSON-LD on the home + model pages, terms, privacy).
+ *
+ * Returns null on any error (or if the record does not exist yet) so every
+ * caller can fall back to its current hardcoded literal - nothing on the live
+ * site changes until Maud creates the record, and nothing breaks if Sanity is
+ * unreachable at build time.
+ */
+export async function getBusinessDetails() {
+  try {
+    return await client.fetch(`*[_id == "businessDetails"][0]{
+      phoneDisplay, phoneHref,
+      textDisplay, textHref,
+      emailOffice, emailAdmin,
+      addressStreet, addressSuburb, addressState, addressPostcode, addressFull,
+      showroomHours,
+      abn,
+      youtubeUrl, instagramUrl, facebookUrl,
+      mapQuery
+    }`)
+  } catch (err) {
+    console.warn('getBusinessDetails: Sanity unreachable:', err.message)
+    return null
+  }
+}
+
 /**
  * Videos page settings singleton - 12 curated slots (6 Kimberley + 6 Stockman).
  * Returns null if the document does not exist yet.
