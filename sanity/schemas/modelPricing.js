@@ -8,6 +8,17 @@
 // This is what makes the recurring "the price changed today" job Maud's, not
 // ours: she opens Model pricing, types the new number, hits Publish. Live in ~60s.
 
+import {
+  TagIcon,
+  EyeOpenIcon,
+  NumberIcon,
+  InfoOutlineIcon,
+  OlistIcon,
+  TextIcon,
+  DocumentTextIcon,
+} from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'modelPricing',
   title: 'Model pricing',
@@ -18,6 +29,7 @@ export default {
       name: 'model',
       title: 'Model',
       type: 'string',
+      components: { field: withFieldIcon(TagIcon) },
       description: 'Which model page this pricing controls. Do not change once set.',
       options: {
         list: [
@@ -36,6 +48,7 @@ export default {
       name: 'priceOnApplication',
       title: 'Contact for pricing (hide all prices on this page)',
       type: 'boolean',
+      components: { field: withFieldIcon(EyeOpenIcon) },
       description: 'Turn ON when a price has changed and you do not yet have the new figure. Every price on this model page is replaced with "Contact us for current pricing" until you turn it off.',
       initialValue: false,
     },
@@ -43,18 +56,21 @@ export default {
       name: 'heroPriceFrom',
       title: 'Hero "from" price',
       type: 'string',
+      components: { field: withFieldIcon(NumberIcon) },
       description: 'The big price at the top of the page, e.g. $59,990. Leave blank to hide it.',
     },
     {
       name: 'heroPriceNote',
       title: 'Hero price note',
       type: 'string',
+      components: { field: withFieldIcon(InfoOutlineIcon) },
       description: 'Small text next to the hero price, e.g. "Driveaway pricing & finance available at SEQ Campers".',
     },
     {
       name: 'versions',
       title: 'Version prices',
       type: 'array',
+      components: { field: withFieldIcon(OlistIcon) },
       description: 'One row per version card on the page (e.g. Intrepid, Ultra). The name must match the card on the page.',
       of: [
         {
@@ -71,12 +87,14 @@ export default {
       name: 'pricingHeading',
       title: 'Pricing section heading',
       type: 'string',
+      components: { field: withFieldIcon(TextIcon) },
       description: 'The heading in the "Pricing" section further down the page, e.g. "Priced from $59,990."',
     },
     {
       name: 'pricingBody',
       title: 'Pricing section paragraphs',
       type: 'array',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       of: [{ type: 'text', rows: 3 }],
       description: 'The paragraphs under the pricing heading. Add one block per paragraph.',
     },
@@ -84,12 +102,14 @@ export default {
       name: 'lowPrice',
       title: 'Lowest price (digits only)',
       type: 'string',
+      components: { field: withFieldIcon(NumberIcon) },
       description: 'For Google / AI search. Digits only, no $ or commas, e.g. 59990.',
     },
     {
       name: 'highPrice',
       title: 'Highest price (digits only)',
       type: 'string',
+      components: { field: withFieldIcon(NumberIcon) },
       description: 'For Google / AI search. Digits only, no $ or commas, e.g. 74990.',
     },
   ],

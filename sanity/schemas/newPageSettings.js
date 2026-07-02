@@ -12,6 +12,9 @@
 // + CTA link override. Leave any field blank to fall back to the coded
 // default for that slot.
 
+import { PlayIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'newPageSettings',
   title: 'New caravans page',
@@ -31,6 +34,7 @@ export default {
       name: `newPageTile${n}`,
       title: t,
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       options: { columns: 1, collapsible: true, collapsed: true },
       fields: [
         { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to use the default placeholder.' },

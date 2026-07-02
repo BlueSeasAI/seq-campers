@@ -993,8 +993,27 @@ a:focus-visible, button:focus-visible {
   align-items: start;
 }
 
+/* When the listing has a hero video, use named grid areas so the video sits
+   above the content on desktop (unchanged look), and on MOBILE the white
+   price/spec box jumps up to sit directly under the video (per SEQ team call,
+   2 Jul 2026). Listings with no hero video keep the original 2-column flow. */
+.listing-grid.has-hero-video {
+  grid-template-areas:
+    "video   sidebar"
+    "content sidebar";
+}
+.listing-grid.has-hero-video > .listing-hero-video { grid-area: video; }
+.listing-grid.has-hero-video > .listing-main { grid-area: content; }
+.listing-grid.has-hero-video > .listing-sidebar { grid-area: sidebar; }
+
 @media (max-width: 768px) {
   .listing-grid { grid-template-columns: 1fr; }
+  .listing-grid.has-hero-video {
+    grid-template-areas:
+      "video"
+      "sidebar"
+      "content";
+  }
 }
 
 .photo-gallery {

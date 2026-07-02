@@ -5,6 +5,12 @@
 // gallery (upload as many as you like), and an optional compare block. Every
 // product name automatically becomes a choice in the single Accessories order
 // form's dropdown - so SEQ never needs a new form per accessory.
+//
+// Field icons (2 Jul 2026) + "Sub-menu label" so the jump-menu under the video
+// on /accessories is editable by Maud.
+
+import { EditIcon, OlistIcon, TagIcon, DocumentTextIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
 
 export default {
   name: 'accessory',
@@ -23,14 +29,25 @@ export default {
       title: 'Accessory name / category',
       type: 'string',
       group: 'main',
+      components: { field: withFieldIcon(EditIcon) },
       description: 'e.g. "Off-Grid Toilets". This heads the section on the Accessories page.',
       validation: (Rule) => Rule.required().max(80),
+    },
+    {
+      name: 'navLabel',
+      title: 'Sub-menu label (jump menu under the video)',
+      type: 'string',
+      group: 'main',
+      components: { field: withFieldIcon(OlistIcon) },
+      description: 'Optional short label for the "What we sell" jump menu at the top of the Accessories page. Leave blank to use the Accessory name above. e.g. use "Toilets" here even if the section is titled "Off-Grid Toilets".',
+      validation: (Rule) => Rule.max(40),
     },
     {
       name: 'eyebrow',
       title: 'Eyebrow (tiny label above the title)',
       type: 'string',
       group: 'main',
+      components: { field: withFieldIcon(EditIcon) },
       description: 'Optional, e.g. "Composting & sealing".',
       validation: (Rule) => Rule.max(60),
     },
@@ -39,6 +56,7 @@ export default {
       title: 'Badges (small pills)',
       type: 'array',
       group: 'main',
+      components: { field: withFieldIcon(TagIcon) },
       of: [{ type: 'string' }],
       description: 'e.g. Certified Installer, Waterless, Chemical-free, No dump points.',
       validation: (Rule) => Rule.max(6),
@@ -48,6 +66,7 @@ export default {
       title: 'Intro paragraph',
       type: 'text',
       group: 'main',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 3,
       validation: (Rule) => Rule.max(600),
     },
@@ -56,6 +75,7 @@ export default {
       title: 'Products / options',
       type: 'array',
       group: 'products',
+      components: { field: withFieldIcon(TagIcon) },
       description:
         'One per product. Each product name becomes a choice in the order form dropdown automatically.',
       of: [
@@ -112,6 +132,7 @@ export default {
       title: 'Compare section heading',
       type: 'string',
       group: 'compare',
+      components: { field: withFieldIcon(EditIcon) },
       description: 'Optional. Leave blank to hide the compare block. e.g. "Composting or sealing - which suits you?"',
       validation: (Rule) => Rule.max(120),
     },
@@ -120,6 +141,7 @@ export default {
       title: 'Compare section intro',
       type: 'text',
       group: 'compare',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 2,
       validation: (Rule) => Rule.max(300),
     },
@@ -128,6 +150,7 @@ export default {
       title: 'Compare columns',
       type: 'array',
       group: 'compare',
+      components: { field: withFieldIcon(OlistIcon) },
       of: [
         {
           type: 'object',
@@ -147,6 +170,7 @@ export default {
       title: 'Compare note (full-width, below the columns)',
       type: 'text',
       group: 'compare',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 3,
       description: 'Optional summary line under the compare columns, e.g. the bracket/pricing explainer.',
       validation: (Rule) => Rule.max(800),
@@ -156,6 +180,7 @@ export default {
       title: 'Display order',
       type: 'number',
       group: 'main',
+      components: { field: withFieldIcon(OlistIcon) },
       description: 'Lower numbers appear first on the Accessories page. Use 10, 20, 30 so you can slot between.',
       initialValue: 10,
     },

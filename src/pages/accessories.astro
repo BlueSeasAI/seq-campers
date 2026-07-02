@@ -132,8 +132,19 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
     </section>
   )}
 
-  {accessories.map((a) => (
-    <section class="section acc-section" style="padding-top:32px; padding-bottom:8px;">
+  {accessories.length > 1 && (
+    <nav class="acc-submenu" aria-label="What we sell">
+      <div class="container" style="max-width:1040px;">
+        <span class="acc-submenu-label">What we sell:</span>
+        {accessories.map((a, i) => (
+          <a class="acc-submenu-link" href={`#acc-${i + 1}`}>{a.navLabel || a.title}</a>
+        ))}
+      </div>
+    </nav>
+  )}
+
+  {accessories.map((a, i) => (
+    <section id={`acc-${i + 1}`} class="section acc-section" style="padding-top:32px; padding-bottom:8px; scroll-margin-top:90px;">
       <div class="container" style="max-width:1040px;">
         <div class="acc-head">
           {a.eyebrow && <div class="acc-eyebrow">{a.eyebrow}</div>}
@@ -309,6 +320,15 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
 
   <script is:inline>
     (function () {
+      // Smooth-scroll the accessory sub-menu links to their section.
+      document.querySelectorAll('.acc-submenu-link').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          var id = a.getAttribute('href')
+          var target = id && document.querySelector(id)
+          if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); history.replaceState(null, '', id) }
+        })
+      })
+
       // Pre-select the product in the order form when a card button is clicked.
       document.querySelectorAll('.order-btn[data-product]').forEach(function (b) {
         b.addEventListener('click', function () {
@@ -355,6 +375,14 @@ const description = 'Off-grid caravan accessories from SEQ Campers on the Sunshi
     .acc-video { position: relative; aspect-ratio: 16 / 9; background: #1a1a1c; border-radius: 14px; overflow: hidden; box-shadow: 0 14px 36px rgba(42,22,8,0.16); }
     .acc-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .acc-video-caption { margin: 12px 0 0; text-align: center; color: var(--muted); font-size: 0.95rem; }
+
+    /* Accessories sub-menu - jump links under the video. Labels come from each
+       accessory's "Sub-menu label" (or name) in Sanity, so Maud controls them. */
+    .acc-submenu { padding: 18px 0 4px; }
+    .acc-submenu > .container { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: center; }
+    .acc-submenu-label { font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .acc-submenu-link { font-family: 'Inter Tight', sans-serif; font-weight: 600; font-size: 0.9rem; color: var(--ink); background: var(--sand-deep); border: 1px solid var(--tan-border); border-radius: 999px; padding: 8px 16px; text-decoration: none; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    .acc-submenu-link:hover { background: var(--rust); color: #fff; border-color: var(--rust); }
 
     .acc-sample-note { background: #FFF5EC; border: 1px solid #F0CDA8; border-left: 4px solid var(--gold, #D4943A); border-radius: 8px; padding: 12px 16px; color: #5A3818; font-size: 0.9rem; line-height: 1.5; }
 

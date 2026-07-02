@@ -5,6 +5,9 @@
 // page". Split out from the old monolithic siteSettings so each page
 // menu item in Studio opens only its own relevant fields.
 
+import { PlayIcon, StarIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'homePageSettings',
   title: 'Home page',
@@ -15,6 +18,7 @@ export default {
       name: 'heroVideo',
       title: 'Hero video',
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       description: 'The YouTube video that plays as a looping background in the home page hero. Leave blank to use the default outback illustration.',
       options: { columns: 1 },
       fields: [
@@ -37,6 +41,7 @@ export default {
       name: 'shanesPick',
       title: "Shane's Pick (this week's featured caravan)",
       type: 'object',
+      components: { field: withFieldIcon(StarIcon) },
       description: "Featured used caravan promoted on the home page. The reference field below pulls the caravan; the override fields let you add the special \"Shane's Pick\" framing.",
       options: { columns: 1 },
       fields: [
@@ -83,6 +88,7 @@ export default {
       name: 'homepageVideo1',
       title: '1. Watch - pathway video (links to /videos)',
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       options: { columns: 1, collapsible: true, collapsed: false },
       description: 'The looping video behind the WATCH pathway tile on the home page.',
       fields: [
@@ -94,6 +100,7 @@ export default {
       name: 'homepageVideo2',
       title: '2. Visit - pathway video (links to /stock)',
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       options: { columns: 1, collapsible: true, collapsed: true },
       description: 'The looping video behind the VISIT pathway tile on the home page.',
       fields: [
@@ -105,6 +112,7 @@ export default {
       name: 'homepageVideo3',
       title: '3. Adventure - pathway video (links to /service)',
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       options: { columns: 1, collapsible: true, collapsed: true },
       description: 'The looping video behind the ADVENTURE pathway tile on the home page.',
       fields: [

@@ -10,6 +10,9 @@
 // getHappeningsFeed in src/lib/sanity.js), so adding a Show is enough to
 // surface it on the homepage and the /whats-happening page.
 
+import { TextIcon, TagIcon, CalendarIcon, DocumentTextIcon, LinkIcon, EyeOpenIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'happening',
   title: "What's Happening item",
@@ -22,6 +25,7 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
+      components: { field: withFieldIcon(TextIcon) },
       description: 'Short headline, e.g. "Mitchell family handover" or "Winter service special".',
       validation: (Rule) => Rule.required().min(4).max(120),
     },
@@ -29,6 +33,7 @@ export default {
       name: 'type',
       title: 'Type',
       type: 'string',
+      components: { field: withFieldIcon(TagIcon) },
       description: 'Controls the small coloured label on the card.',
       options: {
         list: [
@@ -48,6 +53,7 @@ export default {
       name: 'date',
       title: 'Date',
       type: 'date',
+      components: { field: withFieldIcon(CalendarIcon) },
       description: 'The date shown on the card. Newest items appear first.',
       options: { dateFormat: 'YYYY-MM-DD' },
       validation: (Rule) => Rule.required(),
@@ -56,6 +62,7 @@ export default {
       name: 'body',
       title: 'Body',
       type: 'text',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 3,
       description: 'One short paragraph. Plain text.',
       validation: (Rule) => Rule.required().min(10).max(600),
@@ -64,6 +71,7 @@ export default {
       name: 'link',
       title: 'Link (optional)',
       type: 'string',
+      components: { field: withFieldIcon(LinkIcon) },
       description:
         'Optional. A page on this site (e.g. /stock, /service) or a full https:// web address. Adds a "Read more" link to the card. Leave blank for no link.',
       validation: (Rule) =>
@@ -77,6 +85,7 @@ export default {
       name: 'showOnHomepage',
       title: 'Show on homepage feed?',
       type: 'boolean',
+      components: { field: withFieldIcon(EyeOpenIcon) },
       description:
         'On = appears in the short "What\'s Happening" feed on the home page (newest few). Off = only on the full /whats-happening page.',
       initialValue: true,

@@ -1,5 +1,8 @@
 // Singleton: Service & workshop page settings.
 
+import { PlayIcon, VideoIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'servicePageSettings',
   title: 'Service & workshop page',
@@ -17,6 +20,7 @@ export default {
       name: `servicePageVideo${n}`,
       title: t,
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       options: { columns: 1, collapsible: true, collapsed: n > 3 },
       fields: [
         { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to hide this tile.' },
@@ -28,6 +32,7 @@ export default {
       name: 'serviceWorkshopWeekly',
       title: 'This week in the workshop',
       type: 'object',
+      components: { field: withFieldIcon(VideoIcon) },
       description: 'A short video showing what is happening in the workshop. Refresh weekly. Leave the URL blank to hide the block.',
       options: { columns: 1 },
       fields: [

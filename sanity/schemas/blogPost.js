@@ -8,6 +8,18 @@
 // ticked, ordered by publishedAt descending. Drafts (isPublished off) are
 // editable in Studio but never appear on the live site.
 
+import {
+  TextIcon,
+  LinkIcon,
+  CalendarIcon,
+  EyeOpenIcon,
+  ImageIcon,
+  InfoOutlineIcon,
+  DocumentTextIcon,
+  UserIcon,
+} from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'blogPost',
   title: 'Blog post',
@@ -18,6 +30,7 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
+      components: { field: withFieldIcon(TextIcon) },
       description: 'The headline of the blog post. Keep under ~70 characters for good SEO.',
       validation: (Rule) => Rule.required().max(120),
     },
@@ -25,6 +38,7 @@ export default {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
+      components: { field: withFieldIcon(LinkIcon) },
       description: 'Auto-generated from the title. Edit if needed - this becomes the URL (/blog/your-slug).',
       options: { source: 'title', maxLength: 96 },
       validation: (Rule) => Rule.required(),
@@ -33,6 +47,7 @@ export default {
       name: 'publishedAt',
       title: 'Published date',
       type: 'datetime',
+      components: { field: withFieldIcon(CalendarIcon) },
       description: 'When this post should appear as published on the site.',
       validation: (Rule) => Rule.required(),
     },
@@ -40,6 +55,7 @@ export default {
       name: 'isPublished',
       title: 'Published?',
       type: 'boolean',
+      components: { field: withFieldIcon(EyeOpenIcon) },
       description: 'Tick to make this post live on /blog. Untick to keep it as a draft (only visible inside Studio).',
       initialValue: false,
     },
@@ -47,6 +63,7 @@ export default {
       name: 'coverImage',
       title: 'Cover image',
       type: 'image',
+      components: { field: withFieldIcon(ImageIcon) },
       description: 'Shown both on the blog index tile and at the top of the post page.',
       options: { hotspot: true },
       validation: (Rule) => Rule.required(),
@@ -55,6 +72,7 @@ export default {
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',
+      components: { field: withFieldIcon(InfoOutlineIcon) },
       rows: 3,
       description: 'Short summary shown on the blog index tile (1-2 sentences).',
       validation: (Rule) => Rule.required().max(280),
@@ -63,6 +81,7 @@ export default {
       name: 'body',
       title: 'Body',
       type: 'array',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       of: [
         { type: 'block' },
         { type: 'image', options: { hotspot: true } },
@@ -74,6 +93,7 @@ export default {
       name: 'author',
       title: 'Author',
       type: 'string',
+      components: { field: withFieldIcon(UserIcon) },
       description: 'Who wrote the post. Default: "Shane & Maud".',
       initialValue: 'Shane & Maud',
     },

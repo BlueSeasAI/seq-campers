@@ -208,18 +208,20 @@ const productSchema = {
   </div>
 
   <div class="container">
-    <div class="listing-grid">
+    <div class:list={["listing-grid", { "has-hero-video": !!heroVideoEmbed }]}>
+
+      {/* Hero video - pulled out as its own grid cell so on mobile the white
+          price/spec box can sit directly under it (desktop layout unchanged). */}
+      {heroVideoEmbed && (
+        <div class="listing-hero-video">
+          <div class="video-embed">
+            <iframe src={heroVideoEmbed} title={`${caravan.title} walkaround video`} allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+      )}
 
       <!-- Left: photos + description + videos -->
-      <div>
-        {/* Hero video - the first thing on the listing if the editor set one in Sanity. */}
-        {heroVideoEmbed && (
-          <div class="listing-hero-video" style="margin-bottom:22px;">
-            <div class="video-embed">
-              <iframe src={heroVideoEmbed} title={`${caravan.title} walkaround video`} allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-          </div>
-        )}
+      <div class="listing-main">
         {caravan.photos?.length > 0 && (
           <>
             <div class="photo-gallery">

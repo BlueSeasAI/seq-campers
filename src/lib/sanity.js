@@ -421,7 +421,7 @@ export async function getAccessoriesPage() {
 export async function getAccessories() {
   return client.fetch(`
     *[_type == "accessory"] | order(orderRank asc, title asc) {
-      _id, title, eyebrow, badges, intro, orderRank,
+      _id, title, navLabel, eyebrow, badges, intro, orderRank,
       products[]{
         name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs, videoUrl,
         "photos": photos[]{ "url": asset->url, alt }
