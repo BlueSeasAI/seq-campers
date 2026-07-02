@@ -694,3 +694,23 @@ export async function getPublishedFaqs() {
     }
   `)
 }
+
+// ---------------------------------------------------------------------------
+// Model pricing (drives the /[model] marketing pages - Rover, Trekka, etc.)
+// ---------------------------------------------------------------------------
+
+/**
+ * Editable pricing for one model marketing page, matched by the page slug
+ * (e.g. "stockman-rover"). Returns null if none set, in which case
+ * [model].astro falls back to the hardcoded defaults in src/data/model-pages.js
+ * - so the page never breaks if Sanity is unreachable or no record exists yet.
+ */
+export async function getModelPricing(model) {
+  return client.fetch(
+    `*[_type == "modelPricing" && model == $model][0]{
+      model, priceOnApplication, heroPriceFrom, heroPriceNote,
+      versions[]{ tag, priceFrom }, pricingHeading, pricingBody, lowPrice, highPrice
+    }`,
+    { model }
+  )
+}

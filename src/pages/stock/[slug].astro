@@ -66,6 +66,13 @@ const descriptionHtml = portableTextToHtml(caravan.description)
 
 // FAQs - use per-caravan custom FAQs from Sanity if present, otherwise
 // generate a smart default set from the caravan's structured data.
+//
+// Policy FAQs (trade-ins, on-road costs) were REMOVED here on 1 Jul 2026.
+// They were factually wrong - claimed "SEQ Campers accepts trade-ins" (we
+// don't) and pointed at a "Build your spec" tool that no longer exists on
+// this page - and were being emitted as FAQPage JSON-LD, so AI search engines
+// could quote them. Policy answers now live in Sanity on the /faq page where
+// Maud can edit them. The remaining defaults are van-specific and safe.
 const defaultFaqs = [
   {
     q: `Is the ${caravan.title} suitable for off-road touring?`,
@@ -75,20 +82,12 @@ const defaultFaqs = [
     q: `Can I inspect the ${caravan.title} before buying?`,
     a: `Absolutely. We strongly encourage on-site inspection at SEQ Campers in Queensland. Call (07) 5370 7933 or email office@seqcampers.com.au to book a time. Shane personally walks every buyer through the van.`,
   },
-  {
-    q: `Does the listed price include on-road costs and registration?`,
-    a: `The listed price is the caravan only. On-road costs (registration transfer, stamp duty, delivery) are confirmed in writing as part of your formal quote. Use the "Build your spec" tool on this page to send through your selections.`,
-  },
   ...(caravan.specs?.atm
     ? [{
         q: `What can I tow the ${caravan.title} with?`,
         a: `Check the ATM (maximum loaded weight) against your tow vehicle's tow rating. The ${caravan.title} has an ATM of ${caravan.specs.atm}kg${caravan.specs.tareWeight ? ` and tare of ${caravan.specs.tareWeight}kg` : ''}. A dual-cab ute or 4WD wagon with at least ${Math.ceil(caravan.specs.atm / 1000) * 1000}kg tow rating is typically required.`,
       }]
     : []),
-  {
-    q: `Does SEQ Campers accept trade-ins?`,
-    a: `Yes. SEQ Campers accepts trade-ins on most caravans. Send photos and details of your current van with your enquiry and we will come back with a trade-in valuation as part of the quote.`,
-  },
 ]
 const caravanFaqs = caravan.faqs?.length ? caravan.faqs : defaultFaqs
 const faqIsCustom = caravan.faqs?.length > 0
@@ -387,14 +386,14 @@ const productSchema = {
               <div class="spec-item spec-item-key">
                 <span class="spec-label">Inverter</span>
                 <span class="spec-value">{caravan.power.inverterWatts}<span class="spec-unit">W</span></span>
-                <span class="spec-hint">pure sine</span>
+                <span class="spec-hint">output</span>
               </div>
             )}
             {caravan.specs?.waterCapacityL && (
               <div class="spec-item spec-item-key">
                 <span class="spec-label">Water</span>
                 <span class="spec-value">{caravan.specs.waterCapacityL}<span class="spec-unit">L</span></span>
-                <span class="spec-hint">fresh tank</span>
+                <span class="spec-hint">capacity</span>
               </div>
             )}
           </div>

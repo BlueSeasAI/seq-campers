@@ -1,29 +1,31 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
-import {
-  TagIcon, ClockIcon, PauseIcon, CheckmarkCircleIcon, OlistIcon,
-  PlayIcon, CogIcon, EditIcon, FilterIcon, CalendarIcon,
-  DocumentTextIcon, HelpCircleIcon, HomeIcon, RocketIcon,
-  SearchIcon, TrashIcon,
-} from '@sanity/icons'
-// Video doc schema removed 1 June 2026. /videos page now reads from
-// videosPageSettings (12 fixed slots), home page videos from siteSettings.
-// No per-clip records needed anymore.
+import { TrashIcon } from '@sanity/icons'
 import { schemaTypes } from './schemas/index.js'
 import { SeqCampersLogo } from './theme.jsx'
 
-// Studio sidebar is structured PAGE-BY-PAGE so Shane and Maud see the
-// website as they navigate it, not as data records.
-// Per Bart 16 Jun: "make the menu items in Sanity match the pages -
-// it'll be a lot simpler to edit".
+// Studio sidebar is structured PAGE-BY-PAGE so Shane and Maud see the website
+// as they navigate it, not as data records.
 //
-// Structure:
-//   1. Caravans (always at top - the most-edited records)
-//   2. Pages (one menu item per website page, opening to the editable
-//      fields for that page only)
-//   3. Blog & FAQs (long-tail content for AI-search visibility)
-//   4. AEO Keywords (reference table for SEO/AEO strategy)
-//   5. Settings (global Site Settings singleton)
+// Per Bart 1 Jul 2026:
+//  - ONE icon per menu item, not two. We keep the coloured emoji (visual,
+//    friendly) and dropped the grey @sanity/icons SVGs that used to sit
+//    alongside them - they were doubling up.
+//  - Every item maps to a front-end page and, when opened, the panel title
+//    shows the page's URL (e.g. "-> /stock") so it's obvious which page you
+//    are editing.
+//  - Added a "What's Happening" item (the happening docs had no menu entry, so
+//    the /whats-happening news feed was uneditable in practice).
+//
+// Nothing was removed from the schema - every existing document type and
+// singleton is still reachable below.
+//
+// Groups (top to bottom):
+//   1. Caravans (the inventory - most-edited records)
+//   2. Pages (one item per website page)
+//   3. Blog / FAQs / Handover (long-tail content)
+//   4. AEO Keywords + Brands (reference)
+//   5. Site-wide settings (banner + Reserve CTA)
 
 export default defineConfig({
   name: 'seq-campers',
@@ -38,15 +40,13 @@ export default defineConfig({
           .items([
             // ─── CARAVANS ─────────────────────────────────────────────
             S.listItem()
-              .title('Caravans')
-              .icon(TagIcon)
+              .title('🚐 Caravans')
               .child(
                 S.list()
                   .title('Caravans')
                   .items([
                     S.listItem()
-                      .title('For Sale')
-                      .icon(TagIcon)
+                      .title('🟢 For Sale')
                       .schemaType('caravan')
                       .child(
                         S.documentList()
@@ -56,8 +56,7 @@ export default defineConfig({
                           .defaultOrdering([{ field: 'price', direction: 'asc' }])
                       ),
                     S.listItem()
-                      .title('Coming Soon')
-                      .icon(ClockIcon)
+                      .title('🕓 Coming Soon')
                       .schemaType('caravan')
                       .child(
                         S.documentList()
@@ -67,8 +66,7 @@ export default defineConfig({
                           .defaultOrdering([{ field: 'title', direction: 'asc' }])
                       ),
                     S.listItem()
-                      .title('On Hold')
-                      .icon(PauseIcon)
+                      .title('⏸️ On Hold')
                       .schemaType('caravan')
                       .child(
                         S.documentList()
@@ -78,8 +76,7 @@ export default defineConfig({
                           .defaultOrdering([{ field: 'title', direction: 'asc' }])
                       ),
                     S.listItem()
-                      .title('Sold (archive)')
-                      .icon(CheckmarkCircleIcon)
+                      .title('✅ Sold (archive)')
                       .schemaType('caravan')
                       .child(
                         S.documentList()
@@ -90,8 +87,7 @@ export default defineConfig({
                       ),
                     S.divider(),
                     S.listItem()
-                      .title('All caravans (any status)')
-                      .icon(FilterIcon)
+                      .title('🗂️ All caravans (any status)')
                       .schemaType('caravan')
                       .child(
                         S.documentList()
@@ -106,57 +102,59 @@ export default defineConfig({
             S.divider(),
 
             // ─── PAGES (one per website page) ─────────────────────────
-            // Per Bart 16 Jun: structure the menu PAGE-BY-PAGE so Shane
-            // and Maud navigate the same way they navigate the website.
-            // Each item opens the Site Settings singleton at the relevant
-            // section.
             S.listItem()
               .title('🏠 Home page')
-              .icon(HomeIcon)
               .child(
                 S.editor()
                   .id('homePageSettings')
                   .schemaType('homePageSettings')
                   .documentId('homePageSettings')
-                  .title('Home page')
+                  .title('Home page  →  seqcampers.com.au')
               ),
 
             S.listItem()
               .title('🚛 New caravans page')
-              .icon(RocketIcon)
               .child(
                 S.list()
-                  .title('New caravans page')
+                  .title('New caravans page  →  /new')
                   .items([
                     S.listItem()
-                      .title('Tile videos (8 slots)')
-                      .icon(PlayIcon)
+                      .title('🎬 Tile videos (8 slots)')
                       .child(
                         S.editor()
                           .id('newPageSettings')
                           .schemaType('newPageSettings')
                           .documentId('newPageSettings')
-                          .title('New page tiles')
+                          .title('New page tiles  →  /new')
                       ),
                     S.listItem()
-                      .title('Build pages (intro videos per model)')
-                      .icon(PlayIcon)
+                      .title('🎥 Build pages (intro videos per model)')
                       .child(
                         S.editor()
                           .id('quotePageSettings')
                           .schemaType('quotePageSettings')
                           .documentId('quotePageSettings')
-                          .title('Build pages - intro videos')
+                          .title('Build pages - intro videos  →  /quote/{model}')
                       ),
                   ])
               ),
 
             S.listItem()
-              .title('🚐 Stock (used caravans) page')
-              .icon(TagIcon)
+              .title('💰 Model pricing (Rover, Trekka, Kruiser...)')
+              .schemaType('modelPricing')
               .child(
                 S.documentList()
-                  .title('Used caravans on /stock')
+                  .title('Model pricing  →  the /new model pages')
+                  .schemaType('modelPricing')
+                  .filter('_type == "modelPricing"')
+                  .defaultOrdering([{ field: 'model', direction: 'asc' }])
+              ),
+
+            S.listItem()
+              .title('🚐 Stock (used caravans) page')
+              .child(
+                S.documentList()
+                  .title('Used caravans  →  /stock')
                   .schemaType('caravan')
                   .filter('_type == "caravan" && status == "for-sale" && stockType == "used"')
                   .defaultOrdering([{ field: 'price', direction: 'desc' }])
@@ -164,98 +162,100 @@ export default defineConfig({
 
             S.listItem()
               .title('🧰 Accessories page')
-              .icon(TagIcon)
               .child(
                 S.list()
-                  .title('Accessories page')
+                  .title('Accessories page  →  /accessories')
                   .items([
                     S.listItem()
-                      .title('Accessories (one per product/category)')
-                      .icon(TagIcon)
+                      .title('🛒 Accessories (one per product/category)')
                       .schemaType('accessory')
                       .child(
                         S.documentList()
-                          .title('Accessories')
+                          .title('Accessories  →  /accessories')
                           .schemaType('accessory')
                           .filter('_type == "accessory"')
                           .defaultOrdering([{ field: 'orderRank', direction: 'asc' }])
                       ),
                     S.listItem()
-                      .title('Page settings (intro + video)')
-                      .icon(EditIcon)
+                      .title('⚙️ Page settings (intro + video)')
                       .child(
                         S.editor()
                           .id('accessoriesPageSettings')
                           .schemaType('accessoriesPageSettings')
                           .documentId('accessoriesPageSettings')
-                          .title('Accessories page settings')
+                          .title('Accessories page settings  →  /accessories')
                       ),
                   ])
               ),
 
             S.listItem()
               .title('🎥 Videos page')
-              .icon(PlayIcon)
               .child(
                 S.editor()
                   .id('videosPageSettings')
                   .schemaType('videosPageSettings')
                   .documentId('videosPageSettings')
-                  .title('Videos page')
+                  .title('Videos page  →  /videos')
               ),
 
             S.listItem()
               .title('🔧 Service & workshop page')
-              .icon(CogIcon)
               .child(
                 S.editor()
                   .id('servicePageSettings')
                   .schemaType('servicePageSettings')
                   .documentId('servicePageSettings')
-                  .title('Service & workshop page')
+                  .title('Service & workshop page  →  /service')
               ),
 
             S.listItem()
               .title('🎪 Shows page')
-              .icon(CalendarIcon)
               .child(
                 S.list()
-                  .title('Shows page')
+                  .title('Shows page  →  /shows')
                   .items([
                     S.listItem()
-                      .title('Shows (caravan shows + events)')
-                      .icon(CalendarIcon)
+                      .title('🎪 Shows (caravan shows + events)')
                       .schemaType('show')
                       .child(
                         S.documentList()
-                          .title('Shows')
+                          .title('Shows  →  /shows')
                           .schemaType('show')
                           .filter('_type == "show"')
                           .defaultOrdering([{ field: 'startDate', direction: 'desc' }])
                       ),
                     S.listItem()
-                      .title('Shows page settings (intro + compilation video)')
-                      .icon(EditIcon)
+                      .title('⚙️ Shows page settings (intro + compilation video)')
                       .child(
                         S.editor()
                           .id('showsPageSettings')
                           .schemaType('showsPageSettings')
                           .documentId('showsPageSettings')
-                          .title('Shows page')
+                          .title('Shows page settings  →  /shows')
                       ),
                   ])
               ),
 
+            S.listItem()
+              .title("📰 What's Happening page")
+              .schemaType('happening')
+              .child(
+                S.documentList()
+                  .title("What's Happening (news items)  →  /whats-happening")
+                  .schemaType('happening')
+                  .filter('_type == "happening"')
+                  .defaultOrdering([{ field: 'date', direction: 'desc' }])
+              ),
+
             S.divider(),
 
-            // ─── BLOG + FAQs (long-tail AI-search content) ────────────
+            // ─── BLOG + FAQs + HANDOVER (long-tail content) ───────────
             S.listItem()
               .title('📝 Blog posts')
-              .icon(DocumentTextIcon)
               .schemaType('blogPost')
               .child(
                 S.documentList()
-                  .title('Blog posts')
+                  .title('Blog posts  →  /blog')
                   .schemaType('blogPost')
                   .filter('_type == "blogPost"')
                   .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
@@ -263,11 +263,10 @@ export default defineConfig({
 
             S.listItem()
               .title('❓ FAQs')
-              .icon(HelpCircleIcon)
               .schemaType('faq')
               .child(
                 S.documentList()
-                  .title('FAQs')
+                  .title('FAQs  →  /faq')
                   .schemaType('faq')
                   .filter('_type == "faq"')
                   .defaultOrdering([{ field: 'category', direction: 'asc' }, { field: 'order', direction: 'asc' }])
@@ -275,11 +274,10 @@ export default defineConfig({
 
             S.listItem()
               .title('🎁 Handover pages (UNLISTED)')
-              .icon(DocumentTextIcon)
               .schemaType('handoverPage')
               .child(
                 S.documentList()
-                  .title('Handover pages (UNLISTED - shared by direct URL only)')
+                  .title('Handover pages (UNLISTED - shared by direct URL only)  →  /handover/{slug}')
                   .schemaType('handoverPage')
                   .filter('_type == "handoverPage"')
                   .defaultOrdering([{ field: 'title', direction: 'asc' }])
@@ -290,14 +288,12 @@ export default defineConfig({
             // ─── AEO KEYWORDS (reference strategy table) ──────────────
             S.listItem()
               .title('🎯 AEO Keywords (search strategy)')
-              .icon(SearchIcon)
               .child(
                 S.list()
                   .title('AEO Keywords')
                   .items([
                     S.listItem()
                       .title('🔥 High priority (Core + Branded)')
-                      .icon(SearchIcon)
                       .schemaType('aeoKeyword')
                       .child(
                         S.documentList()
@@ -307,8 +303,7 @@ export default defineConfig({
                           .defaultOrdering([{ field: 'type', direction: 'asc' }, { field: 'keyword', direction: 'asc' }])
                       ),
                     S.listItem()
-                      .title('All keywords (sortable table)')
-                      .icon(FilterIcon)
+                      .title('🗂️ All keywords (sortable table)')
                       .schemaType('aeoKeyword')
                       .child(
                         S.documentList()
@@ -318,8 +313,7 @@ export default defineConfig({
                           .defaultOrdering([{ field: 'priority', direction: 'desc' }, { field: 'type', direction: 'asc' }])
                       ),
                     S.listItem()
-                      .title('Not yet live on site')
-                      .icon(ClockIcon)
+                      .title('🕓 Not yet live on site')
                       .schemaType('aeoKeyword')
                       .child(
                         S.documentList()
@@ -329,8 +323,7 @@ export default defineConfig({
                           .defaultOrdering([{ field: 'priority', direction: 'desc' }])
                       ),
                     S.listItem()
-                      .title('Branded only')
-                      .icon(TagIcon)
+                      .title('🏷️ Branded only')
                       .schemaType('aeoKeyword')
                       .child(
                         S.documentList()
@@ -340,8 +333,7 @@ export default defineConfig({
                           .defaultOrdering([{ field: 'priority', direction: 'desc' }])
                       ),
                     S.listItem()
-                      .title('Core only')
-                      .icon(TagIcon)
+                      .title('🏷️ Core only')
                       .schemaType('aeoKeyword')
                       .child(
                         S.documentList()
@@ -357,8 +349,7 @@ export default defineConfig({
 
             // ─── REFERENCE DATA ──────────────────────────────────────
             S.listItem()
-              .title('Brands (Kimberley Kampers, Stockman Products)')
-              .icon(OlistIcon)
+              .title('🏷️ Brands (Kimberley Kampers, Stockman Products)')
               .schemaType('brand')
               .child(
                 S.documentList()
@@ -373,7 +364,6 @@ export default defineConfig({
             // ─── SITE-WIDE SETTINGS (banner + Reserve Stripe CTA) ─────
             S.listItem()
               .title('⚙️ Site-wide settings (banner + Reserve CTA)')
-              .icon(CogIcon)
               .child(
                 S.editor()
                   .id('siteSettings')

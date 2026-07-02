@@ -1,14 +1,60 @@
 ---
 import Site from '../layouts/Site.astro'
 import { modelPages, getModelPage } from '../data/model-pages.js'
+import { getModelPricing } from '../lib/sanity.js'
 
 export async function getStaticPaths() {
   return modelPages.map((m) => ({ params: { model: m.slug } }))
 }
 
 const { model } = Astro.params
-const m = getModelPage(model)
-if (!m) return Astro.redirect('/new')
+const rawModel = getModelPage(model)
+if (!rawModel) return Astro.redirect('/new')
+
+// Clone so we can overlay Sanity-editable pricing without mutating the shared
+// modelPages array.
+const m = structuredClone(rawModel)
+
+// Overlay editable pricing from Sanity (Studio -> Model pricing). Any field left
+// blank in Sanity falls back to the model-pages.js default, so the page never
+// breaks if Sanity is unreachable or a record has not been created yet.
+let sanityPricing = null
+try { sanityPricing = await getModelPricing(m.slug) } catch (err) {
+  console.warn(`Sanity model pricing unreachable for ${m.slug}:`, err.message)
+}
+if (sanityPricing) {
+  const poa = sanityPricing.priceOnApplication === true
+  const POA_NOTE = 'Contact us for current pricing'
+  if (poa) {
+    m.hero.priceFrom = null
+    m.hero.priceNote = POA_NOTE
+  } else {
+    if (sanityPricing.heroPriceFrom) m.hero.priceFrom = sanityPricing.heroPriceFrom
+    if (sanityPricing.heroPriceNote) m.hero.priceNote = sanityPricing.heroPriceNote
+  }
+  if (m.versions?.items?.length) {
+    m.versions.items = m.versions.items.map((v) => {
+      if (poa) return { ...v, priceFrom: null }
+      const match = (sanityPricing.versions || []).find(
+        (pv) => pv?.tag && v?.tag && pv.tag.toLowerCase() === v.tag.toLowerCase()
+      )
+      return match && match.priceFrom ? { ...v, priceFrom: match.priceFrom } : v
+    })
+  }
+  if (m.pricing) {
+    if (poa) {
+      m.pricing.heading = POA_NOTE
+      m.pricing.body = ['Pricing for this model has just been updated. Call us on 07 5370 7933 or send an enquiry and we will give you the current driveaway figure.']
+    } else {
+      if (sanityPricing.pricingHeading) m.pricing.heading = sanityPricing.pricingHeading
+      if (sanityPricing.pricingBody?.length) m.pricing.body = sanityPricing.pricingBody
+    }
+  }
+  if (!poa && m.structured?.product) {
+    if (sanityPricing.lowPrice) m.structured.product.lowPrice = sanityPricing.lowPrice
+    if (sanityPricing.highPrice) m.structured.product.highPrice = sanityPricing.highPrice
+  }
+}
 
 const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).origin
 const pageUrl = `${siteBase}/${m.slug}`
