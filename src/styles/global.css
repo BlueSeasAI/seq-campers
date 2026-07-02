@@ -896,6 +896,7 @@ a:focus-visible, button:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
   font-family: 'Inter Tight', sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
@@ -907,6 +908,9 @@ a:focus-visible, button:focus-visible {
 .enquiry-form input,
 .enquiry-form select,
 .enquiry-form textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   font-weight: 400;
@@ -2507,6 +2511,13 @@ a:focus-visible, button:focus-visible {
   .trust-item { font-size: 0.85rem; }
   .trust-tick { width: 24px; height: 24px; font-size: 0.8rem; }
   .trust-aus-icon { width: 54px; height: 54px; }
+}
+
+/* Phones (portrait): stack the credentials vertically so the three ticks +
+   text line up in one column instead of wrapping into a jumble. Per Bart 2 Jul. */
+@media (max-width: 640px) {
+  .trust-strip-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .trust-item { white-space: normal; }
 }
 
 /* Mini Authorised Dealer badge (caravan detail sidebar) */
