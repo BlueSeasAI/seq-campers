@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css'
-import { getSiteSettings } from '../lib/sanity.js'
+import { getSiteSettings, getBusinessDetails } from '../lib/sanity.js'
 import TrustStrip from '../components/TrustStrip.astro'
 
 const {
@@ -30,6 +30,38 @@ try {
 } catch (err) {
   console.warn('Sanity unreachable for show-special banner:', err.message)
 }
+
+// Sitewide contact details (contact bar + footer). Editable by Maud in one
+// spot (Studio -> Business details); every value keeps the current hardcoded
+// literal as a fallback so nothing changes until the record exists and nothing
+// breaks if Sanity is unreachable.
+const biz = await getBusinessDetails()
+const phoneDisplay = biz?.phoneDisplay || '(07) 5370 7933'
+const phoneHref = biz?.phoneHref || '+61753707933'
+const textDisplay = biz?.textDisplay || '0422 624 920'
+const textHref = biz?.textHref || '0422624920'
+const emailOffice = biz?.emailOffice || 'office@seqcampers.com.au'
+const addressStreet = biz?.addressStreet || '3B/6 Bonanza Court'
+const addressSuburb = biz?.addressSuburb || 'Marcoola'
+const addressState = biz?.addressState || 'QLD'
+const addressPostcode = biz?.addressPostcode || '4564'
+const showroomHours = biz?.showroomHours || 'Mon - Fri: 8:30am - 3pm\nSaturday: 8:30am - 12:30pm\nSunday: Closed'
+const youtubeUrl = biz?.youtubeUrl || 'https://www.youtube.com/@seqcampers9450?sub_confirmation=1'
+// Contact-bar map link + short location label (kept as literals - they are
+// display sugar, not the canonical address which lives in the fields above).
+const cbMapQuery = biz?.mapQuery || '6 Bonanza Court Marcoola QLD 4564'
+const cbMapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cbMapQuery)}`
+// Showroom hours as {label, value} rows for the footer. Splits each non-empty
+// line on the first colon; lines without a colon render as a single value.
+const showroomHoursRows = String(showroomHours)
+  .split('\n')
+  .map((l) => l.trim())
+  .filter(Boolean)
+  .map((line) => {
+    const idx = line.indexOf(':')
+    if (idx === -1) return { label: '', value: line }
+    return { label: line.slice(0, idx).trim(), value: line.slice(idx + 1).trim() }
+  })
 
 // Build canonical + absolute OG image URLs from site base
 const siteBase = Astro.site ?? new URL('https://seqcampers.com.au')
@@ -460,9 +492,9 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
   {!isHome && (
     <div class="contact-bar">
       <div class="container contact-bar-inner">
-        <a class="cb-item cb-loc" href="https://www.google.com/maps/search/?api=1&query=6+Bonanza+Court+Marcoola+QLD+4564" target="_blank" rel="noopener">Campers @ Marcoola &middot; 6 Bonanza Crt</a>
-        <a class="cb-item" href="tel:+61753707933">Call <b>07 5370 7933</b></a>
-        <a class="cb-item" href="sms:0422624920">Text <b>0422 624 920</b></a>
+        <a class="cb-item cb-loc" href={cbMapHref} target="_blank" rel="noopener">Campers @ {addressSuburb} &middot; {addressStreet}</a>
+        <a class="cb-item" href={`tel:${phoneHref}`}>Call <b>{phoneDisplay}</b></a>
+        <a class="cb-item" href={`sms:${textHref}`}>Text <b>{textDisplay}</b></a>
       </div>
     </div>
   )}
@@ -647,19 +679,21 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           <h4>SEQ Campers - Sunshine Coast</h4>
           <p class="footer-brand">Premium off-road caravans on the Sunshine Coast, Queensland. Authorised Kimberley Kampers and Stockman Products dealer. Hand-picked and inspected by the SEQ team.</p>
           <address class="footer-address">
-            3B/6 Bonanza Court<br />
-            Marcoola QLD 4564<br />
-            <a href="tel:0753707933">(07) 5370 7933</a><br />
-            <a href="mailto:office@seqcampers.com.au">office@seqcampers.com.au</a>
+            {addressStreet}<br />
+            {addressSuburb} {addressState} {addressPostcode}<br />
+            <a href={`tel:${phoneHref}`}>{phoneDisplay}</a><br />
+            <a href={`mailto:${emailOffice}`}>{emailOffice}</a>
           </address>
         </div>
 
         <div class="footer-col">
           <h4>Showroom hours</h4>
           <div class="footer-hours-compact">
-            <strong>Mon - Fri</strong> 8:30am - 3pm<br />
-            <strong>Saturday</strong> 8:30am - 12:30pm<br />
-            <strong>Sunday</strong> Closed
+            {showroomHoursRows.map((row) => (
+              <>
+                {row.label && <strong>{row.label}</strong>} {row.value}<br />
+              </>
+            ))}
           </div>
           <p style="margin-top:12px; font-size:0.78rem; color:rgba(244,237,224,0.5);">
             Showroom appointments preferred - after-hours always welcome.
@@ -676,7 +710,7 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
             <li><a href="/faq">FAQs</a></li>
             <li><a href="/privacy">Privacy</a></li>
             <li><a href="/terms">Terms</a></li>
-            <li><a href="https://www.youtube.com/@seqcampers9450?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a></li>
+            <li><a href={youtubeUrl} target="_blank" rel="noopener">Subscribe on YouTube</a></li>
           </ul>
         </div>
       </div>

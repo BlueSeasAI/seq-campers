@@ -9,7 +9,10 @@ try { settings = await getSiteSettings() ?? {} } catch (err) {
   console.warn('Sanity unreachable on build:', err.message)
 }
 
-const services = [
+// The three "what we do" cards. Editable in Studio (Service & workshop page
+// -> Service cards); the array below is the fallback used until that field is
+// filled in / if Sanity is unreachable.
+const SERVICE_CARDS_FALLBACK = [
   {
     title: 'Scheduled service & pre-trip check',
     body: 'Bearings, brakes, lights, hoses, gas, electrics. The full pre-trip check on every off-road caravan and 4x4 camper van before you point it at the outback.',
@@ -23,6 +26,13 @@ const services = [
     body: 'Solar upgrades, lithium battery swap-outs, REDARC systems, awnings, bike racks, storage builds. Set your off-grid caravan up your way.',
   },
 ]
+const services = settings?.serviceCards?.length ? settings.serviceCards : SERVICE_CARDS_FALLBACK
+
+// Page copy - read from Sanity with the current literals as fallbacks.
+const heroH1 = settings?.heroH1 || 'From our Sunshine Coast workshop to your off-grid driveway.'
+const heroSub = settings?.heroSub || 'Off-road caravan servicing, off-grid system upgrades and authorised Kimberley Kampers and Stockman Products warranty work - all under one roof in Marcoola, Queensland.'
+const crewEyebrow = settings?.crewEyebrow || 'Meet the crew'
+const crewHeading = settings?.crewHeading || 'Keeping you moving. In a SEQ.'
 
 // 6 service-page video tiles - 3x2 grid. Each tile is Sanity-driven via
 // settings.servicePageVideo1..6. If a slot is empty we fall back to a sensible
@@ -58,8 +68,8 @@ const workshopWeekly = settings?.serviceWorkshopWeekly?.youtubeUrl
 >
   <div class="page-header page-header-tight">
     <div class="container">
-      <h1>From our Sunshine Coast workshop to your off-grid driveway.</h1>
-      <p>Off-road caravan servicing, off-grid system upgrades and authorised Kimberley Kampers and Stockman Products warranty work - all under one roof in Marcoola, Queensland.</p>
+      <h1>{heroH1}</h1>
+      <p>{heroSub}</p>
     </div>
   </div>
 
@@ -67,8 +77,8 @@ const workshopWeekly = settings?.serviceWorkshopWeekly?.youtubeUrl
   <section class="section" style="padding-top:32px; padding-bottom:24px;">
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
-        <div class="page-eyebrow" style="color:var(--rust);">Meet the crew</div>
-        <h2 class="section-title">Keeping you moving. In a SEQ.</h2>
+        <div class="page-eyebrow" style="color:var(--rust);">{crewEyebrow}</div>
+        <h2 class="section-title">{crewHeading}</h2>
       </div>
       <div class="service-video-grid">
         {serviceTiles.map((tile) => {

@@ -5,7 +5,7 @@ import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
 import ReserveCta from '../components/ReserveCta.astro'
 import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
-import { getSiteSettings, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
+import { getSiteSettings, getBusinessDetails, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
 
 let settings = null
 try {
@@ -13,6 +13,17 @@ try {
 } catch (err) {
   console.warn('Sanity unreachable on build:', err.message)
 }
+
+// Business details for the LocalBusiness / AutoDealer JSON-LD below. Each value
+// keeps the current hardcoded literal as a fallback so the structured data is
+// unchanged until Maud creates the record and never breaks if Sanity is down.
+const biz = await getBusinessDetails()
+const ldTelephone = biz?.phoneHref || '+61-7-5370-7933'
+const ldEmail = biz?.emailOffice || 'office@seqcampers.com.au'
+const ldStreet = biz?.addressStreet || '3B/6 Bonanza Court'
+const ldLocality = biz?.addressSuburb || 'Marcoola'
+const ldRegion = biz?.addressState || 'QLD'
+const ldPostcode = biz?.addressPostcode || '4564'
 
 // Hero video resolution: Sanity siteSettings.heroVideo.youtubeUrl wins when
 // set. Falls back to the self-hosted /hero-video.mp4 so the page still works
@@ -77,7 +88,9 @@ const shanesPick = settings?.shanesPick?.caravan
 // Format intentionally specific (full name + suburb + caravan + star rating)
 // because the audit found Kimberley + Stockman both lack this trust signal.
 // Real Google reviews - verbatim, names + attribution preserved.
-const testimonials = [
+// Editable in Studio (Home page -> Testimonials); the array below is the
+// fallback used until that field is filled in / if Sanity is unreachable.
+const TESTIMONIALS_FALLBACK = [
   {
     quote: "A huge shout out to SEQ Campers. While traveling we found one of our guide rollers kept coming off the track, after inspecting them discovered the others were in bad shape. A phone call to SEQ campers and a conversation with Shane had us diverting to their workshop, where Grant took control and sorted our van out - he and the crew gave it a thorough check over. The service was something we didn't expect at such short notice, but was very much appreciated as it saved us the hassle of doing that fiddly job while on the road. Thanks fellas!",
     name: "Willie & Cathy",
@@ -97,6 +110,31 @@ const testimonials = [
     rating: 5,
   },
 ]
+
+// Testimonials: use the Sanity-managed list when it has entries, otherwise the
+// verbatim Google-review fallback above. Keeps the live site identical until
+// Maud adds testimonials in Studio.
+const testimonials = settings?.testimonials?.length ? settings.testimonials : TESTIMONIALS_FALLBACK
+
+// Section copy - read from Sanity with the current literals as fallbacks so
+// nothing changes on the live site until each field is filled in.
+const reviewsCounter = settings?.reviewsCounter || '35+ five-star reviews from SEQ owners'
+const pathwayEyebrow = settings?.pathwayEyebrow || 'How it works'
+const pathwayHeading = settings?.pathwayHeading || 'Three steps to your next off-road adventure.'
+const pathwayIntro = settings?.pathwayIntro || 'From browsing off-road caravans and off-grid hybrids to driving away from our Marcoola showroom on the Sunshine Coast - the way SEQ Campers does it.'
+const testimonialsEyebrow = settings?.testimonialsEyebrow || 'In their own words'
+const testimonialsHeading = settings?.testimonialsHeading || 'Real off-road owners, real trips, real stories'
+const testimonialsIntro = settings?.testimonialsIntro || "From Kimberley Karavan and Kruiser owners exploring the outback to Stockman Trekka and Rover families chasing off-grid camping weekends - here's what they have to say about SEQ Campers."
+const happeningEyebrow = settings?.happeningEyebrow || "What's happening"
+const happeningHeading = settings?.happeningHeading || 'News from the showroom floor'
+
+// The reviews counter bolds the "N five-star reviews" clause. Split on the
+// word "reviews" so the count + label are bold and the trailing text is not,
+// matching the original hardcoded markup ("35+ five-star reviews" bold,
+// "from SEQ owners" regular). Falls back gracefully if the pattern differs.
+const reviewsCounterMatch = reviewsCounter.match(/^(.*?reviews)(.*)$/i)
+const reviewsCounterBold = reviewsCounterMatch ? reviewsCounterMatch[1] : reviewsCounter
+const reviewsCounterRest = reviewsCounterMatch ? reviewsCounterMatch[2] : ''
 
 // What's Happening (homepage view). Pulls from Sanity - getHappeningsFeed
 // merges editor "What's Happening" items with upcoming/active shows so a show
@@ -126,15 +164,15 @@ const localBusiness = {
   name: 'SEQ Campers',
   description: "Premium off-road caravan dealer on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman Products stock. Off-road camping experts since 2013.",
   url: 'https://seqcampers.com.au',
-  telephone: '+61-7-5370-7933',
-  email: 'office@seqcampers.com.au',
+  telephone: ldTelephone,
+  email: ldEmail,
   areaServed: { '@type': 'State', name: 'Queensland, Australia' },
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '3B/6 Bonanza Court',
-    addressLocality: 'Marcoola',
-    addressRegion: 'QLD',
-    postalCode: '4564',
+    streetAddress: ldStreet,
+    addressLocality: ldLocality,
+    addressRegion: ldRegion,
+    postalCode: ldPostcode,
     addressCountry: 'AU',
   },
   openingHoursSpecification: [
@@ -250,10 +288,10 @@ const faqSchema = {
   <section class="section pathway-tiles-section" aria-label="Three steps to your next adventure">
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:18px;">
-        <div class="page-eyebrow" style="color:var(--rust);">How it works</div>
-        <h2 class="section-title">Three steps to your next off-road adventure.</h2>
+        <div class="page-eyebrow" style="color:var(--rust);">{pathwayEyebrow}</div>
+        <h2 class="section-title">{pathwayHeading}</h2>
         <p style="color:var(--muted); font-size:0.98rem; margin-top:6px; max-width:620px; margin-left:auto; margin-right:auto;">
-          From browsing off-road caravans and off-grid hybrids to driving away from our Marcoola showroom on the Sunshine Coast - the way SEQ Campers does it.
+          {pathwayIntro}
         </p>
       </div>
 
@@ -296,7 +334,7 @@ const faqSchema = {
     <div class="container">
       <a href="#testimonials" class="reviews-bar-inner">
         <span class="reviews-stars" aria-hidden="true">★★★★★</span>
-        <span class="reviews-text"><strong>35+ five-star reviews</strong> from SEQ owners</span>
+        <span class="reviews-text"><strong>{reviewsCounterBold}</strong>{reviewsCounterRest}</span>
         <span class="reviews-link">See what they say</span>
       </a>
     </div>
@@ -558,17 +596,19 @@ const faqSchema = {
   <section id="testimonials" class="section">
     <div class="container">
       <div class="section-header" style="justify-content:center; text-align:center; flex-direction:column; gap:4px; margin-bottom:8px;">
-        <div class="page-eyebrow" style="color:var(--rust);">In their own words</div>
-        <h2 class="section-title">Real off-road owners, real trips, real stories</h2>
+        <div class="page-eyebrow" style="color:var(--rust);">{testimonialsEyebrow}</div>
+        <h2 class="section-title">{testimonialsHeading}</h2>
         <p style="color:var(--muted); font-size:0.98rem; margin-top:6px; max-width:620px; margin-left:auto; margin-right:auto; text-align:center;">
-          From Kimberley Karavan and Kruiser owners exploring the outback to Stockman Trekka and Rover families chasing off-grid camping weekends - here's what they have to say about SEQ Campers.
+          {testimonialsIntro}
         </p>
       </div>
       <div class="testimonial-grid">
-        {testimonials.map((t) => (
+        {testimonials.map((t) => {
+          const stars = Math.max(1, Math.min(5, Number(t.rating) || 5))
+          return (
           <figure class="testimonial-card">
-            <div class="testimonial-stars" aria-label={`${t.rating} out of 5 stars`}>
-              {Array.from({ length: t.rating }).map(() => <span aria-hidden="true">★</span>)}
+            <div class="testimonial-stars" aria-label={`${stars} out of 5 stars`}>
+              {Array.from({ length: stars }).map(() => <span aria-hidden="true">★</span>)}
             </div>
             <blockquote class="testimonial-quote">"{t.quote}"</blockquote>
             <figcaption class="testimonial-meta">
@@ -576,7 +616,7 @@ const faqSchema = {
               <div class="testimonial-sub">{t.source}</div>
             </figcaption>
           </figure>
-        ))}
+        )})}
       </div>
     </div>
   </section>
@@ -588,8 +628,8 @@ const faqSchema = {
       <div class="container" style="max-width:880px;">
         <div class="section-header" style="margin-bottom:28px;">
           <div>
-            <div class="page-eyebrow" style="color:var(--rust);">What's happening</div>
-            <h2 class="section-title">News from the showroom floor</h2>
+            <div class="page-eyebrow" style="color:var(--rust);">{happeningEyebrow}</div>
+            <h2 class="section-title">{happeningHeading}</h2>
           </div>
           <a href="/whats-happening" class="section-link">See all →</a>
         </div>

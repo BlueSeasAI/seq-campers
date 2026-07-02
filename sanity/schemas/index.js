@@ -1,6 +1,7 @@
 import caravan from './caravan.js'
 import brand from './brand.js'
 import siteSettings from './siteSettings.js'
+import businessDetails from './businessDetails.js'
 import videosPageSettings from './videosPageSettings.js'
 import show from './show.js'
 import happening from './happening.js'
@@ -14,17 +15,20 @@ import aeoKeyword from './aeoKeyword.js'
 // the fields relevant to its page so when Maud clicks "Home page" in
 // Studio she sees Home fields, not the show banner / Reserve CTA etc.
 import homePageSettings from './homePageSettings.js'
+import aboutPage from './aboutPage.js'
 import newPageSettings from './newPageSettings.js'
 import servicePageSettings from './servicePageSettings.js'
 import showsPageSettings from './showsPageSettings.js'
 import quotePageSettings from './quotePageSettings.js'
 import handoverPage from './handoverPage.js'
 import modelPricing from './modelPricing.js'
+import quoteBuilder from './quoteBuilder.js'
 
 export const schemaTypes = [
   caravan,
   brand,
   siteSettings,
+  businessDetails,
   videosPageSettings,
   show,
   happening,
@@ -34,10 +38,12 @@ export const schemaTypes = [
   faq,
   aeoKeyword,
   homePageSettings,
+  aboutPage,
   newPageSettings,
   servicePageSettings,
   showsPageSettings,
   quotePageSettings,
   handoverPage,
   modelPricing,
+  quoteBuilder,
 ]

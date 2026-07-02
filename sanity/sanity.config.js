@@ -113,6 +113,16 @@ export default defineConfig({
               ),
 
             S.listItem()
+              .title('ℹ️ About page')
+              .child(
+                S.editor()
+                  .id('aboutPage')
+                  .schemaType('aboutPage')
+                  .documentId('aboutPage')
+                  .title('About page  →  /about')
+              ),
+
+            S.listItem()
               .title('🚛 New caravans page')
               .child(
                 S.list()
@@ -147,6 +157,17 @@ export default defineConfig({
                   .title('Model pricing  →  the /new model pages')
                   .schemaType('modelPricing')
                   .filter('_type == "modelPricing"')
+                  .defaultOrdering([{ field: 'model', direction: 'asc' }])
+              ),
+
+            S.listItem()
+              .title('🧮 Configurator / quote prices')
+              .schemaType('quoteBuilder')
+              .child(
+                S.documentList()
+                  .title('Configurator / quote prices  →  /quote/{model}')
+                  .schemaType('quoteBuilder')
+                  .filter('_type == "quoteBuilder"')
                   .defaultOrdering([{ field: 'model', direction: 'asc' }])
               ),
 
@@ -360,6 +381,17 @@ export default defineConfig({
               ),
 
             S.divider(),
+
+            // ─── BUSINESS DETAILS (phone, email, address, hours, ABN) ─
+            S.listItem()
+              .title('📇 Business details (phone, email, address, hours)')
+              .child(
+                S.editor()
+                  .id('businessDetails')
+                  .schemaType('businessDetails')
+                  .documentId('businessDetails')
+                  .title('Business details')
+              ),
 
             // ─── SITE-WIDE SETTINGS (banner + Reserve Stripe CTA) ─────
             S.listItem()
