@@ -714,3 +714,13 @@ export async function getModelPricing(model) {
     { model }
   )
 }
+
+/**
+ * All model pricing records (just the fields the /new tiles need), so the tile
+ * price on /new matches the model page. Returns [] if none / Sanity unreachable.
+ */
+export async function getAllModelPricing() {
+  return client.fetch(
+    `*[_type == "modelPricing"]{ model, priceOnApplication, heroPriceFrom }`
+  )
+}

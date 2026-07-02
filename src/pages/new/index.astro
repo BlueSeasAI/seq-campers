@@ -3,7 +3,7 @@ import Site from '../../layouts/Site.astro'
 import BrollCard from '../../components/BrollCard.astro'
 import ReserveCta from '../../components/ReserveCta.astro'
 import YoutubeSubscribeBar from '../../components/YoutubeSubscribeBar.astro'
-import { getNewCaravans, getSiteSettings, youtubeId } from '../../lib/sanity.js'
+import { getNewCaravans, getSiteSettings, getAllModelPricing, youtubeId } from '../../lib/sanity.js'
 
 let caravans = []
 try {
@@ -18,6 +18,16 @@ try {
 } catch (err) {
   console.warn('Sanity unreachable for /new settings:', err.message)
 }
+
+// Model pricing is the single source of truth for each model's price, so the
+// tile price on this page always matches the model page you click through to.
+let modelPricingList = []
+try {
+  modelPricingList = await getAllModelPricing()
+} catch (err) {
+  console.warn('Sanity unreachable for /new model pricing:', err.message)
+}
+const pricingByModel = Object.fromEntries((modelPricingList || []).map((p) => [p.model, p]))
 
 const reserveCta = (settings?.reserveCta?.enabled && settings.reserveCta.stripeUrl) ? settings.reserveCta : null
 
@@ -47,12 +57,30 @@ function resolveTile(idx) {
   const fallback = NEW_TILE_DEFAULTS[idx]
   const youtubeUrl = (slot.youtubeUrl && slot.youtubeUrl.trim()) || fallback.youtubeUrl
   const videoId = youtubeId(youtubeUrl) || youtubeId(fallback.youtubeUrl)
+  const ctaHref = (slot.ctaHref?.trim?.()) || fallback.ctaHref
+
+  // Price ALWAYS comes from the model's "Model pricing" record so this tile can
+  // never disagree with the model page it links to. Single source of truth:
+  //   Contact-for-pricing -> that label; a hero price -> "From $X"; neither ->
+  //   "Enquire" (e.g. the Pod). Only a tile with no matching model page falls
+  //   back to its own label / code default.
+  const modelSlug = (ctaHref || '').replace(/^\//, '')
+  const mp = pricingByModel[modelSlug]
+  let priceLabel
+  if (mp) {
+    if (mp.priceOnApplication) priceLabel = 'Contact us for current pricing'
+    else if (mp.heroPriceFrom && mp.heroPriceFrom.trim()) priceLabel = `From ${mp.heroPriceFrom.trim()}`
+    else priceLabel = 'Enquire'
+  } else {
+    priceLabel = (slot.priceLabel?.trim?.()) || fallback.priceLabel
+  }
+
   return {
     videoId,
     brandLabel: (slot.brandLabel?.trim?.()) || fallback.brandLabel,
     modelLabel: (slot.modelLabel?.trim?.()) || fallback.modelLabel,
-    priceLabel: (slot.priceLabel?.trim?.()) || fallback.priceLabel,
-    ctaHref:    (slot.ctaHref?.trim?.())    || fallback.ctaHref,
+    priceLabel,
+    ctaHref,
   }
 }
 
