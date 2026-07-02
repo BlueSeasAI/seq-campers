@@ -18,7 +18,7 @@ export default function Configurator({
   options = [],
   caravanTitle = 'this caravan',
   caravanSlug = '',
-  contactEmail = 'office@seqcampers.com.au',
+  contactEmail = 'sales@seqcampers.com.au',
   siteBase = 'https://seqcampers.com.au',
   isPlaceholder = false,
 }) {
