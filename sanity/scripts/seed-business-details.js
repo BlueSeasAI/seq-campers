@@ -52,7 +52,7 @@ const doc = {
   phoneHref: '+61753707933',
   textDisplay: '0422 624 920',
   textHref: '0422624920',
-  emailOffice: 'office@seqcampers.com.au',
+  emailOffice: 'sales@seqcampers.com.au',
   emailAdmin: 'admin@seqcampers.com.au',
   addressStreet: '3B/6 Bonanza Court',
   addressSuburb: 'Marcoola',

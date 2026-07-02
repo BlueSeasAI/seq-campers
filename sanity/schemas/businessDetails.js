@@ -78,7 +78,7 @@ export default {
       title: 'Office email (general enquiries)',
       type: 'string',
       components: { field: withFieldIcon(EnvelopeIcon) },
-      description: 'The main enquiries address, e.g. "office@seqcampers.com.au".',
+      description: 'The main enquiries address, e.g. "sales@seqcampers.com.au".',
       validation: (Rule) => Rule.max(120),
     },
     {
