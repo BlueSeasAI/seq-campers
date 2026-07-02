@@ -8,6 +8,22 @@
 // FAQs" - so they live on a dedicated /faq page, NOT inline on every page.
 // The JSON-LD goes site-wide so the AI engines pick them up regardless of
 // which page is being indexed.
+//
+// PILOT (1 Jul 2026): field-level icons. Each field shows a small coloured
+// @sanity/icons SVG to the left of its label via the shared withFieldIcon
+// helper, so the editing form is easier to scan. If Bart likes the look we
+// roll the same pattern across the other schemas. Backing it out is just
+// deleting the two imports + the one `components:` line per field - no data
+// impact whatsoever.
+
+import {
+  HelpCircleIcon,
+  DocumentTextIcon,
+  TagIcon,
+  OlistIcon,
+  CheckmarkCircleIcon,
+} from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
 
 export default {
   name: 'faq',
@@ -19,6 +35,7 @@ export default {
       name: 'question',
       title: 'Question',
       type: 'string',
+      components: { field: withFieldIcon(HelpCircleIcon) },
       description: 'The visitor question - exactly as a customer would ask it. Plain language.',
       validation: (Rule) => Rule.required().max(200),
     },
@@ -27,6 +44,7 @@ export default {
       title: 'Answer',
       type: 'text',
       rows: 5,
+      components: { field: withFieldIcon(DocumentTextIcon) },
       description: 'A concise answer (1-3 sentences). AI search engines prefer direct, complete answers near the start.',
       validation: (Rule) => Rule.required().max(800),
     },
@@ -34,6 +52,7 @@ export default {
       name: 'category',
       title: 'Category',
       type: 'string',
+      components: { field: withFieldIcon(TagIcon) },
       description: 'Group similar questions together on the /faq page.',
       options: {
         list: [
@@ -52,6 +71,7 @@ export default {
       name: 'order',
       title: 'Display order',
       type: 'number',
+      components: { field: withFieldIcon(OlistIcon) },
       description: 'Lower numbers appear first within the category. Use 10, 20, 30 etc so you can insert new ones between.',
       initialValue: 10,
     },
@@ -59,6 +79,7 @@ export default {
       name: 'isPublished',
       title: 'Published?',
       type: 'boolean',
+      components: { field: withFieldIcon(CheckmarkCircleIcon) },
       description: 'Tick to show this FAQ on the live site.',
       initialValue: true,
     },

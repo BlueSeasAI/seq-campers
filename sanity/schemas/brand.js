@@ -5,6 +5,9 @@
 // "Kimberley Kampers" 14 times. Canonical brand names match the
 // website: "Kimberley Kampers" and "Stockman Products".
 
+import { TextIcon, LinkIcon, ImageIcon, DocumentTextIcon, EarthGlobeIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'brand',
   title: 'Brand',
@@ -15,6 +18,7 @@ export default {
       name: 'name',
       title: 'Brand name',
       type: 'string',
+      components: { field: withFieldIcon(TextIcon) },
       validation: (Rule) => Rule.required(),
     },
 
@@ -22,6 +26,7 @@ export default {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
+      components: { field: withFieldIcon(LinkIcon) },
       options: { source: 'name' },
     },
 
@@ -29,6 +34,7 @@ export default {
       name: 'logo',
       title: 'Brand logo',
       type: 'image',
+      components: { field: withFieldIcon(ImageIcon) },
       options: { hotspot: true },
     },
 
@@ -36,6 +42,7 @@ export default {
       name: 'description',
       title: 'Brand description',
       type: 'text',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 3,
       description: 'Shown on the brand filter page',
     },
@@ -44,6 +51,7 @@ export default {
       name: 'website',
       title: 'Brand website (optional)',
       type: 'url',
+      components: { field: withFieldIcon(EarthGlobeIcon) },
     },
   ],
 

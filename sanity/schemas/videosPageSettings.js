@@ -13,6 +13,9 @@
 // "Kimberley Kingdom" and "Stockman Convoy". Same on the front end and in
 // Studio so it stays consistent.
 
+import { VideoIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 const slotFields = [
   {
     name: 'youtubeUrl',
@@ -41,6 +44,7 @@ function slotObject(slotKey, slotLabel) {
     name: slotKey,
     title: slotLabel,
     type: 'object',
+    components: { field: withFieldIcon(VideoIcon) },
     options: { columns: 1, collapsible: true, collapsed: true },
     fields: slotFields.map((f) => ({ ...f })),
   }

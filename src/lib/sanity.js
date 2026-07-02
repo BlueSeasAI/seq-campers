@@ -155,6 +155,7 @@ export async function getCaravan(slug) {
       _id, title, price, status, condition, description, features, topFeatures,
       "brand": brand->name,
       "photos": photos[].asset->url,
+      heroVideo,
       "videos": videos[],
       specs,
       compliance,
@@ -420,9 +421,9 @@ export async function getAccessoriesPage() {
 export async function getAccessories() {
   return client.fetch(`
     *[_type == "accessory"] | order(orderRank asc, title asc) {
-      _id, title, eyebrow, badges, intro, orderRank,
+      _id, title, navLabel, eyebrow, badges, intro, orderRank,
       products[]{
-        name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs,
+        name, brand, type, tag, tagColor, price, priceNote, pitch, features, specs, videoUrl,
         "photos": photos[]{ "url": asset->url, alt }
       },
       compareHeading, compareIntro,
@@ -662,7 +663,7 @@ export async function getPublishedBlogPosts() {
 export async function getBlogPostBySlug(slug) {
   return client.fetch(
     `*[_type == "blogPost" && slug.current == $slug && isPublished == true][0] {
-      _id, title, "slug": slug.current, publishedAt, excerpt, author, body,
+      _id, title, "slug": slug.current, publishedAt, "updatedAt": _updatedAt, excerpt, author, body,
       "coverImage": coverImage.asset->url
     }`,
     { slug }
@@ -692,4 +693,24 @@ export async function getPublishedFaqs() {
       _id, question, answer, category, order
     }
   `)
+}
+
+// ---------------------------------------------------------------------------
+// Model pricing (drives the /[model] marketing pages - Rover, Trekka, etc.)
+// ---------------------------------------------------------------------------
+
+/**
+ * Editable pricing for one model marketing page, matched by the page slug
+ * (e.g. "stockman-rover"). Returns null if none set, in which case
+ * [model].astro falls back to the hardcoded defaults in src/data/model-pages.js
+ * - so the page never breaks if Sanity is unreachable or no record exists yet.
+ */
+export async function getModelPricing(model) {
+  return client.fetch(
+    `*[_type == "modelPricing" && model == $model][0]{
+      model, priceOnApplication, heroPriceFrom, heroPriceNote,
+      versions[]{ tag, priceFrom }, pricingHeading, pricingBody, lowPrice, highPrice
+    }`,
+    { model }
+  )
 }

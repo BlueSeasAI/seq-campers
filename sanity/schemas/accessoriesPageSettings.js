@@ -5,6 +5,9 @@
 // product/category), each with its own photo gallery + products. Each product
 // auto-populates the single order form's dropdown.
 
+import { DocumentTextIcon, PlayIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'accessoriesPageSettings',
   title: 'Accessories page',
@@ -15,6 +18,7 @@ export default {
       name: 'intro',
       title: 'Intro paragraph',
       type: 'text',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 3,
       description: 'Short intro shown under the page heading, e.g. "Genuine off-road accessories we fit and ship Australia-wide."',
       validation: (Rule) => Rule.max(400),
@@ -23,6 +27,7 @@ export default {
       name: 'heroVideo',
       title: 'Accessories video (YouTube)',
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       description: 'The accessories video that used to sit on the New page. Paste a YouTube URL.',
       fields: [
         {

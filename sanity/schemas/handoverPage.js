@@ -9,6 +9,9 @@
 // direct URL (from the printed handover letter or follow-up email).
 // noindex meta tag is set on the page so they don't appear in search.
 
+import { LinkIcon, TextIcon, DocumentTextIcon, VideoIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'handoverPage',
   title: 'Handover page',
@@ -19,6 +22,7 @@ export default {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
+      components: { field: withFieldIcon(LinkIcon) },
       description: 'The /handover/{slug} URL. Use "kimberley" or "stockman".',
       options: { source: 'title', maxLength: 60 },
       validation: (Rule) => Rule.required(),
@@ -27,6 +31,7 @@ export default {
       name: 'title',
       title: 'Page title (brand family)',
       type: 'string',
+      components: { field: withFieldIcon(TextIcon) },
       description: 'e.g. "Kimberley Kampers" or "Stockman Products". Shown in the page header.',
       validation: (Rule) => Rule.required().max(80),
     },
@@ -34,6 +39,7 @@ export default {
       name: 'congratulationsHeading',
       title: 'Congratulations heading',
       type: 'string',
+      components: { field: withFieldIcon(TextIcon) },
       description: 'e.g. "Congratulations on your new Kimberley Kampers". Shown above the model sections.',
       validation: (Rule) => Rule.required().max(140),
     },
@@ -41,6 +47,7 @@ export default {
       name: 'introBody',
       title: 'Intro paragraph (optional)',
       type: 'text',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 3,
       description: 'Short welcome paragraph shown under the congratulations heading.',
       validation: (Rule) => Rule.max(500),
@@ -49,6 +56,7 @@ export default {
       name: 'sections',
       title: 'Model sections',
       type: 'array',
+      components: { field: withFieldIcon(VideoIcon) },
       description: 'Add one section per model on this page. Each section gets its own heading + a grid of YouTube videos.',
       of: [
         {

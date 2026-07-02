@@ -1,0 +1,488 @@
+---
+import Site from '../layouts/Site.astro'
+import { modelPages, getModelPage } from '../data/model-pages.js'
+import { getModelPricing } from '../lib/sanity.js'
+
+export async function getStaticPaths() {
+  return modelPages.map((m) => ({ params: { model: m.slug } }))
+}
+
+const { model } = Astro.params
+const rawModel = getModelPage(model)
+if (!rawModel) return Astro.redirect('/new')
+
+// Clone so we can overlay Sanity-editable pricing without mutating the shared
+// modelPages array.
+const m = structuredClone(rawModel)
+
+// Overlay editable pricing from Sanity (Studio -> Model pricing). Any field left
+// blank in Sanity falls back to the model-pages.js default, so the page never
+// breaks if Sanity is unreachable or a record has not been created yet.
+let sanityPricing = null
+try { sanityPricing = await getModelPricing(m.slug) } catch (err) {
+  console.warn(`Sanity model pricing unreachable for ${m.slug}:`, err.message)
+}
+if (sanityPricing) {
+  const poa = sanityPricing.priceOnApplication === true
+  const POA_NOTE = 'Contact us for current pricing'
+  if (poa) {
+    m.hero.priceFrom = null
+    m.hero.priceNote = POA_NOTE
+  } else {
+    if (sanityPricing.heroPriceFrom) m.hero.priceFrom = sanityPricing.heroPriceFrom
+    if (sanityPricing.heroPriceNote) m.hero.priceNote = sanityPricing.heroPriceNote
+  }
+  if (m.versions?.items?.length) {
+    m.versions.items = m.versions.items.map((v) => {
+      if (poa) return { ...v, priceFrom: null }
+      const match = (sanityPricing.versions || []).find(
+        (pv) => pv?.tag && v?.tag && pv.tag.toLowerCase() === v.tag.toLowerCase()
+      )
+      return match && match.priceFrom ? { ...v, priceFrom: match.priceFrom } : v
+    })
+  }
+  if (m.pricing) {
+    if (poa) {
+      m.pricing.heading = POA_NOTE
+      m.pricing.body = ['Pricing for this model has just been updated. Call us on 07 5370 7933 or send an enquiry and we will give you the current driveaway figure.']
+    } else {
+      if (sanityPricing.pricingHeading) m.pricing.heading = sanityPricing.pricingHeading
+      if (sanityPricing.pricingBody?.length) m.pricing.body = sanityPricing.pricingBody
+    }
+  }
+  if (!poa && m.structured?.product) {
+    if (sanityPricing.lowPrice) m.structured.product.lowPrice = sanityPricing.lowPrice
+    if (sanityPricing.highPrice) m.structured.product.highPrice = sanityPricing.highPrice
+  }
+}
+
+const siteBase = (Astro.site ?? new URL('https://seqcampers.com.au')).origin
+const pageUrl = `${siteBase}/${m.slug}`
+
+// Build & Price target - the live configurator, or an enquiry for models with
+// no configurator (Pod). Maud's note: swap her placeholder URLs for the real
+// page URLs on our site.
+const buildHref = m.configuratorSlug ? `/quote/${m.configuratorSlug}` : '/contact'
+const buildLabel = m.configuratorSlug ? `Build & Price your ${m.brand} ${m.name.split(' ').pop()}` : `Enquire about the ${m.name}`
+
+// "Why buy from SEQ" - the same four reasons on every model page (SEQ-wide, not
+// per-model), so it lives here rather than in the data.
+const WHY_SEQ = [
+  { n: '01', h: 'See it on the Sunshine Coast', p: 'Our showroom is at Marcoola, right by the Sunshine Coast Airport - an easy run from Brisbane and across South East Queensland. Walk through a real one, open every door, and talk specs with people who tow them.' },
+  { n: '02', h: 'Honest driveaway pricing', p: 'No mystery on-road surprises. We give you a clear driveaway figure for Queensland or interstate, with our build-and-price tool so you can see exactly what your spec costs.' },
+  { n: '03', h: 'Flexible finance', p: "Talk to us about finance options to suit your budget. We'll help you work out what fits - no pressure, plan now and buy when you're ready." },
+  { n: '04', h: 'Backed after the sale', p: "Local handover, servicing and warranty support. When you're 1,000km from home and have a question, you've got a real team to call." },
+]
+
+// Structured data - Product + Dealer + FAQ (Maud's pages carried these; kept so
+// the SEO value transfers across).
+const productLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: m.structured.product.name,
+  image: `${siteBase}${m.hero.image}`,
+  description: m.structured.product.description,
+  brand: { '@type': 'Brand', name: m.structured.product.brand },
+  category: m.structured.product.category,
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'AUD',
+    lowPrice: m.structured.product.lowPrice,
+    highPrice: m.structured.product.highPrice,
+    offerCount: m.structured.product.offerCount,
+    availability: 'https://schema.org/InStock',
+    seller: { '@type': 'AutoDealer', name: 'SEQ Campers', url: siteBase },
+  },
+}
+const dealerLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AutoDealer',
+  name: 'SEQ Campers',
+  url: siteBase,
+  telephone: '+61753707933',
+  email: 'sales@seqcampers.com.au',
+  address: { '@type': 'PostalAddress', streetAddress: 'Unit 3, 6 Bonanza Court', addressLocality: 'Marcoola', addressRegion: 'QLD', postalCode: '4564', addressCountry: 'AU' },
+  areaServed: ['Sunshine Coast', 'Brisbane', 'Gold Coast', 'Toowoomba', 'South East Queensland'],
+  brand: ['Stockman', 'Kimberley Kampers'],
+}
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: m.faq.items.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+}
+---
+
+<Site title={m.meta.title} description={m.meta.description} ogImage={m.meta.ogImage} ogType="product">
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <script type="application/ld+json" set:html={JSON.stringify(productLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(dealerLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+  </Fragment>
+
+  <div class="mp">
+    <!-- HERO (text banner, no background photo) -->
+    <header class="mp-hero">
+      <div class="mp-hero-inner">
+        <span class="mp-pill">{m.hero.pill}</span>
+        <h1>{m.hero.h1}</h1>
+        <p class="mp-lead">{m.hero.lead}</p>
+        <p class="mp-price">
+          {m.hero.priceFrom
+            ? (<Fragment>Priced from <b>{m.hero.priceFrom}</b><span class="mp-price-note"> · {m.hero.priceNote}</span></Fragment>)
+            : (<span class="mp-price-note">{m.hero.priceNote}</span>)}
+        </p>
+        <div class="mp-cta-row">
+          <a class="mp-btn mp-btn-lg" href={buildHref}>{buildLabel}</a>
+          <a class="mp-btn mp-btn-sec mp-btn-lg" href="/contact">Visit our Sunshine Coast showroom</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- SHOWCASE IMAGE - the hero photo shown in full, below the banner -->
+    {m.hero.image && (
+      <section class="mp-showcase">
+        <img src={m.hero.image} alt={`${m.name} - ${m.hero.pill}`} />
+      </section>
+    )}
+
+    <!-- INTRO -->
+    <section class="mp-section mp-intro">
+      <div class="container">
+        <div class="mp-eyebrow">{m.intro.eyebrow}</div>
+        <h2 class="mp-h2">{m.intro.heading}</h2>
+        {m.intro.body.map((p, i) => <p class={i === 0 ? 'mp-lead-tan' : 'mp-body'}>{p}</p>)}
+      </div>
+    </section>
+
+    <!-- WHY SEQ -->
+    <section class="mp-section mp-band">
+      <div class="container">
+        <div class="mp-eyebrow mp-eyebrow-light">Why buy your {m.name.split(' ').pop()} from SEQ Campers</div>
+        <h2 class="mp-h2 mp-h2-light">Local experts, there and back.</h2>
+        <div class="mp-why-grid">
+          {WHY_SEQ.map((w) => (
+            <div class="mp-why">
+              <div class="mp-why-n">{w.n}</div>
+              <div><h3>{w.h}</h3><p>{w.p}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- VERSIONS (optional - some models have one spec, not Intrepid/Ultra-style variants) -->
+    {m.versions && (
+      <section class="mp-section" id="versions">
+        <div class="container">
+          <div class="mp-eyebrow">{m.versions.eyebrow}</div>
+          <h2 class="mp-h2">{m.versions.heading}</h2>
+          <p class="mp-lead-tan">{m.versions.lead}</p>
+          <div class={`mp-versions ${m.versions.items.length === 1 ? 'is-single' : ''} ${m.versions.items.length >= 3 ? 'is-three' : ''}`}>
+            {m.versions.items.map((v) => (
+              <div class={`mp-vcard ${v.featured ? 'is-featured' : ''}`}>
+                <span class={`mp-vtag mp-vtag-${v.tagColor}`}>{v.tag}</span>
+                {v.priceFrom && <div class="mp-vprice">{v.priceFrom}</div>}
+                <div class="mp-vsub">{v.sub}</div>
+                <ul class="mp-ticks">
+                  {v.ticks.map((t) => <li>{t}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- FEATURES -->
+    <section class="mp-section mp-band">
+      <div class="container">
+        <div class="mp-eyebrow mp-eyebrow-light">{m.features.eyebrow}</div>
+        <h2 class="mp-h2 mp-h2-light">{m.features.heading}</h2>
+        <p class="mp-lead-tan mp-lead-sand">{m.features.lead}</p>
+        <div class="mp-feat-grid">
+          {m.features.items.map((f, i) => (
+            <div class="mp-feat">
+              <div class="mp-feat-n">{String(i + 1).padStart(2, '0')}</div>
+              <h3>{f.h}</h3>
+              <p>{f.p}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- LIFESTYLE BAND -->
+    {m.lifestyle && (
+      <section class="mp-lifestyle">
+        <img src={m.lifestyle.image} alt={m.lifestyle.caption || m.name} loading="lazy" />
+        {m.lifestyle.caption && <div class="mp-lifestyle-cap">{m.lifestyle.caption}</div>}
+      </section>
+    )}
+
+    <!-- SPECS -->
+    <section class="mp-section" id="specs">
+      <div class="container">
+        <div class="mp-eyebrow">{m.specs.eyebrow}</div>
+        <h2 class="mp-h2">{m.specs.heading}</h2>
+        <p class="mp-lead-tan">{m.specs.note}</p>
+        <div class="mp-spec-wrap">
+          <table class="mp-spec">
+            <thead><tr>{m.specs.columns.map((c) => <th>{c}</th>)}</tr></thead>
+            <tbody>
+              {m.specs.rows.map((r) => (
+                <tr><th>{r[0]}</th>{r.slice(1).map((c) => <td>{c}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    {m.gallery && m.gallery.length > 0 && (
+      <section class="mp-section mp-gallery-sec">
+        <div class="container">
+          <div class="mp-eyebrow">Gallery</div>
+          <h2 class="mp-h2">See it from every angle.</h2>
+          <div class="mp-gallery">
+            {m.gallery.map((g) => (
+              <button class="mp-gfig" type="button" data-full={g.src} aria-label={`Enlarge photo: ${g.alt}`}>
+                <img src={g.src} alt={g.alt} loading="lazy" />
+                <span class="mp-gfig-zoom" aria-hidden="true">⤢</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- WHO FOR -->
+    <section class="mp-section mp-band">
+      <div class="container">
+        <div class="mp-eyebrow mp-eyebrow-light">{m.whoFor.eyebrow}</div>
+        <h2 class="mp-h2 mp-h2-light">{m.whoFor.heading}</h2>
+        <div class="mp-feat-grid mp-feat-grid-3">
+          {m.whoFor.items.map((w) => (
+            <div class="mp-feat"><h3>{w.h}</h3><p>{w.p}</p></div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="mp-section" id="pricing">
+      <div class="container">
+        <div class="mp-price-grid">
+          <div>
+            <div class="mp-eyebrow">{m.pricing.eyebrow}</div>
+            <h2 class="mp-h2">{m.pricing.heading}</h2>
+            {m.pricing.body.map((p) => <p class="mp-body">{p}</p>)}
+            <div class="mp-cta-row" style="margin-top:24px;">
+              <a class="mp-btn mp-btn-lg" href={buildHref}>{buildLabel}</a>
+            </div>
+          </div>
+          <div class="mp-incl-card">
+            <h3>{m.pricing.includedHeading}</h3>
+            <ul class="mp-ticks">{m.pricing.included.map((t) => <li>{t}</li>)}</ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="mp-section" id="faq">
+      <div class="container mp-narrow">
+        <div class="mp-eyebrow">{m.faq.eyebrow}</div>
+        <h2 class="mp-h2">{m.faq.heading}</h2>
+        <div class="mp-faq">
+          {m.faq.items.map((f, i) => (
+            <details open={i === 0}>
+              <summary>{f.q}</summary>
+              <div class="mp-faq-a"><p>{f.a}</p></div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="mp-final">
+      <div class="container">
+        <h2>{m.finalCta.heading}</h2>
+        <p>{m.finalCta.body}</p>
+        <div class="mp-cta-row" style="justify-content:center;">
+          <a class="mp-btn mp-btn-lg mp-btn-onlight" href={buildHref}>{buildLabel}</a>
+          <a class="mp-btn mp-btn-sec mp-btn-lg mp-btn-onrust" href="tel:+61753707933">Call 07 5370 7933</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery lightbox (click-to-enlarge, same pattern as the stock pages) -->
+    <div class="mp-lightbox" id="mp-lightbox" hidden>
+      <button class="mp-lightbox-close" type="button" aria-label="Close">&times;</button>
+      <img class="mp-lightbox-img" src="" alt="" />
+    </div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var lb = document.getElementById('mp-lightbox')
+      if (!lb) return
+      var img = lb.querySelector('.mp-lightbox-img')
+      function open(src, alt) { img.src = src; img.alt = alt || ''; lb.hidden = false; document.body.style.overflow = 'hidden' }
+      function close() { lb.hidden = true; img.src = ''; document.body.style.overflow = '' }
+      document.querySelectorAll('.mp-gallery .mp-gfig').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var im = b.querySelector('img')
+          open(b.getAttribute('data-full'), im ? im.alt : '')
+        })
+      })
+      lb.addEventListener('click', function (e) { if (e.target !== img) close() })
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.hidden) close() })
+    })()
+  </script>
+</Site>
+
+<style>
+  /* Model marketing page - re-skinned into the SEQ template. Uses the SEQ
+     brand palette + the site fonts (Inter Tight headings / Inter body, loaded
+     by the layout). Scoped under .mp so it never leaks into other pages. */
+  .mp {
+    --earth: #2A1608; --rock: #C0341A; --rock-dark: #A02D15; --gold: #D4943A;
+    --olive: #6B7A3A; --tan: #8B6A40; --sand: #DCCBA8; --off: #F4EDE0;
+    --deep: #1A0E06; --white: #FFFDF9;
+    color: var(--earth);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .mp h1, .mp h2, .mp h3 { font-family: 'Inter Tight', sans-serif; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
+  .mp .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+  .mp .mp-narrow { max-width: 820px; }
+  .mp-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--rock); margin-bottom: 8px; }
+  .mp-eyebrow-light { color: var(--gold); }
+  .mp-h2 { font-size: clamp(28px, 4vw, 36px); margin-bottom: 12px; color: var(--earth); }
+  .mp-h2-light { color: var(--off); }
+  .mp-body { max-width: 64ch; margin-bottom: 16px; }
+  .mp-lead-tan { color: var(--tan); font-size: 18px; margin-bottom: 26px; max-width: 64ch; }
+  .mp-lead-sand { color: var(--sand); }
+  /* Intro runs the full image width - align with the left of the image, span to the right */
+  .mp-intro .mp-lead-tan, .mp-intro .mp-body { max-width: none; }
+  .mp-pill { display: inline-block; background: var(--rock); color: var(--off); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; letter-spacing: 0.04em; }
+
+  .mp-section { padding: 60px 0; }
+  .mp-band { background: var(--earth); }
+  .mp-band .mp-h2, .mp-band h3 { color: var(--off); }
+  .mp-band p { color: var(--sand); }
+
+  /* Hero - text-only banner with a brand gradient, generous breathing room */
+  .mp-hero { position: relative; background: linear-gradient(105deg, #1A0E06 0%, #3a1c0e 32%, #7a2d15 72%, #C0341A 100%); color: var(--off); border-bottom: 4px solid var(--gold); }
+  .mp-hero-inner { position: relative; z-index: 2; max-width: 1140px; margin: 0 auto; padding: 40px 20px 44px; }
+  .mp-hero h1 { font-size: clamp(38px, 6vw, 56px); margin: 18px 0 20px; color: var(--off); max-width: 16ch; font-weight: 900; }
+
+  /* Showcase image - the hero photo, shown in full BELOW the banner (clear gap, no overlap) */
+  .mp-showcase { max-width: 1180px; margin: 46px auto 0; padding: 0 20px; }
+  .mp-showcase img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: 0 22px 54px rgba(42,22,8,.22); }
+  @media (max-width: 620px) { .mp-showcase { margin-top: 30px; } .mp-showcase img { border-radius: 10px; } }
+  .mp-lead { font-size: clamp(17px, 2.4vw, 21px); color: var(--sand); max-width: 56ch; margin-bottom: 16px; }
+  .mp-price { font-size: 17px; color: var(--off); margin: 8px 0 30px; }
+  .mp-price b { font-family: 'Inter Tight'; font-size: 24px; color: var(--gold); }
+  .mp-price-note { color: rgba(244,237,224,0.85); }
+  @media (max-width: 620px) { .mp-price-note { display: block; margin-top: 4px; } }
+
+  .mp-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .mp-btn { display: inline-block; background: var(--rock); color: var(--off); font-family: 'Inter Tight', sans-serif; font-weight: 700; padding: 14px 28px; border-radius: 6px; font-size: 16px; text-decoration: none; transition: transform .15s, background .15s, box-shadow .15s; }
+  .mp-btn:hover { background: var(--rock-dark); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(42,22,8,.28); }
+  .mp-btn-lg { padding: 16px 32px; font-size: 17px; }
+  .mp-btn-sec { background: rgba(244,237,224,0.08); color: var(--off); border: 2px solid rgba(244,237,224,0.45); }
+  .mp-btn-sec:hover { background: var(--gold); color: var(--earth); border-color: var(--gold); }
+
+  /* Why-SEQ */
+  .mp-why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+  @media (max-width: 720px) { .mp-why-grid { grid-template-columns: 1fr; } }
+  .mp-why { display: flex; gap: 18px; align-items: flex-start; padding: 20px; border-left: 3px solid var(--gold); background: rgba(255,253,249,0.04); border-radius: 0 8px 8px 0; }
+  .mp-why-n { font-family: 'Inter Tight'; font-size: 24px; color: var(--gold); font-weight: 800; flex: none; width: 34px; }
+  .mp-why h3 { color: var(--off); font-size: 19px; margin-bottom: 4px; }
+  .mp-why p { color: var(--sand); font-size: 15px; }
+
+  /* Versions */
+  .mp-versions { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 8px; }
+  .mp-versions.is-single { grid-template-columns: minmax(0, 580px); }
+  .mp-versions.is-three { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 880px) { .mp-versions.is-three { grid-template-columns: 1fr; } }
+  @media (max-width: 720px) { .mp-versions { grid-template-columns: 1fr; } }
+  .mp-vcard { background: var(--white); border: 1px solid var(--sand); border-radius: 12px; padding: 26px; box-shadow: 0 2px 10px rgba(42,22,8,.06); }
+  .mp-vcard.is-featured { border: 1px solid var(--rock); box-shadow: 0 10px 30px rgba(192,52,26,.12); }
+  .mp-vtag { display: inline-block; color: var(--off); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; letter-spacing: 0.04em; }
+  .mp-vtag-olive { background: var(--olive); }
+  .mp-vtag-rust { background: var(--rock); }
+  .mp-vprice { font-family: 'Inter Tight'; font-size: 26px; font-weight: 800; margin: 14px 0 4px; color: var(--earth); }
+  .mp-vsub { color: var(--tan); font-weight: 600; font-size: 14px; margin-bottom: 14px; }
+  .mp-ticks { list-style: none; margin: 10px 0 0; padding: 0; }
+  .mp-ticks li { padding-left: 26px; position: relative; margin-bottom: 10px; font-size: 15.5px; }
+  .mp-ticks li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); }
+
+  /* Features / who-for cards */
+  .mp-feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 12px; }
+  .mp-feat-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 880px) { .mp-feat-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .mp-feat-grid { grid-template-columns: 1fr; } }
+  .mp-feat { background: rgba(255,253,249,0.04); border: 1px solid #3a2412; border-radius: 10px; padding: 22px; }
+  .mp-feat-n { font-family: 'Inter Tight'; font-size: 28px; color: var(--gold); font-weight: 800; line-height: 1; }
+  .mp-feat h3 { color: var(--off); font-size: 18px; margin: 10px 0 6px; }
+  .mp-feat p { color: var(--sand); font-size: 15px; }
+
+  /* Lifestyle band - the full photo edge to edge + a caption bar below it */
+  .mp-lifestyle { margin: 0; }
+  .mp-lifestyle img { display: block; width: 100%; height: auto; }
+  .mp-lifestyle-cap { background: var(--earth); color: var(--off); font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: clamp(16px, 2.2vw, 22px); text-align: center; padding: 18px 20px; }
+
+  /* Specs table */
+  .mp-spec-wrap { overflow-x: auto; margin-top: 10px; border-radius: 10px; }
+  .mp-spec { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--sand); border-radius: 10px; overflow: hidden; font-size: 15px; min-width: 640px; }
+  .mp-spec th, .mp-spec td { text-align: left; padding: 13px 16px; border-bottom: 1px solid var(--sand); vertical-align: top; }
+  .mp-spec thead th { background: var(--earth); color: var(--off); font-family: 'Inter Tight'; font-size: 14px; }
+  .mp-spec tbody th { font-weight: 600; color: var(--tan); width: 24%; background: #faf5ec; }
+  .mp-spec tr:last-child td, .mp-spec tr:last-child th { border-bottom: none; }
+
+  /* Gallery (click-to-enlarge) */
+  .mp-gallery-sec { background: var(--off); }
+  .mp-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px; }
+  @media (max-width: 720px) { .mp-gallery { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 460px) { .mp-gallery { grid-template-columns: 1fr; } }
+  .mp-gfig { margin: 0; padding: 0; border: none; background: none; cursor: pointer; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(42,22,8,.12); aspect-ratio: 3/2; position: relative; display: block; width: 100%; }
+  .mp-gfig img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+  .mp-gfig:hover img { transform: scale(1.05); }
+  .mp-gfig-zoom { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; border-radius: 50%; background: rgba(26,14,6,.62); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 19px; opacity: 0; transition: opacity .2s; }
+  .mp-gfig:hover .mp-gfig-zoom { opacity: 1; }
+
+  /* Lightbox */
+  .mp-lightbox { position: fixed; inset: 0; z-index: 9999; background: rgba(10,6,3,.93); display: flex; align-items: center; justify-content: center; padding: 30px; }
+  .mp-lightbox[hidden] { display: none; }
+  .mp-lightbox-img { max-width: 95vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .mp-lightbox-close { position: absolute; top: 18px; right: 28px; background: none; border: none; color: #fff; font-size: 42px; line-height: 1; cursor: pointer; }
+
+  /* Pricing */
+  .mp-price-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: center; }
+  @media (max-width: 820px) { .mp-price-grid { grid-template-columns: 1fr; } }
+  .mp-incl-card { background: var(--white); border: 1px solid var(--sand); border-radius: 12px; padding: 26px; box-shadow: 0 2px 10px rgba(42,22,8,.06); }
+  .mp-incl-card h3 { font-size: 20px; margin-bottom: 6px; color: var(--earth); }
+
+  /* FAQ */
+  .mp-faq { margin-top: 18px; }
+  .mp-faq details { background: var(--white); border: 1px solid var(--sand); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+  .mp-faq summary { cursor: pointer; padding: 18px 22px; font-family: 'Inter Tight'; font-weight: 700; font-size: 17px; list-style: none; display: flex; justify-content: space-between; gap: 14px; align-items: center; color: var(--earth); }
+  .mp-faq summary::-webkit-details-marker { display: none; }
+  .mp-faq summary::after { content: "+"; color: var(--rock); font-size: 24px; font-weight: 700; flex: none; }
+  .mp-faq details[open] summary::after { content: "\2212"; }
+  .mp-faq details[open] summary { border-bottom: 1px solid var(--sand); }
+  .mp-faq-a { padding: 16px 22px; color: var(--earth); }
+
+  /* Final CTA */
+  .mp-final { background: linear-gradient(100deg, var(--rock) 0%, var(--rock-dark) 100%); color: var(--off); text-align: center; padding: 64px 0; border-top: 4px solid var(--gold); }
+  .mp-final h2 { font-size: clamp(28px, 4vw, 36px); color: var(--off); margin-bottom: 12px; }
+  .mp-final p { color: #ffeede; max-width: 56ch; margin: 0 auto 26px; }
+  .mp-btn-onlight { background: var(--off); color: var(--earth); }
+  .mp-btn-onlight:hover { background: var(--white); color: var(--earth); }
+  .mp-btn-onrust { background: transparent; border-color: rgba(244,237,224,0.5); }
+</style>

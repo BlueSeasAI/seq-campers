@@ -14,6 +14,9 @@
 //   quotePageSettings   - 8 model intro videos
 //   videosPageSettings  - 12 video library tiles (Kingdom + Convoy)
 
+import { PinIcon, TokenIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'siteSettings',
   title: 'Site-wide settings',
@@ -25,6 +28,7 @@ export default {
       name: 'showSpecial',
       title: 'Show Special banner (site-wide strip)',
       type: 'object',
+      components: { field: withFieldIcon(PinIcon) },
       description: 'The thin coloured strip that runs across the top of every page. Use it to push a deadline ("Get it before the Brisbane Caravan Show ends Sun 8 June"). Leave the headline blank to hide the banner entirely.',
       options: { columns: 1 },
       fields: [
@@ -61,6 +65,7 @@ export default {
       name: 'reserveCta',
       title: 'Reserve $1,000 CTA (shown on /new)',
       type: 'object',
+      components: { field: withFieldIcon(TokenIcon) },
       description: 'The "Reserve this van for $1,000" Stripe payment button shown on the New Caravans page. Leave the Stripe URL blank to hide the button.',
       options: { columns: 1 },
       fields: [

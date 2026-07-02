@@ -210,6 +210,38 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       .show-special-banner { font-size: 0.85rem; padding: 8px 0; }
       .show-special-inner { gap: 8px; }
     }
+
+    /* Contact utility bar - shown on every page EXCEPT the home page (home
+       header overlays the hero, so no bar there). Inner pages use a normal
+       sticky header, so this thin strip sits cleanly above it. Items sit on
+       the RIGHT, clear of the large left-aligned logo. */
+    .contact-bar {
+      background: var(--sand-deep, #EBE0CD);
+      border-bottom: 1px solid var(--tan-border, #DCCBA8);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.85rem;
+    }
+    .contact-bar-inner {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 22px;
+      padding: 7px 0;
+      flex-wrap: wrap;
+    }
+    .contact-bar .cb-item {
+      color: var(--ink, #2A1608);
+      text-decoration: none;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .contact-bar .cb-item b { color: var(--rust, #C0341A); font-weight: 800; }
+    .contact-bar .cb-item:hover b { text-decoration: underline; }
+    .contact-bar .cb-loc { color: var(--muted, #8B6A40); }
+    @media (max-width: 600px) {
+      .contact-bar { font-size: 0.8rem; }
+      .contact-bar-inner { justify-content: center; gap: 4px 16px; padding: 6px 12px; }
+    }
     /* Site-wide kill switch for browser-native media controls on every
        autoplay video (hero, pathway tiles, broll cards, /quote intro, /service
        team grid, workshop weekly, /new tiles). Per Bart 16 Jun - "remove the
@@ -425,6 +457,15 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
   </script>
 </head>
 <body data-home={isHome ? 'true' : 'false'}>
+  {!isHome && (
+    <div class="contact-bar">
+      <div class="container contact-bar-inner">
+        <a class="cb-item cb-loc" href="https://www.google.com/maps/search/?api=1&query=6+Bonanza+Court+Marcoola+QLD+4564" target="_blank" rel="noopener">Campers @ Marcoola &middot; 6 Bonanza Crt</a>
+        <a class="cb-item" href="tel:+61753707933">Call <b>07 5370 7933</b></a>
+        <a class="cb-item" href="sms:0422624920">Text <b>0422 624 920</b></a>
+      </div>
+    </div>
+  )}
   {showSpecial && (
     <div class="show-special-banner" role="region" aria-label="Show special">
       <div class="container show-special-inner">

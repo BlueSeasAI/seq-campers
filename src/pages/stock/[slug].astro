@@ -41,6 +41,11 @@ function youtubeEmbed(url) {
   return `https://www.youtube.com/embed/${id}?${params.toString()}`
 }
 
+// Optional hero video shown at the very top of the listing (above the photos).
+// Editor-controlled via the caravan's "Hero video" field in Sanity. When blank,
+// the photos lead as normal.
+const heroVideoEmbed = caravan.heroVideo ? youtubeEmbed(caravan.heroVideo) : null
+
 // Build a meta description from structured data
 const specsBits = []
 if (caravan.specs?.sleeps) specsBits.push(`sleeps ${caravan.specs.sleeps}`)
@@ -61,6 +66,13 @@ const descriptionHtml = portableTextToHtml(caravan.description)
 
 // FAQs - use per-caravan custom FAQs from Sanity if present, otherwise
 // generate a smart default set from the caravan's structured data.
+//
+// Policy FAQs (trade-ins, on-road costs) were REMOVED here on 1 Jul 2026.
+// They were factually wrong - claimed "SEQ Campers accepts trade-ins" (we
+// don't) and pointed at a "Build your spec" tool that no longer exists on
+// this page - and were being emitted as FAQPage JSON-LD, so AI search engines
+// could quote them. Policy answers now live in Sanity on the /faq page where
+// Maud can edit them. The remaining defaults are van-specific and safe.
 const defaultFaqs = [
   {
     q: `Is the ${caravan.title} suitable for off-road touring?`,
@@ -70,20 +82,12 @@ const defaultFaqs = [
     q: `Can I inspect the ${caravan.title} before buying?`,
     a: `Absolutely. We strongly encourage on-site inspection at SEQ Campers in Queensland. Call (07) 5370 7933 or email office@seqcampers.com.au to book a time. Shane personally walks every buyer through the van.`,
   },
-  {
-    q: `Does the listed price include on-road costs and registration?`,
-    a: `The listed price is the caravan only. On-road costs (registration transfer, stamp duty, delivery) are confirmed in writing as part of your formal quote. Use the "Build your spec" tool on this page to send through your selections.`,
-  },
   ...(caravan.specs?.atm
     ? [{
         q: `What can I tow the ${caravan.title} with?`,
         a: `Check the ATM (maximum loaded weight) against your tow vehicle's tow rating. The ${caravan.title} has an ATM of ${caravan.specs.atm}kg${caravan.specs.tareWeight ? ` and tare of ${caravan.specs.tareWeight}kg` : ''}. A dual-cab ute or 4WD wagon with at least ${Math.ceil(caravan.specs.atm / 1000) * 1000}kg tow rating is typically required.`,
       }]
     : []),
-  {
-    q: `Does SEQ Campers accept trade-ins?`,
-    a: `Yes. SEQ Campers accepts trade-ins on most caravans. Send photos and details of your current van with your enquiry and we will come back with a trade-in valuation as part of the quote.`,
-  },
 ]
 const caravanFaqs = caravan.faqs?.length ? caravan.faqs : defaultFaqs
 const faqIsCustom = caravan.faqs?.length > 0
@@ -204,10 +208,20 @@ const productSchema = {
   </div>
 
   <div class="container">
-    <div class="listing-grid">
+    <div class:list={["listing-grid", { "has-hero-video": !!heroVideoEmbed }]}>
+
+      {/* Hero video - pulled out as its own grid cell so on mobile the white
+          price/spec box can sit directly under it (desktop layout unchanged). */}
+      {heroVideoEmbed && (
+        <div class="listing-hero-video">
+          <div class="video-embed">
+            <iframe src={heroVideoEmbed} title={`${caravan.title} walkaround video`} allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+      )}
 
       <!-- Left: photos + description + videos -->
-      <div>
+      <div class="listing-main">
         {caravan.photos?.length > 0 && (
           <>
             <div class="photo-gallery">
@@ -227,8 +241,8 @@ const productSchema = {
           </>
         )}
 
-        {/* Videos moved up here so they sit alongside photos as the primary visual story */}
-        {videoCount > 0 ? (
+        {/* Lower-down video section - shows only if the editor added videos in Sanity. */}
+        {videoCount > 0 && (
           <div style="margin-top:24px;">
             <div class="page-eyebrow" style="color:var(--rust); margin-bottom:8px;">Walkaround</div>
             <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:14px;">See it in motion</h2>
@@ -242,14 +256,6 @@ const productSchema = {
                 ) : null
               })}
             </div>
-          </div>
-        ) : (
-          <div style="margin-top:24px; background:var(--sand-deep); border:1px dashed var(--tan-border); border-radius:var(--radius); padding:20px 24px; text-align:center;">
-            <div class="page-eyebrow" style="color:var(--muted); margin-bottom:6px;">Walkaround video</div>
-            <p style="color:var(--muted); font-size:0.92rem; line-height:1.5;">
-              Shane is filming a B-roll walkthrough of this caravan - it will appear here as soon as it is ready.
-              Want to see it sooner? <a href="/contact" style="color:var(--rust); font-weight:600;">Book a private walkthrough</a>.
-            </p>
           </div>
         )}
 
@@ -323,33 +329,43 @@ const productSchema = {
           </div>
         )}
 
-        {(caravan.specs || caravan.power?.solarWatts || caravan.power?.inverterWatts) && (
+        {(caravan.specs?.atm || caravan.specs?.tareWeight || caravan.specs?.length || caravan.power?.solarWatts || caravan.power?.inverterWatts || caravan.power?.batteryCapacityAh || batteryTypeShort || caravan.specs?.waterCapacityL) && (
         <div class="specs-block">
-          {caravan.specs && (
+          {(caravan.specs?.atm || caravan.specs?.tareWeight || caravan.specs?.length) && (
           <>
           <div class="specs-block-label">Can you tow it?</div>
           <div class="specs-grid">
-            {caravan.specs.atm && (
+            {caravan.specs?.atm && (
               <div class="spec-item spec-item-key">
                 <span class="spec-label">ATM</span>
                 <span class="spec-value">{caravan.specs.atm.toLocaleString('en-AU')}<span class="spec-unit">kg</span></span>
                 <span class="spec-hint">towing weight</span>
               </div>
             )}
-            {caravan.specs.tareWeight && (
+            {caravan.specs?.tareWeight && (
               <div class="spec-item spec-item-key">
                 <span class="spec-label">Tare</span>
                 <span class="spec-value">{caravan.specs.tareWeight.toLocaleString('en-AU')}<span class="spec-unit">kg</span></span>
                 <span class="spec-hint">empty weight</span>
               </div>
             )}
-            {caravan.specs.length && (
+            {caravan.specs?.length && (
               <div class="spec-item spec-item-key">
                 <span class="spec-label">Length</span>
                 <span class="spec-value">{caravan.specs.length}<span class="spec-unit">m</span></span>
                 <span class="spec-hint">overall</span>
               </div>
             )}
+          </div>
+          </>
+          )}
+          {(caravan.power?.batteryCapacityAh || batteryTypeShort || caravan.power?.solarWatts || caravan.power?.inverterWatts || caravan.specs?.waterCapacityL) && (
+          <>
+          {(caravan.specs?.atm || caravan.specs?.tareWeight || caravan.specs?.length) && (
+            <hr style="border:none; border-top:1px solid var(--tan-border); margin:16px 0 14px;" />
+          )}
+          <div class="specs-block-label">Power &amp; off-grid</div>
+          <div class="specs-grid">
             {(caravan.power?.batteryCapacityAh || batteryTypeShort) && (
               <div class="spec-item spec-item-key">
                 <span class="spec-label">Battery</span>
@@ -361,32 +377,25 @@ const productSchema = {
                 <span class="spec-hint">{batteryTypeShort || 'battery'}</span>
               </div>
             )}
-            {caravan.specs.waterCapacityL && (
-              <div class="spec-item spec-item-key">
-                <span class="spec-label">Water</span>
-                <span class="spec-value">{caravan.specs.waterCapacityL}<span class="spec-unit">L</span></span>
-                <span class="spec-hint">fresh tank</span>
-              </div>
-            )}
-          </div>
-          </>
-          )}
-          {(caravan.power?.solarWatts || caravan.power?.inverterWatts) && (
-          <>
-          <div class="specs-block-label" style={caravan.specs ? 'margin-top:16px;' : ''}>Power &amp; off-grid</div>
-          <div class="specs-grid">
-            {caravan.power.solarWatts && (
+            {caravan.power?.solarWatts && (
               <div class="spec-item spec-item-key">
                 <span class="spec-label">Solar</span>
                 <span class="spec-value">{caravan.power.solarWatts}<span class="spec-unit">W</span></span>
                 <span class="spec-hint">total</span>
               </div>
             )}
-            {caravan.power.inverterWatts && (
+            {caravan.power?.inverterWatts && (
               <div class="spec-item spec-item-key">
                 <span class="spec-label">Inverter</span>
                 <span class="spec-value">{caravan.power.inverterWatts}<span class="spec-unit">W</span></span>
-                <span class="spec-hint">pure sine</span>
+                <span class="spec-hint">output</span>
+              </div>
+            )}
+            {caravan.specs?.waterCapacityL && (
+              <div class="spec-item spec-item-key">
+                <span class="spec-label">Water</span>
+                <span class="spec-value">{caravan.specs.waterCapacityL}<span class="spec-unit">L</span></span>
+                <span class="spec-hint">capacity</span>
               </div>
             )}
           </div>

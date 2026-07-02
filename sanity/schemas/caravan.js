@@ -6,6 +6,25 @@
 // Change a field here, refresh the studio in the browser, the form
 // updates instantly. No database migration. No developer hand-off.
 
+import {
+  TextIcon,
+  TagIcon,
+  LinkIcon,
+  StarIcon,
+  NumberIcon,
+  CheckmarkCircleIcon,
+  EyeOpenIcon,
+  PlayIcon,
+  VideoIcon,
+  ImagesIcon,
+  DocumentTextIcon,
+  CogIcon,
+  OlistIcon,
+  DocumentIcon,
+  HelpCircleIcon,
+} from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'caravan',
   title: 'Caravan',
@@ -16,6 +35,7 @@ export default {
       name: 'title',
       title: 'Caravan name',
       type: 'string',
+      components: { field: withFieldIcon(TextIcon) },
       description: 'Shown in the listing - e.g. "Stockman Products Trekka 2024" or "Kimberley Kampers Karavan 2023"',
       validation: (Rule) => Rule.required().min(3),
     },
@@ -24,6 +44,7 @@ export default {
       name: 'compliance',
       title: 'Stock identifiers',
       type: 'object',
+      components: { field: withFieldIcon(TagIcon) },
       description: 'Fill the SEQ stock number here FIRST, then click Generate on the URL slug below - the stock number gets added to the web address so URLs never clash. VIN + registration state are optional.',
       options: { columns: 2 },
       fields: [
@@ -70,6 +91,7 @@ export default {
       name: 'slug',
       title: 'URL slug',
       type: 'slug',
+      components: { field: withFieldIcon(LinkIcon) },
       description: 'The web address ending for this caravan. Fill in the SEQ stock number below FIRST, then click the blue Generate button - it auto-builds the URL from the Caravan name PLUS the stock number (e.g. ...kimberley-karavan-7455). The stock number on the end keeps every URL unique and easy to identify. If you type your own, use only lowercase letters, numbers and hyphens.',
       options: {
         // Build the slug from the title + the SEQ stock number, so two vans
@@ -110,6 +132,7 @@ export default {
       name: 'brand',
       title: 'Brand',
       type: 'reference',
+      components: { field: withFieldIcon(TagIcon) },
       to: [{ type: 'brand' }],
       description: 'Pick the manufacturer (Kimberley Kampers, Stockman Products, etc.)',
       validation: (Rule) => Rule.required(),
@@ -119,6 +142,7 @@ export default {
       name: 'price',
       title: 'Price (AUD)',
       type: 'number',
+      components: { field: withFieldIcon(NumberIcon) },
       description: 'Whole dollars only, no comma. Most premium off-road vans are $40K-$200K.',
       validation: (Rule) =>
         Rule.required()
@@ -133,6 +157,7 @@ export default {
       name: 'status',
       title: 'Status',
       type: 'string',
+      components: { field: withFieldIcon(TagIcon) },
       options: {
         list: [
           { title: 'For Sale', value: 'for-sale' },
@@ -150,6 +175,7 @@ export default {
       name: 'soldListed',
       title: 'Show in the public Sold archive?',
       type: 'boolean',
+      components: { field: withFieldIcon(EyeOpenIcon) },
       description:
         'Only matters once Status is Sold. On = this sold van shows in the public Sold Caravans archive (on /sold). Off = kept in the system but hidden from the website. Tip: keep the most recent handful On and switch older ones Off - nothing is ever deleted.',
       initialValue: true,
@@ -160,6 +186,7 @@ export default {
       name: 'stockType',
       title: 'New or Used',
       type: 'string',
+      components: { field: withFieldIcon(TagIcon) },
       description: 'Select which page this caravan appears on. NEW caravans show on /new (with configurator entry). USED caravans show on /stock.',
       options: {
         list: [
@@ -176,6 +203,7 @@ export default {
       name: 'brollVideoUrl',
       title: 'B-roll YouTube video',
       type: 'url',
+      components: { field: withFieldIcon(PlayIcon) },
       description: 'The short looping video shown in the small tile for this caravan on /new (if NEW) or /stock (if USED) - before the visitor clicks into the full listing. Keep it SHORT (15-30 seconds is ideal). Paste the full YouTube URL. Auto-plays muted with no controls. Click the tile - opens the full spec page.',
     },
 
@@ -183,6 +211,7 @@ export default {
       name: 'condition',
       title: 'Condition rating',
       type: 'string',
+      components: { field: withFieldIcon(StarIcon) },
       description: 'Honest assessment of overall condition. Shown as a badge on the listing.',
       options: {
         list: [
@@ -200,6 +229,7 @@ export default {
       name: 'photos',
       title: 'Photos',
       type: 'array',
+      components: { field: withFieldIcon(ImagesIcon) },
       description:
         '⚡ TO UPLOAD MANY PHOTOS AT ONCE: open File Explorer (Windows) or Finder (Mac), select multiple photos (Ctrl+click on Windows / Cmd+click on Mac, or Shift+click for a range), then DRAG the whole selection into the dashed dropzone below. They will all upload in parallel. The "Add item" button only adds one photo at a time - use drag-and-drop for bulk. Drag thumbnails to reorder once uploaded - the first photo is the main image shown in the listing grid.',
       options: { layout: 'grid' },
@@ -220,6 +250,7 @@ export default {
       name: 'description',
       title: 'Description',
       type: 'array',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       of: [{ type: 'block' }],
       description: 'Use the toolbar for headings and bullet points',
     },
@@ -228,6 +259,7 @@ export default {
       name: 'specs',
       title: 'Specifications',
       type: 'object',
+      components: { field: withFieldIcon(CogIcon) },
       options: { columns: 2 },
       fields: [
         {
@@ -330,6 +362,7 @@ export default {
       name: 'topFeatures',
       title: 'Top 5 features ("Is this right for you?")',
       type: 'array',
+      components: { field: withFieldIcon(StarIcon) },
       of: [{ type: 'string' }],
       description: 'The five biggest selling points of this caravan. Per Shane (16 Jun): "what are the five benefits of this van? Is this right for you?" Each one should be a short, specific benefit (e.g. "Tows behind a mid-size SUV - 1,800kg ATM"). Aim for 5 lines.',
       validation: (Rule) => Rule.max(7).warning('Aim for exactly 5'),
@@ -339,6 +372,7 @@ export default {
       name: 'power',
       title: 'Power system',
       type: 'object',
+      components: { field: withFieldIcon(CogIcon) },
       description: 'Battery, solar and inverter setup. Leave blank what does not apply.',
       options: { columns: 2 },
       fields: [
@@ -404,6 +438,7 @@ export default {
       name: 'tripHistory',
       title: 'Trip / travel history - "Where has this van been?"',
       type: 'text',
+      components: { field: withFieldIcon(DocumentTextIcon) },
       rows: 4,
       description: 'Tell the story. Notable trips, what conditions it handled, how it performed. Buyers love the story - especially for second-hand vans. Even 2-3 sentences makes a big difference.',
     },
@@ -412,6 +447,7 @@ export default {
       name: 'faqs',
       title: 'FAQs for this caravan (optional)',
       type: 'array',
+      components: { field: withFieldIcon(HelpCircleIcon) },
       description:
         'Optional. If left empty, the site uses a smart default FAQ set tailored to this caravan (brand, model, specs). Add custom Q&As here when you want to answer something specific - e.g. "Does this van have the optional Cape York pack?" Each Q&A is also exposed as Schema.org FAQPage data so AI search engines can quote the answers directly.',
       of: [
@@ -448,16 +484,27 @@ export default {
       name: 'features',
       title: 'Key features',
       type: 'array',
+      components: { field: withFieldIcon(OlistIcon) },
       of: [{ type: 'string' }],
       description: 'One per line. Shown as a bullet list on the listing page.',
     },
 
     {
-      name: 'videos',
-      title: 'Videos (YouTube)',
-      type: 'array',
+      name: 'heroVideo',
+      title: 'Hero video (top of listing)',
+      type: 'url',
+      components: { field: withFieldIcon(PlayIcon) },
       description:
-        'Paste up to 3 YouTube links. The first 3 display in a row on the listing page.',
+        'Optional. A YouTube link shown as the FIRST thing on the listing, ABOVE the photos. Leave it blank and the photos show first as normal. Paste the full YouTube URL, e.g. https://www.youtube.com/watch?v=abc123',
+    },
+
+    {
+      name: 'videos',
+      title: 'Videos (lower down the page)',
+      type: 'array',
+      components: { field: withFieldIcon(VideoIcon) },
+      description:
+        'Optional. Paste up to 3 YouTube links shown LOWER DOWN the listing, below the photos. For the video at the very TOP of the listing, use the "Hero video" field above. The first 3 display in a row.',
       of: [
         {
           type: 'object',
@@ -500,6 +547,7 @@ export default {
       name: 'configurator',
       title: 'Available configurations (new stock only)',
       type: 'array',
+      components: { field: withFieldIcon(DocumentIcon) },
       description: 'Leave blank for consignment / used stock. Only fill this in for NEW caravans where buyers can add upgrades (extra solar, lithium upgrade, etc.). The Brisbane Show "Build your spec" flow now lives on the dedicated /quote/{brand} pages, not on the listing itself.',
       of: [
         {

@@ -13,6 +13,17 @@
 //
 // Source: Keyword_Strategy_CorrectFInal.xlsx (Bart 16 Jun 2026).
 
+import {
+  SearchIcon,
+  TagIcon,
+  StarIcon,
+  NumberIcon,
+  InfoOutlineIcon,
+  DocumentIcon,
+  CheckmarkCircleIcon,
+} from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'aeoKeyword',
   title: 'AEO Keyword',
@@ -23,6 +34,7 @@ export default {
       name: 'keyword',
       title: 'Keyword',
       type: 'string',
+      components: { field: withFieldIcon(SearchIcon) },
       description: 'The exact phrase to target (e.g. "off-road caravan Australia").',
       validation: (Rule) => Rule.required().max(140),
     },
@@ -30,6 +42,7 @@ export default {
       name: 'type',
       title: 'Type',
       type: 'string',
+      components: { field: withFieldIcon(TagIcon) },
       description: 'The category of keyword. Core + Branded carry the highest weight on page copy. Long-tail and Question keywords go into FAQs and blog posts.',
       options: {
         list: [
@@ -54,6 +67,7 @@ export default {
       name: 'priority',
       title: 'Priority',
       type: 'number',
+      components: { field: withFieldIcon(StarIcon) },
       description: '1 (low), 2 (medium), 3 (high). Higher = more important to weave into page copy and headings.',
       options: {
         list: [
@@ -70,6 +84,7 @@ export default {
       name: 'volume',
       title: 'Search volume',
       type: 'string',
+      components: { field: withFieldIcon(NumberIcon) },
       description: 'Rough Google search volume per month.',
       options: {
         list: [
@@ -87,6 +102,7 @@ export default {
       name: 'category',
       title: 'Category / Notes',
       type: 'string',
+      components: { field: withFieldIcon(InfoOutlineIcon) },
       description: 'Short note - e.g. "Core", "Lifestyle", "Decision", "Feature". From the source spreadsheet.',
       validation: (Rule) => Rule.max(80),
     },
@@ -94,6 +110,7 @@ export default {
       name: 'targetPages',
       title: 'Pages to target',
       type: 'array',
+      components: { field: withFieldIcon(DocumentIcon) },
       of: [{ type: 'string' }],
       description: 'Which website pages this keyword should appear on. e.g. "Home", "/new", "/stock", "FAQ", "Blog post 2".',
       options: {
@@ -115,6 +132,7 @@ export default {
       name: 'liveOnSite',
       title: 'Already live on site?',
       type: 'boolean',
+      components: { field: withFieldIcon(CheckmarkCircleIcon) },
       description: 'Tick once this keyword is woven into the relevant page copy.',
       initialValue: false,
     },

@@ -4,6 +4,9 @@
 // /quote/{slug} page. Leave the URL blank to fall back to the coded
 // per-model default.
 
+import { PlayIcon } from '@sanity/icons'
+import { withFieldIcon } from '../components/fieldIcon.jsx'
+
 export default {
   name: 'quotePageSettings',
   title: 'Build-your-spec pages',
@@ -23,6 +26,7 @@ export default {
       name: `quoteVideo_${slug.replace(/-/g, '_')}`,
       title: t,
       type: 'object',
+      components: { field: withFieldIcon(PlayIcon) },
       options: { columns: 1, collapsible: true, collapsed: true },
       fields: [
         { name: 'youtubeUrl', title: 'YouTube URL', type: 'url' },
