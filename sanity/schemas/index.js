@@ -15,6 +15,7 @@ import aeoKeyword from './aeoKeyword.js'
 // the fields relevant to its page so when Maud clicks "Home page" in
 // Studio she sees Home fields, not the show banner / Reserve CTA etc.
 import homePageSettings from './homePageSettings.js'
+import aboutPage from './aboutPage.js'
 import newPageSettings from './newPageSettings.js'
 import servicePageSettings from './servicePageSettings.js'
 import showsPageSettings from './showsPageSettings.js'
@@ -36,6 +37,7 @@ export const schemaTypes = [
   faq,
   aeoKeyword,
   homePageSettings,
+  aboutPage,
   newPageSettings,
   servicePageSettings,
   showsPageSettings,

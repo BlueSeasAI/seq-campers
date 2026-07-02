@@ -296,7 +296,12 @@ export async function getSiteSettings() {
       },
       homepageVideo1 { youtubeUrl, description },
       homepageVideo2 { youtubeUrl, description },
-      homepageVideo3 { youtubeUrl, description }
+      homepageVideo3 { youtubeUrl, description },
+      pathwayEyebrow, pathwayHeading, pathwayIntro,
+      reviewsCounter,
+      testimonialsEyebrow, testimonialsHeading, testimonialsIntro,
+      testimonials[]{ quote, name, source, rating },
+      happeningEyebrow, happeningHeading
     }`),
     client.fetch(`*[_id == "newPageSettings"][0] {
       newPageTile1 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
@@ -315,7 +320,9 @@ export async function getSiteSettings() {
       servicePageVideo4 { youtubeUrl, label },
       servicePageVideo5 { youtubeUrl, label },
       servicePageVideo6 { youtubeUrl, label },
-      serviceWorkshopWeekly { youtubeUrl, caption }
+      serviceWorkshopWeekly { youtubeUrl, caption },
+      heroH1, heroSub, crewEyebrow, crewHeading,
+      serviceCards[]{ title, body }
     }`),
     client.fetch(`*[_id == "showsPageSettings"][0] {
       showsIndexIntro,
@@ -379,6 +386,38 @@ export async function getBusinessDetails() {
     }`)
   } catch (err) {
     console.warn('getBusinessDetails: Sanity unreachable:', err.message)
+    return null
+  }
+}
+
+// ---------------------------------------------------------------------------
+// About page singleton (hero, intro story, team, timeline, why-us cards, CTA)
+// ---------------------------------------------------------------------------
+
+/**
+ * The single "About page" record (Studio -> About page). Holds every piece of
+ * marketing copy on /about so Maud can edit it without a code change.
+ *
+ * Returns null on any error (or if the record does not exist yet) so about.astro
+ * can fall back to its current hardcoded literals - nothing on the live site
+ * changes until the record is created and never breaks if Sanity is unreachable
+ * at build time.
+ */
+export async function getAboutPage() {
+  try {
+    return await client.fetch(`*[_id == "aboutPage"][0]{
+      heroH1, heroSub,
+      introParagraphs,
+      teamEyebrow, teamHeading, teamSub,
+      team[]{ name, role, bio, "photo": photo.asset->url },
+      timelineEyebrow, timelineHeading,
+      timeline[]{ year, title, body },
+      whyEyebrow, whyHeading,
+      whyCards[]{ heading, body },
+      ctaHeading, ctaSub
+    }`)
+  } catch (err) {
+    console.warn('getAboutPage: Sanity unreachable:', err.message)
     return null
   }
 }

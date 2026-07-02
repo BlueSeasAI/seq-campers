@@ -113,6 +113,16 @@ export default defineConfig({
               ),
 
             S.listItem()
+              .title('ℹ️ About page')
+              .child(
+                S.editor()
+                  .id('aboutPage')
+                  .schemaType('aboutPage')
+                  .documentId('aboutPage')
+                  .title('About page  →  /about')
+              ),
+
+            S.listItem()
               .title('🚛 New caravans page')
               .child(
                 S.list()
