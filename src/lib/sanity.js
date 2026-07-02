@@ -796,3 +796,180 @@ export async function getAllModelPricing() {
     `*[_type == "modelPricing"]{ model, priceOnApplication, heroPriceFrom }`
   )
 }
+
+// ---------------------------------------------------------------------------
+// Configurator / quote prices (drives the /quote/{model} "Build your spec"
+// configurator - the money-critical running-total pages).
+// ---------------------------------------------------------------------------
+
+/**
+ * Brand family is deterministic per model slug and never edited, so we derive
+ * it rather than storing it. quote/[slug].astro uses it only to pick the
+ * ex-factory location (Kimberley -> Ballina NSW, Stockman -> Melbourne).
+ */
+const QUOTE_BRAND_FAMILY = {
+  karavan: 'Kimberley',
+  kube: 'Kimberley',
+  kruiswagen: 'Kimberley',
+  kruiser: 'Kimberley',
+  rover: 'Stockman',
+  trekka: 'Stockman',
+}
+
+/**
+ * Coerce a stored price STRING back to the exact value the configurator expects.
+ * The four meanings the calculator distinguishes:
+ *   "" / null / undefined -> null    (N/A - option unavailable on this variant)
+ *   "POA" (any case)       -> 'POA'   (price on application, no dollar figure)
+ *   "0"                    -> 0       (Included)
+ *   "-890"                 -> -890    (a credit)
+ *   "555"                  -> 555     (dollars added)
+ * Anything that is not blank, not POA, and not a finite number is treated as
+ * N/A (null) rather than silently poisoning the total with NaN.
+ */
+function coerceQuotePrice(raw) {
+  if (raw === null || raw === undefined) return null
+  const s = String(raw).trim()
+  if (s === '') return null
+  if (s.toUpperCase() === 'POA') return 'POA'
+  const n = Number(s)
+  return Number.isFinite(n) ? n : null
+}
+
+/**
+ * Fetch the editable configurator prices for one model and transform the Sanity
+ * document back into the EXACT object shape src/pages/quote/[slug].astro imports
+ * from src/data/quote-builders.js. Reconstructs:
+ *   - flat options       -> { ...opt, price: <number|'POA'|null> }
+ *   - per-variant options -> { ...opt, priceByVariant: { <variantId>: value, ... } }
+ * preserving 0 (Included), negatives (credits), 'POA', and null (N/A), and
+ * keeping variant-key order so the server-rendered data-price-by-variant JSON is
+ * byte-identical to the code-driven output.
+ *
+ * Returns null on any error or when no record exists, so the page falls straight
+ * back to the code file - the live site is unchanged until the record is seeded.
+ */
+export async function getQuoteBuilder(slug) {
+  try {
+    const doc = await client.fetch(
+      `*[_type == "quoteBuilder" && model == $slug][0]{
+        model, name, intro, delivery,
+        variants[]{ variantId, name, basePrice, tare, included },
+        categories[]{
+          categoryId, title,
+          options[]{
+            optionId, label, note, priceMode, price,
+            priceByVariant[]{ variantId, price },
+            requires, blockedBy, depNote, blockedNote, naNote
+          }
+        },
+        onRoad{ stampDutyRate, registration, dealerDelivery },
+        weight{
+          baseGvm, upgradedGvm, gvmOptionId, passengers, fuelBase, waterBase,
+          fuelExtra[]{ optId, kg },
+          waterExtra[]{ optId, kg },
+          weights[]{ optId, kg }
+        }
+      }`,
+      { slug }
+    )
+    if (!doc) return null
+
+    // ── Variants ──────────────────────────────────────────────────────────
+    const variants = (doc.variants || []).map((v) => {
+      const out = {
+        id: v.variantId,
+        name: v.name,
+        basePrice: v.basePrice,
+        included: Array.isArray(v.included) ? v.included : [],
+      }
+      // `tare` only exists on the Kruiswagen variants; keep it off the others
+      // so the shape matches the source exactly.
+      if (typeof v.tare === 'number') out.tare = v.tare
+      return out
+    })
+
+    // ── Categories + options ─────────────────────────────────────────────
+    const categories = (doc.categories || []).map((c) => ({
+      id: c.categoryId,
+      title: c.title,
+      options: (c.options || []).map((o) => {
+        const opt = { id: o.optionId, label: o.label }
+        // `note` is optional in the source - only attach it when present so we
+        // don't introduce a `note: undefined` key that isn't in the original.
+        if (o.note) opt.note = o.note
+
+        if (o.priceMode === 'byVariant') {
+          // Rebuild the { variantId: value } object in row order so the
+          // stringified JSON key order matches the source declaration order.
+          const map = {}
+          for (const row of o.priceByVariant || []) {
+            map[row.variantId] = coerceQuotePrice(row.price)
+          }
+          opt.priceByVariant = map
+        } else {
+          // Flat price - the same value for every variant.
+          opt.price = coerceQuotePrice(o.price)
+        }
+
+        // Dependency / availability metadata - only attach when present so the
+        // reconstructed option carries exactly the same keys as the source.
+        if (Array.isArray(o.requires) && o.requires.length) opt.requires = o.requires
+        if (Array.isArray(o.blockedBy) && o.blockedBy.length) opt.blockedBy = o.blockedBy
+        if (o.depNote) opt.depNote = o.depNote
+        if (o.blockedNote) opt.blockedNote = o.blockedNote
+        if (o.naNote) opt.naNote = o.naNote
+        return opt
+      }),
+    }))
+
+    const brand = {
+      slug: doc.model,
+      brandFamily: QUOTE_BRAND_FAMILY[doc.model] || null,
+      name: doc.name,
+      intro: doc.intro,
+      delivery: doc.delivery,
+      variants,
+      categories,
+    }
+
+    // ── On-road (Kruiswagen only) ────────────────────────────────────────
+    // Only attach when a rate is actually set - a towed model must NOT carry an
+    // onRoad{} object or the page swaps to the on-road delivery line.
+    if (doc.onRoad && typeof doc.onRoad.stampDutyRate === 'number') {
+      brand.onRoad = {
+        stampDutyRate: doc.onRoad.stampDutyRate,
+        registration: doc.onRoad.registration,
+        dealerDelivery: doc.onRoad.dealerDelivery,
+      }
+    }
+
+    // ── Weight / GVM payload (Kruiswagen only) ───────────────────────────
+    // Only attach when a base GVM is set - otherwise the weight panel must stay
+    // hidden (towed models have no weight{} in the source).
+    if (doc.weight && typeof doc.weight.baseGvm === 'number') {
+      const w = doc.weight
+      brand.weight = {
+        baseGvm: w.baseGvm,
+        upgradedGvm: w.upgradedGvm,
+        gvmOptionId: w.gvmOptionId,
+        passengers: w.passengers,
+        fuelBase: w.fuelBase,
+        waterBase: w.waterBase,
+        fuelExtra: (w.fuelExtra || []).map((f) => ({ optId: f.optId, kg: f.kg })),
+        waterExtra: (w.waterExtra || []).map((x) => ({ optId: x.optId, kg: x.kg })),
+        // The source `weights` is a { optId: kg } lookup; rebuild it from the
+        // stored array so renderWeight() reads it exactly as before.
+        weights: (w.weights || []).reduce((acc, row) => {
+          acc[row.optId] = row.kg
+          return acc
+        }, {}),
+      }
+    }
+
+    return brand
+  } catch (err) {
+    console.warn('getQuoteBuilder: Sanity unreachable or transform failed:', err.message)
+    return null
+  }
+}

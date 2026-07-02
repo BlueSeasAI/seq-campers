@@ -1,14 +1,21 @@
 ---
 import Site from '../../layouts/Site.astro'
 import { quoteBuilders, getQuoteBuilder } from '../../data/quote-builders.js'
-import { getSiteSettings, youtubeId } from '../../lib/sanity.js'
+import { getSiteSettings, youtubeId, getQuoteBuilder as getSanityQuoteBuilder } from '../../lib/sanity.js'
 
 export async function getStaticPaths() {
   return quoteBuilders.map((b) => ({ params: { slug: b.slug } }))
 }
 
 const { slug } = Astro.params
-const brand = getQuoteBuilder(slug)
+
+// Prices are editable in Sanity (Studio -> Configurator / quote prices). When a
+// record exists we use it; otherwise we fall back to the code source of truth in
+// quote-builders.js. getSanityQuoteBuilder reconstructs the EXACT same object
+// shape, so the template + running-total calculator below are unchanged either
+// way - the ONLY thing that swaps is where the numbers come from.
+let brand = await getSanityQuoteBuilder(slug)
+if (!brand) brand = getQuoteBuilder(slug)
 
 if (!brand) return Astro.redirect('/stock')
 

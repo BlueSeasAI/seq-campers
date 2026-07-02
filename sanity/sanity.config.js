@@ -161,6 +161,17 @@ export default defineConfig({
               ),
 
             S.listItem()
+              .title('🧮 Configurator / quote prices')
+              .schemaType('quoteBuilder')
+              .child(
+                S.documentList()
+                  .title('Configurator / quote prices  →  /quote/{model}')
+                  .schemaType('quoteBuilder')
+                  .filter('_type == "quoteBuilder"')
+                  .defaultOrdering([{ field: 'model', direction: 'asc' }])
+              ),
+
+            S.listItem()
               .title('🚐 Stock (used caravans) page')
               .child(
                 S.documentList()

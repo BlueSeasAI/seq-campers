@@ -22,6 +22,7 @@ import showsPageSettings from './showsPageSettings.js'
 import quotePageSettings from './quotePageSettings.js'
 import handoverPage from './handoverPage.js'
 import modelPricing from './modelPricing.js'
+import quoteBuilder from './quoteBuilder.js'
 
 export const schemaTypes = [
   caravan,
@@ -44,4 +45,5 @@ export const schemaTypes = [
   quotePageSettings,
   handoverPage,
   modelPricing,
+  quoteBuilder,
 ]
