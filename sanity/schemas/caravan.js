@@ -200,11 +200,20 @@ export default {
     },
 
     {
+      name: 'brollVideoFile',
+      title: 'B-roll video file (MP4 - plays clean, no YouTube branding)',
+      type: 'file',
+      components: { field: withFieldIcon(PlayIcon) },
+      options: { accept: 'video/mp4' },
+      description: 'PREFERRED. Upload the MP4 clip directly - the same export you send to YouTube. It plays with no YouTube logo, title or controls at all. Keep it SHORT (15-30 seconds) and export at 720p - aim for under 8 MB so the page stays fast. If both this and the YouTube URL below are filled in, this file is used.',
+    },
+
+    {
       name: 'brollVideoUrl',
-      title: 'B-roll YouTube video',
+      title: 'B-roll YouTube video (backup - YouTube branding will show)',
       type: 'url',
       components: { field: withFieldIcon(PlayIcon) },
-      description: 'The short looping video shown in the small tile for this caravan on /new (if NEW) or /stock (if USED) - before the visitor clicks into the full listing. Keep it SHORT (15-30 seconds is ideal). Paste the full YouTube URL. Auto-plays muted with no controls. Click the tile - opens the full spec page.',
+      description: 'The short looping video shown in the small tile for this caravan on /new (if NEW) or /stock (if USED) - before the visitor clicks into the full listing. Keep it SHORT (15-30 seconds is ideal). Paste the full YouTube URL. Auto-plays muted, but YouTube adds its own title/logo and a play button on some phones - upload an MP4 above to avoid that. Click the tile - opens the full spec page.',
     },
 
     {
