@@ -110,6 +110,7 @@ export async function getForSaleCaravans(stockType = null) {
     ${filter}
     | order(price asc) {
       _id, title, slug, price, status, condition, stockType, brollVideoUrl,
+      "brollVideoFileUrl": brollVideoFile.asset->url,
       "brand": brand->name,
       "mainImage": photos[0].asset->url,
       specs { sleeps, length, tareWeight, year },

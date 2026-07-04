@@ -5,8 +5,10 @@
  * Per Shane: model + year + last 4 of stock# only. No price, no sound, no text overlay.
  * Tile clicks through to /stock/[slug] spec page.
  *
- * Fallback: if no brollVideoUrl is set on the caravan, falls back to the
- * mainImage so the tile still renders.
+ * Media priority: brollVideoFile (self-hosted MP4, zero YouTube chrome) wins
+ * over brollVideoUrl (YouTube iframe - shows title/logo, and a play button
+ * when mobile blocks autoplay). Falls back to mainImage so the tile still
+ * renders when neither is set.
  */
 import { sanityImage, youtubeId } from '../lib/sanity.js'
 
@@ -16,6 +18,7 @@ const slugStr = typeof c.slug === 'string' ? c.slug : c.slug?.current
 // they render WITHOUT an href - non-clickable, never a dead /stock/placeholder.
 const href = (slugStr && !c._isPlaceholder) ? `/stock/${slugStr}` : undefined
 
+const fileUrl = c.brollVideoFileUrl || null
 const vid = youtubeId(c.brollVideoUrl)
 const stockNo = c.compliance?.stockNumber || ''
 const stockTail = stockNo.slice(-4)
@@ -25,7 +28,19 @@ const modelLine = [c.brand, year].filter(Boolean).join(' ')
 
 <a href={href} class="broll-card" data-brand={c.brand || ''}>
   <div class="broll-media">
-    {vid ? (
+    {fileUrl ? (
+      <video
+        src={fileUrl}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        disablepictureinpicture
+        controlslist="nodownload nofullscreen noremoteplayback"
+        tabindex="-1"
+      ></video>
+    ) : vid ? (
       <iframe
         src={`https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&mute=1&loop=1&playlist=${vid}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
         title={c.title}
@@ -82,6 +97,7 @@ const modelLine = [c.brand, year].filter(Boolean).join(' ')
     overflow: hidden;
   }
   .broll-media iframe,
+  .broll-media video,
   .broll-media img {
     position: absolute;
     inset: 0;
