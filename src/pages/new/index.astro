@@ -76,6 +76,7 @@ function resolveTile(idx) {
   }
 
   return {
+    fileUrl: slot.videoFileUrl || null,
     videoId,
     brandLabel: (slot.brandLabel?.trim?.()) || fallback.brandLabel,
     modelLabel: (slot.modelLabel?.trim?.()) || fallback.modelLabel,
@@ -141,7 +142,19 @@ const description = `New off-road caravans, off-grid hybrids and 4x4 camper vans
         {tiles.map((t) => (
           <a href={t.ctaHref} class="new-tile">
             <div class="new-tile-media">
-              {t.videoId ? (
+              {t.fileUrl ? (
+                <video
+                  src={t.fileUrl}
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  disablepictureinpicture
+                  controlslist="nodownload nofullscreen noremoteplayback"
+                  tabindex="-1"
+                ></video>
+              ) : t.videoId ? (
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${t.videoId}?autoplay=1&mute=1&loop=1&playlist=${t.videoId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
                   title={`${t.brandLabel} ${t.modelLabel}`}
@@ -374,6 +387,16 @@ const description = `New off-road caravans, off-grid hybrids and 4x4 camper vans
       min-height: 56.25vw;
       transform: translate(-50%, -50%);
       border: 0;
+    }
+    /* Self-hosted MP4s have no chrome to crop - fill the tile normally. */
+    .new-tile-media video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 0;
+      pointer-events: none;
     }
     .new-tile-block {
       position: absolute;
