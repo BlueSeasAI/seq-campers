@@ -19,14 +19,21 @@ export default {
       title: 'Hero video',
       type: 'object',
       components: { field: withFieldIcon(PlayIcon) },
-      description: 'The YouTube video that plays as a looping background in the home page hero. Leave blank to use the default outback illustration.',
+      description: 'The video that plays as a looping background in the home page hero. Upload an MP4 (preferred - plays clean) or paste a YouTube URL. Leave both blank to use the built-in default.',
       options: { columns: 1 },
       fields: [
         {
+          name: 'videoFile',
+          title: 'Video file (MP4 - preferred, no YouTube branding)',
+          type: 'file',
+          options: { accept: 'video/mp4' },
+          description: 'Upload the MP4 export directly - it plays with no YouTube logo, title or controls. This is the full-screen hero, so use a 1080p export; aim for under 15 MB (roughly 30 seconds). If both fields are filled in, this file is used.',
+        },
+        {
           name: 'youtubeUrl',
-          title: 'YouTube URL',
+          title: 'YouTube URL (backup - YouTube branding will show)',
           type: 'url',
-          description: 'Paste the full link. The site converts it to an autoplay muted loop.',
+          description: 'Paste the full link. The site converts it to an autoplay muted loop, but YouTube adds its own title/logo on load and a play button on some phones.',
         },
         {
           name: 'caption',
@@ -92,7 +99,14 @@ export default {
       options: { columns: 1, collapsible: true, collapsed: false },
       description: 'The looping video behind the WATCH pathway tile on the home page.',
       fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url' },
+        {
+          name: 'videoFile',
+          title: 'Video file (MP4 - preferred, no YouTube branding)',
+          type: 'file',
+          options: { accept: 'video/mp4' },
+          description: 'Upload the MP4 clip directly - the same export you send to YouTube. Plays with no YouTube logo, title or controls. 15-30 seconds, 720p export, aim under 8 MB. If both fields are filled in, this file is used.',
+        },
+        { name: 'youtubeUrl', title: 'YouTube URL (backup - YouTube branding will show)', type: 'url' },
         { name: 'description', title: 'Sub text (one line)', type: 'string', validation: (Rule) => Rule.max(220) },
       ],
     },
@@ -104,7 +118,14 @@ export default {
       options: { columns: 1, collapsible: true, collapsed: true },
       description: 'The looping video behind the VISIT pathway tile on the home page.',
       fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url' },
+        {
+          name: 'videoFile',
+          title: 'Video file (MP4 - preferred, no YouTube branding)',
+          type: 'file',
+          options: { accept: 'video/mp4' },
+          description: 'Upload the MP4 clip directly - the same export you send to YouTube. Plays with no YouTube logo, title or controls. 15-30 seconds, 720p export, aim under 8 MB. If both fields are filled in, this file is used.',
+        },
+        { name: 'youtubeUrl', title: 'YouTube URL (backup - YouTube branding will show)', type: 'url' },
         { name: 'description', title: 'Sub text (one line)', type: 'string', validation: (Rule) => Rule.max(220) },
       ],
     },
@@ -116,7 +137,14 @@ export default {
       options: { columns: 1, collapsible: true, collapsed: true },
       description: 'The looping video behind the ADVENTURE pathway tile on the home page.',
       fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url' },
+        {
+          name: 'videoFile',
+          title: 'Video file (MP4 - preferred, no YouTube branding)',
+          type: 'file',
+          options: { accept: 'video/mp4' },
+          description: 'Upload the MP4 clip directly - the same export you send to YouTube. Plays with no YouTube logo, title or controls. 15-30 seconds, 720p export, aim under 8 MB. If both fields are filled in, this file is used.',
+        },
+        { name: 'youtubeUrl', title: 'YouTube URL (backup - YouTube branding will show)', type: 'url' },
         { name: 'description', title: 'Sub text (one line)', type: 'string', validation: (Rule) => Rule.max(220) },
       ],
     },
