@@ -7,3 +7,6 @@ dist/
 npm-install-*.log
 *.log
 debug-*.txt
+
+# Netlify CLI local state
+.netlify/
