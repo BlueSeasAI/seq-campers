@@ -523,13 +523,8 @@ const description = `New off-road caravans, off-grid hybrids and 4x4 camper vans
       .reserve-cta-helper { text-align: center; }
     }
 
-    /* Tighten the brown page-header banner. Used on every page except home.
-       Per Bart 8 Jun - smaller padding so the brown band does not dominate
-       the viewport before the visitor sees the content. */
-    :global(.page-header.page-header-tight) {
-      padding-top: 32px;
-      padding-bottom: 32px;
-    }
+    /* .page-header-tight is now defined once in global.css so the brown band
+       is identical on every page (it was duplicated per-page before). */
   </style>
 
   <YoutubeSubscribeBar variant="bar" headline="See the rigs in action before you visit" sub="Walk-arounds and on-the-track footage. Subscribe to see new model deep-dives first." />

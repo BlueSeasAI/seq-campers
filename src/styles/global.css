@@ -470,6 +470,21 @@ nav a.is-active {
   margin-bottom: 12px;
 }
 
+/* Tightened brown band - the .page-header-tight modifier is on every inner
+   page. Centralised here (was duplicated in stock/new/shows only, which left
+   the other ~15 pages on the loose base padding). Squeezes the top and bottom
+   so the band hugs its text instead of leaving empty brown above the eyebrow
+   and below the closing line. Responsive. Per Kyle/Shane 16 Jul. */
+.page-header.page-header-tight {
+  padding: 26px 0 22px;
+}
+@media (max-width: 768px) {
+  .page-header.page-header-tight { padding: 20px 0 18px; }
+}
+@media (max-width: 520px) {
+  .page-header.page-header-tight { padding: 16px 0 14px; }
+}
+
 /* ============================================================
    Home hero
    ============================================================ */
