@@ -25,7 +25,12 @@
   /* Structure */
   --radius: 8px;
   --radius-sm: 5px;
-  --container: 1200px;
+  /* Content width. Widened 1200 -> 1360 per Kyle 17 Jul - the sand gutters
+     either side of the content read as too-wide "lighter borders" on a
+     laptop screen. 1360 keeps the stock grid at 3 cards across (4 would
+     need 1334px of inner width) so no layout re-flows, the cards just get
+     wider and the cream margins tighten. */
+  --container: 1360px;
   --shadow-sm: 0 2px 8px rgba(42, 22, 8, 0.08);
   --shadow-md: 0 8px 24px rgba(42, 22, 8, 0.12);
 }
@@ -160,9 +165,23 @@ a { color: inherit; }
 /* Inner-page logo also lifts up like the home hero so its visual
    position matches across the whole site. Lifting puts the logo's top
    above the header sand background, which is fine because the page
-   header below is also sand (no visible seam). */
+   header below is also sand (no visible seam).
+
+   The logo PNG carries ~34% transparent padding ABOVE and BELOW the
+   artwork (alpha box y 486-955 of 1440). The negative top margin crops the
+   top padding; the matching negative bottom margin crops the bottom, which
+   is what removes the ~80px of empty sand that used to sit between the logo
+   and the brown band below it (Kyle's mark-up, 17 Jul). .logo clips the
+   overflow so the cropped-away transparent area can never paint over - or
+   swallow clicks on - the section underneath. Margins are ~0.337 x the
+   rendered logo height, so they change with the logo at each breakpoint. */
+.site-header:not(.site-header-overlay) .logo {
+  overflow: hidden;
+  align-items: flex-start;
+}
 .site-header:not(.site-header-overlay) .logo img {
-  margin-top: -78px;
+  margin-top: -74px;
+  margin-bottom: -74px;
 }
 
 /* Nudge the nav items down a touch (matches home overlay). */
@@ -174,14 +193,14 @@ a { color: inherit; }
 }
 
 @media (max-width: 860px) {
-  .site-header:not(.site-header-overlay) .logo img { margin-top: -52px; }
+  .site-header:not(.site-header-overlay) .logo img { margin-top: -50px; margin-bottom: -50px; }
 }
 @media (max-width: 720px) {
   .site-header .container { padding: 6px 18px; }
   .site-header-overlay .container { padding: 6px 18px; }
 }
 @media (max-width: 520px) {
-  .site-header:not(.site-header-overlay) .logo img { margin-top: -36px; }
+  .site-header:not(.site-header-overlay) .logo img { margin-top: -37px; margin-bottom: -37px; }
 }
 
 .logo {
@@ -309,13 +328,21 @@ nav a.is-active {
     padding: 8px 24px 16px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, padding 0.3s ease;
+    /* CLOSED = fully invisible. max-height:0 collapses the links but padding
+       and the two hairline borders still PAINT, so the closed panel was
+       laying a ~26px sand strip across the top of the brown band on phones
+       and clipping the eyebrow line. visibility:hidden stops it painting
+       without touching the slide-down animation. Per Kyle 17 Jul (same
+       "lighter borders" complaint as the desktop header gap). */
+    visibility: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease, visibility 0.3s;
     box-shadow: 0 12px 24px rgba(42, 22, 8, 0.08);
   }
 
   nav#primary-nav.is-open {
     max-height: 90vh;
     overflow: auto;
+    visibility: visible;
   }
 
   nav#primary-nav a {
