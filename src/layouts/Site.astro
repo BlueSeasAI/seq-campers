@@ -357,6 +357,19 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       background: #1a1a1c url('/hero-poster.jpg') center/cover no-repeat !important;
       animation: video-cover-bg-fade-out 2.5s 1.5s ease-out forwards;
     }
+    /* LAZY-LOAD COVER HOLD (per Kyle 4 Aug 2026 - Sanity bandwidth).
+       Tile clips no longer download on page load; they start when the tile
+       is scrolled near. So their sand cover must NOT fade on a page-load
+       clock - a tile 4 screens down would sit uncovered and dark for
+       minutes before its clip arrives. We PAUSE the cover animation (delay
+       included) until the loader marks the video started, then it runs the
+       normal 0.5s delay + 3s fade exactly as before.
+       Scoped to .lazyvid (set by the loader script) so a no-JS visitor
+       still gets the plain fade rather than a permanently covered tile. */
+    .lazyvid video[data-lazy-src]:not([data-lazy-on]) ~ div {
+      animation-play-state: paused !important;
+    }
+
     /* /quote intro and /shows compilation video containers don't have a
        block element child. We use ::after on the media container itself. */
     .quote-intro-media,
@@ -384,6 +397,78 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
       100% { opacity: 0; visibility: hidden; }
     }
   </style>
+
+  <!-- SITE-WIDE LAZY VIDEO LOADER (per Kyle 4 Aug 2026).
+       Every tile clip used to carry `autoplay`, which makes the browser
+       download the WHOLE file the moment the page opens - even for tiles
+       nobody scrolls to. /stock alone was pulling ~55MB a visit and that
+       is what burned the Sanity bandwidth quota on 30 Jul.
+
+       Now those clips ship with no src at all (`data-lazy-src`) and
+       preload="none". This observer gives each one its src and starts it
+       only when the tile comes within 400px of the viewport, and pauses it
+       again once it scrolls well clear (a paused clip stops buffering).
+       The hero clip is deliberately NOT lazy - it is above the fold on
+       every visit, so deferring it would only add a delay.
+
+       No IntersectionObserver (very old browsers): load everything at once,
+       i.e. the previous behaviour. -->
+  <script is:inline>
+    (function () {
+      document.documentElement.classList.add('lazyvid')
+
+      function start(v) {
+        var src = v.getAttribute('data-lazy-src')
+        if (src && !v.src) {
+          v.preload = 'auto'
+          v.src = src
+          try { v.load() } catch (e) {}
+        }
+        v.setAttribute('data-lazy-on', '1')
+        var p
+        try { p = v.play() } catch (e) {}
+        if (p && typeof p.catch === 'function') p.catch(function () {})
+      }
+
+      function stop(v) {
+        try { v.pause() } catch (e) {}
+      }
+
+      var io = null
+      if ('IntersectionObserver' in window) {
+        io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) start(entry.target)
+            else stop(entry.target)
+          })
+        }, { rootMargin: '400px 0px', threshold: 0.01 })
+      }
+
+      function scan() {
+        Array.prototype.forEach.call(document.querySelectorAll('video[data-lazy-src]'), function (v) {
+          if (v.dataset.lazyBound === '1') return
+          v.dataset.lazyBound = '1'
+          if (io) io.observe(v)
+          else start(v)
+        })
+      }
+
+      function init() {
+        scan()
+        try {
+          if (document.body) {
+            new MutationObserver(scan).observe(document.body, { childList: true, subtree: true })
+          }
+        } catch (e) { /* no-op */ }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init)
+      } else {
+        init()
+      }
+    })()
+  </script>
 
   <!-- Site-wide media-session blockade. Chrome's "Global Media Controls"
        attach Media Session handlers WHEN a video starts playing (not before),

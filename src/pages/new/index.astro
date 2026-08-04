@@ -144,12 +144,11 @@ const description = `New off-road caravans, off-grid hybrids and 4x4 camper vans
             <div class="new-tile-media">
               {t.fileUrl ? (
                 <video
-                  src={t.fileUrl}
-                  autoplay
+                  data-lazy-src={t.fileUrl}
                   muted
                   loop
                   playsinline
-                  preload="metadata"
+                  preload="none"
                   disablepictureinpicture
                   controlslist="nodownload nofullscreen noremoteplayback"
                   tabindex="-1"

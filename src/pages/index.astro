@@ -309,12 +309,11 @@ const faqSchema = {
             <div class="pathway-tile-media">
               {p.fileUrl ? (
                 <video
-                  src={p.fileUrl}
-                  autoplay
+                  data-lazy-src={p.fileUrl}
                   muted
                   loop
                   playsinline
-                  preload="metadata"
+                  preload="none"
                   disablepictureinpicture
                   controlslist="nodownload nofullscreen noremoteplayback"
                   tabindex="-1"
