@@ -15,6 +15,25 @@ export const client = createClient({
   useCdn: false,
 })
 
+// ─── Bunny.net video delivery (added 14 Aug 2026) ───────────────────────
+// Sanity bills bandwidth at USD $0.30/GB past the plan quota; the July
+// breach 402-blocked the whole site. All file assets (the 12 video MP4s =
+// 84% of site bytes) are therefore served through a Bunny pull zone that
+// mirrors cdn.sanity.io from Sydney at USD $0.03/GB. Editors change
+// nothing: uploads still go to Sanity, Bunny fetches each file once on
+// first request. Images stay on Sanity - they use its image pipeline
+// (?w=&auto=format) and are not a bandwidth lever.
+// The rewrite happens once here, at the fetch layer, so every query in
+// this file and every direct client.fetch elsewhere is covered.
+const SANITY_FILES = 'https://cdn.sanity.io/files/ttam87n8/production/'
+const BUNNY_FILES = 'https://seqcampers-media.b-cdn.net/files/ttam87n8/production/'
+function viaBunny(result) {
+  if (result == null) return result
+  return JSON.parse(JSON.stringify(result).split(SANITY_FILES).join(BUNNY_FILES))
+}
+const _rawFetch = client.fetch.bind(client)
+client.fetch = (...args) => _rawFetch(...args).then(viaBunny)
+
 const builder = imageUrlBuilder(client)
 export const urlFor = (source) => builder.image(source)
 
