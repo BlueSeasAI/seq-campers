@@ -16,18 +16,24 @@ export default {
   fields: [
     {
       name: 'heroVideo',
-      title: 'Hero video',
+      title: 'Hero background (photo or video)',
       type: 'object',
       components: { field: withFieldIcon(PlayIcon) },
-      description: 'The video that plays as a looping background in the home page hero. Upload an MP4 (preferred - plays clean) or paste a YouTube URL. Leave both blank to use the built-in default.',
+      description: 'The full-screen background at the top of the home page. Upload a photo for the lightest, fastest option, or an MP4 / YouTube URL for a moving background. Leave everything blank to use the built-in default video.',
       options: { columns: 1 },
       fields: [
         {
+          name: 'imageFile',
+          title: 'Photo (lightest option - replaces the video)',
+          type: 'image',
+          description: 'Upload a photo here and it is used INSTEAD of any video below - the video stops downloading for visitors entirely. A wide landscape shot around 1920px works best. Remove the photo to bring the video back.',
+        },
+        {
           name: 'videoFile',
-          title: 'Video file (MP4 - preferred, no YouTube branding)',
+          title: 'Video file (MP4 - preferred over YouTube, no branding)',
           type: 'file',
           options: { accept: 'video/mp4' },
-          description: 'Upload the MP4 export directly - it plays with no YouTube logo, title or controls. This is the full-screen hero, so use a 1080p export; aim for under 15 MB (roughly 30 seconds). If both fields are filled in, this file is used.',
+          description: 'Upload the MP4 export directly - it plays with no YouTube logo, title or controls. This is the full-screen hero, so use a 1080p export; aim for under 8 MB (roughly 15-20 seconds). Ignored while a photo is uploaded above.',
         },
         {
           name: 'youtubeUrl',

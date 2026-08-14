@@ -5,7 +5,7 @@ import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
 import ReserveCta from '../components/ReserveCta.astro'
 import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
-import { getSiteSettings, getBusinessDetails, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
+import { getSiteSettings, getBusinessDetails, sanityImage, sanitySrcset, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
 
 let settings = null
 try {
@@ -25,18 +25,27 @@ const ldLocality = biz?.addressSuburb || 'Marcoola'
 const ldRegion = biz?.addressState || 'QLD'
 const ldPostcode = biz?.addressPostcode || '4564'
 
-// Hero video resolution: a self-hosted MP4 uploaded in Studio wins (plays
-// with zero YouTube chrome), then a YouTube URL, then the bundled
-// /hero-video.mp4 so the page still works if both fields are empty or
-// Sanity is unreachable.
+// Hero background resolution: a photo uploaded in Studio wins outright
+// (per Bart 14 Aug: a photo hero must fully replace the video so it stops
+// downloading - the 29 MB hero was the site's biggest bandwidth cost),
+// then a self-hosted MP4 (plays with zero YouTube chrome), then a YouTube
+// URL, then the bundled /hero-video.mp4 so the page still works if all
+// fields are empty or Sanity is unreachable.
 // Per Bart 16 Jun: Kyle was pasting YouTube URLs into the field and they
 // were ignored because the hero used to be hardcoded MP4. This wires them
 // up properly. Per Kyle 3 Jul: MP4 upload added so no YouTube chrome shows.
-const heroYouTubeId = settings?.heroVideo?.youtubeUrl
+const heroImage = settings?.heroVideo?.imageUrl
+  ? sanityImage(settings.heroVideo.imageUrl, { w: 1920 })
+  : null
+const heroImageSrcset = settings?.heroVideo?.imageUrl
+  ? sanitySrcset(settings.heroVideo.imageUrl, [768, 1280, 1920])
+  : null
+const heroYouTubeId = !heroImage && settings?.heroVideo?.youtubeUrl
   ? youtubeId(settings.heroVideo.youtubeUrl)
   : null
-const heroMp4 = settings?.heroVideo?.videoFileUrl
-  || (!heroYouTubeId ? '/hero-video.mp4' : null)
+const heroMp4 = heroImage
+  ? null
+  : (settings?.heroVideo?.videoFileUrl || (!heroYouTubeId ? '/hero-video.mp4' : null))
 
 // Pathway tile defaults - used when Maud hasn't filled a slot in Site
 // Settings → Home page videos (Watch / Visit / Adventure).
@@ -249,7 +258,16 @@ const faqSchema = {
        (the controls that occasionally flicker in). -->
   <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
-      {!heroMp4 && heroYouTubeId ? (
+      {heroImage ? (
+        <img
+          class="hero-video-mp4 hero-image"
+          src={heroImage}
+          srcset={heroImageSrcset}
+          sizes="100vw"
+          alt=""
+          fetchpriority="high"
+        />
+      ) : !heroMp4 && heroYouTubeId ? (
         <iframe
           class="hero-video-iframe"
           src={`https://www.youtube-nocookie.com/embed/${heroYouTubeId}?autoplay=1&mute=1&loop=1&playlist=${heroYouTubeId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}

@@ -283,7 +283,7 @@ export async function getSiteSettings() {
       reserveCta { enabled, buttonText, stripeUrl, helperText }
     }`),
     client.fetch(`*[_id == "homePageSettings"][0] {
-      heroVideo { youtubeUrl, caption, "videoFileUrl": videoFile.asset->url },
+      heroVideo { youtubeUrl, caption, "videoFileUrl": videoFile.asset->url, "imageUrl": imageFile.asset->url },
       "shanesPick": shanesPick {
         originalPrice,
         shanesQuote,
