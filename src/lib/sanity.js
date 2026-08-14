@@ -110,6 +110,7 @@ export async function getForSaleCaravans(stockType = null) {
     ${filter}
     | order(price asc) {
       _id, title, slug, price, status, condition, stockType, brollVideoUrl,
+      "brollVideoFileUrl": brollVideoFile.asset->url,
       "brand": brand->name,
       "mainImage": photos[0].asset->url,
       specs { sleeps, length, tareWeight, year },
@@ -282,7 +283,7 @@ export async function getSiteSettings() {
       reserveCta { enabled, buttonText, stripeUrl, helperText }
     }`),
     client.fetch(`*[_id == "homePageSettings"][0] {
-      heroVideo,
+      heroVideo { youtubeUrl, caption, "videoFileUrl": videoFile.asset->url, "imageUrl": imageFile.asset->url },
       "shanesPick": shanesPick {
         originalPrice,
         shanesQuote,
@@ -294,9 +295,9 @@ export async function getSiteSettings() {
           specs { sleeps, length, tareWeight }
         }
       },
-      homepageVideo1 { youtubeUrl, description },
-      homepageVideo2 { youtubeUrl, description },
-      homepageVideo3 { youtubeUrl, description },
+      homepageVideo1 { youtubeUrl, description, "videoFileUrl": videoFile.asset->url },
+      homepageVideo2 { youtubeUrl, description, "videoFileUrl": videoFile.asset->url },
+      homepageVideo3 { youtubeUrl, description, "videoFileUrl": videoFile.asset->url },
       pathwayEyebrow, pathwayHeading, pathwayIntro,
       reviewsCounter,
       testimonialsEyebrow, testimonialsHeading, testimonialsIntro,
@@ -304,14 +305,14 @@ export async function getSiteSettings() {
       happeningEyebrow, happeningHeading
     }`),
     client.fetch(`*[_id == "newPageSettings"][0] {
-      newPageTile1 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile2 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile3 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile4 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile5 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile6 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile7 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref },
-      newPageTile8 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref }
+      newPageTile1 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url },
+      newPageTile2 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url },
+      newPageTile3 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url },
+      newPageTile4 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url },
+      newPageTile5 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url },
+      newPageTile6 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url },
+      newPageTile7 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url },
+      newPageTile8 { youtubeUrl, brandLabel, modelLabel, priceLabel, ctaHref, "videoFileUrl": videoFile.asset->url }
     }`),
     client.fetch(`*[_id == "servicePageSettings"][0] {
       servicePageVideo1 { youtubeUrl, label },

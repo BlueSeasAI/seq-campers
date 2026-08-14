@@ -372,7 +372,12 @@ const faqLd = {
     line-height: 1.6;
   }
   .mp h1, .mp h2, .mp h3 { font-family: 'Inter Tight', sans-serif; font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
-  .mp .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+  /* Model pages run their own container, kept ~a hair narrower than the
+     site --container (1360) so it stays a touch tighter than the rest of the
+     site while the sand gutters still line up with the header and footer.
+     Bumped 1140 -> 1300 alongside the site-wide widening, Kyle 17 Jul.
+     Prose stays readable - .mp-body / .mp-lead-tan cap at 64ch regardless. */
+  .mp .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
   .mp .mp-narrow { max-width: 820px; }
   .mp-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--rock); margin-bottom: 8px; }
   .mp-eyebrow-light { color: var(--gold); }
@@ -392,11 +397,11 @@ const faqLd = {
 
   /* Hero - text-only banner with a brand gradient, generous breathing room */
   .mp-hero { position: relative; background: linear-gradient(105deg, #1A0E06 0%, #3a1c0e 32%, #7a2d15 72%, #C0341A 100%); color: var(--off); border-bottom: 4px solid var(--gold); }
-  .mp-hero-inner { position: relative; z-index: 2; max-width: 1140px; margin: 0 auto; padding: 40px 20px 44px; }
+  .mp-hero-inner { position: relative; z-index: 2; max-width: 1300px; margin: 0 auto; padding: 40px 20px 44px; }
   .mp-hero h1 { font-size: clamp(38px, 6vw, 56px); margin: 18px 0 20px; color: var(--off); max-width: 16ch; font-weight: 900; }
 
   /* Showcase image - the hero photo, shown in full BELOW the banner (clear gap, no overlap) */
-  .mp-showcase { max-width: 1180px; margin: 46px auto 0; padding: 0 20px; }
+  .mp-showcase { max-width: 1340px; margin: 46px auto 0; padding: 0 20px; }
   .mp-showcase img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: 0 22px 54px rgba(42,22,8,.22); }
   @media (max-width: 620px) { .mp-showcase { margin-top: 30px; } .mp-showcase img { border-radius: 10px; } }
   .mp-lead { font-size: clamp(17px, 2.4vw, 21px); color: var(--sand); max-width: 56ch; margin-bottom: 16px; }

@@ -12,51 +12,16 @@ try {
   console.warn('Sanity unreachable for /stock:', err.message)
 }
 
-// Per Shane: every used van is a B-roll video tile. We top up to 15 tiles
-// with placeholder videos when there are fewer real listings, so the page
-// shape stays consistent. Real listings fill these slots as Maud adds the
-// brollVideoUrl to each van.
-const PLACEHOLDER_VIDEOS = [
-  'tozC7prVbOg', 'xYf81xUZtNE', 'WwgapQt3xO4',
-]
-const PLACEHOLDER_BRANDS = [
-  { brand: 'Kimberley Kampers', model: 'Karavan' },
-  { brand: 'Kimberley Kampers', model: 'Kube' },
-  { brand: 'Kimberley Kampers', model: 'Kruiser T' },
-  { brand: 'Kimberley Kampers', model: 'Kruiser S' },
-  { brand: 'Stockman Products', model: 'Trekka' },
-  { brand: 'Stockman Products', model: 'Rover' },
-  { brand: 'Stockman Products', model: 'Pod' },
-]
-function makePlaceholder(i) {
-  const vidId = PLACEHOLDER_VIDEOS[i % PLACEHOLDER_VIDEOS.length]
-  const b = PLACEHOLDER_BRANDS[i % PLACEHOLDER_BRANDS.length]
-  const year = 2018 + (i % 8)
-  const stockNo = String(6000 + i * 11).padStart(4, '0')
-  // Synthetic price so placeholders mix into the descending sort sensibly
-  // (descend across the 7 placeholder brands - Karavan most expensive).
-  const placeholderPrices = [145000, 95000, 220000, 175000, 65000, 60000, 35000]
-  return {
-    _id: `placeholder-${i}`,
-    title: `${b.brand} ${b.model} ${year}`,
-    slug: { current: 'placeholder' },
-    brand: b.brand,
-    brollVideoUrl: `https://www.youtube.com/watch?v=${vidId}`,
-    price: placeholderPrices[i % placeholderPrices.length],
-    specs: { year },
-    compliance: { stockNumber: stockNo },
-    _isPlaceholder: true,
-  }
-}
-const TARGET_TILES = 15
-const placeholdersNeeded = Math.max(0, TARGET_TILES - caravans.length)
-let tiles = [
-  ...caravans,
-  ...Array.from({ length: placeholdersNeeded }, (_, i) => makePlaceholder(i)),
-]
-
-// Sort tiles by price descending (most expensive first) per Bart 8 Jun.
-tiles = tiles.sort((a, b) => (b.price || 0) - (a.price || 0))
+// Every used van is a B-roll video tile. The page shows ONLY real Sanity
+// listings, most expensive first.
+//
+// NOTE (16 Jul): the grid used to be topped up to 15 tiles with synthetic
+// "placeholder" cards generated in code (fake stock numbers like #6000 /
+// #6011, fake prices, no spec page). Those were the "placeholders that keep
+// reappearing" Kyle couldn't find in Sanity - because they were never in
+// Sanity; the code invented them whenever real stock dropped below 15. The
+// generator has been removed so the page now mirrors the real stock exactly.
+let tiles = [...caravans].sort((a, b) => (b.price || 0) - (a.price || 0))
 
 const description = `Used off-road caravans, off-grid hybrids and 4x4 camper vans ready to tow away from SEQ Campers on the Sunshine Coast, Queensland. Hand-picked Kimberley Kampers and Stockman Products stock with walk-around video for every van. Affordable off-road caravan to luxury off-grid options.`
 ---
@@ -78,7 +43,7 @@ const description = `Used off-road caravans, off-grid hybrids and 4x4 camper van
       </div>
     ) : (
       <div class="broll-grid" id="stock-grid">
-        {tiles.map((c) => <BrollCard caravan={c} />)}
+        {tiles.map((c) => <BrollCard caravan={c} showPrice={true} />)}
       </div>
     )}
   </div>
@@ -93,11 +58,8 @@ const description = `Used off-road caravans, off-grid hybrids and 4x4 camper van
     @media (max-width: 640px) {
       .broll-grid { grid-template-columns: 1fr; gap: 14px; }
     }
-    /* Tighten the brown page-header banner site-wide. Per Bart 8 Jun. */
-    :global(.page-header.page-header-tight) {
-      padding-top: 32px;
-      padding-bottom: 32px;
-    }
+    /* .page-header-tight is now defined once in global.css (was duplicated
+       per-page, which left most pages on the loose base padding). */
   </style>
 
   <YoutubeSubscribeBar variant="bar" headline="Watch walk-arounds before you visit" sub="Every used van gets a YouTube walk-around. Subscribe to see new arrivals first." />

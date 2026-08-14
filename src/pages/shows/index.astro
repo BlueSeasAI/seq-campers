@@ -194,12 +194,8 @@ const description = intro
       line-height: 1.5;
     }
 
-    /* Tighten the brown page-header banner. Used on every page except
-       homepage. Per Bart 8 Jun. */
-    :global(.page-header.page-header-tight) {
-      padding-top: 32px;
-      padding-bottom: 32px;
-    }
+    /* .page-header-tight is now defined once in global.css so the brown band
+       is identical on every page (it was duplicated per-page before). */
 
     .shows-grid {
       display: grid;

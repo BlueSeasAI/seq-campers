@@ -5,7 +5,7 @@ import VideoCard from '../components/VideoCard.astro'
 import TrustStrip from '../components/TrustStrip.astro'
 import ReserveCta from '../components/ReserveCta.astro'
 import YoutubeSubscribeBar from '../components/YoutubeSubscribeBar.astro'
-import { getSiteSettings, getBusinessDetails, sanityImage, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
+import { getSiteSettings, getBusinessDetails, sanityImage, sanitySrcset, conditionLabel, youtubeId, getHappeningsFeed, shortDate } from '../lib/sanity.js'
 
 let settings = null
 try {
@@ -25,15 +25,27 @@ const ldLocality = biz?.addressSuburb || 'Marcoola'
 const ldRegion = biz?.addressState || 'QLD'
 const ldPostcode = biz?.addressPostcode || '4564'
 
-// Hero video resolution: Sanity siteSettings.heroVideo.youtubeUrl wins when
-// set. Falls back to the self-hosted /hero-video.mp4 so the page still works
-// if the field is empty or Sanity is unreachable.
+// Hero background resolution: a photo uploaded in Studio wins outright
+// (per Bart 14 Aug: a photo hero must fully replace the video so it stops
+// downloading - the 29 MB hero was the site's biggest bandwidth cost),
+// then a self-hosted MP4 (plays with zero YouTube chrome), then a YouTube
+// URL, then the bundled /hero-video.mp4 so the page still works if all
+// fields are empty or Sanity is unreachable.
 // Per Bart 16 Jun: Kyle was pasting YouTube URLs into the field and they
 // were ignored because the hero used to be hardcoded MP4. This wires them
-// up properly.
-const heroYouTubeId = settings?.heroVideo?.youtubeUrl
+// up properly. Per Kyle 3 Jul: MP4 upload added so no YouTube chrome shows.
+const heroImage = settings?.heroVideo?.imageUrl
+  ? sanityImage(settings.heroVideo.imageUrl, { w: 1920 })
+  : null
+const heroImageSrcset = settings?.heroVideo?.imageUrl
+  ? sanitySrcset(settings.heroVideo.imageUrl, [768, 1280, 1920])
+  : null
+const heroYouTubeId = !heroImage && settings?.heroVideo?.youtubeUrl
   ? youtubeId(settings.heroVideo.youtubeUrl)
   : null
+const heroMp4 = heroImage
+  ? null
+  : (settings?.heroVideo?.videoFileUrl || (!heroYouTubeId ? '/hero-video.mp4' : null))
 
 // Pathway tile defaults - used when Maud hasn't filled a slot in Site
 // Settings → Home page videos (Watch / Visit / Adventure).
@@ -46,9 +58,10 @@ const PATHWAY_DEFAULTS = [
 function resolvePathway(idx) {
   const slot = settings?.[`homepageVideo${idx + 1}`]
   const fallback = PATHWAY_DEFAULTS[idx]
+  const fileUrl = slot?.videoFileUrl || null
   const videoId = (slot?.youtubeUrl && youtubeId(slot.youtubeUrl)) || fallback.videoId
   const sub = (slot?.description && slot.description.trim()) || fallback.sub
-  return { videoId, sub }
+  return { fileUrl, videoId, sub }
 }
 
 const pathwayWatch = resolvePathway(0)
@@ -245,7 +258,16 @@ const faqSchema = {
        (the controls that occasionally flicker in). -->
   <section class="hero hero-video hero-video-clean">
     <div class="hero-video-bg" aria-hidden="true">
-      {heroYouTubeId ? (
+      {heroImage ? (
+        <img
+          class="hero-video-mp4 hero-image"
+          src={heroImage}
+          srcset={heroImageSrcset}
+          sizes="100vw"
+          alt=""
+          fetchpriority="high"
+        />
+      ) : !heroMp4 && heroYouTubeId ? (
         <iframe
           class="hero-video-iframe"
           src={`https://www.youtube-nocookie.com/embed/${heroYouTubeId}?autoplay=1&mute=1&loop=1&playlist=${heroYouTubeId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
@@ -260,7 +282,7 @@ const faqSchema = {
       ) : (
         <video
           class="hero-video-mp4"
-          src="/hero-video.mp4"
+          src={heroMp4}
           poster="/hero-poster.jpg"
           autoplay
           muted
@@ -297,22 +319,35 @@ const faqSchema = {
 
       <div class="pathway-tile-grid">
         {[
-          { href: '/videos', label: '1. Watch', sub: pathwayWatch.sub, videoId: pathwayWatch.videoId, variant: 'watch' },
-          { href: '/stock', label: '2. Visit', sub: pathwayVisit.sub, videoId: pathwayVisit.videoId, variant: 'visit' },
-          { href: '/service', label: '3. Adventure', sub: pathwayAdventure.sub, videoId: pathwayAdventure.videoId, variant: 'adventure' },
+          { href: '/videos', label: '1. Watch', sub: pathwayWatch.sub, videoId: pathwayWatch.videoId, fileUrl: pathwayWatch.fileUrl, variant: 'watch' },
+          { href: '/stock', label: '2. Visit', sub: pathwayVisit.sub, videoId: pathwayVisit.videoId, fileUrl: pathwayVisit.fileUrl, variant: 'visit' },
+          { href: '/service', label: '3. Adventure', sub: pathwayAdventure.sub, videoId: pathwayAdventure.videoId, fileUrl: pathwayAdventure.fileUrl, variant: 'adventure' },
         ].map((p) => (
           <a href={p.href} class={`pathway-tile pathway-tile-${p.variant}`}>
             <div class="pathway-tile-media">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${p.videoId}?autoplay=1&mute=1&loop=1&playlist=${p.videoId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
-                title={p.label}
-                frameborder="0"
-                allow="autoplay; encrypted-media"
-                allowfullscreen="false"
-                tabindex="-1"
-                inert
-                loading="lazy"
-              ></iframe>
+              {p.fileUrl ? (
+                <video
+                  data-lazy-src={p.fileUrl}
+                  muted
+                  loop
+                  playsinline
+                  preload="none"
+                  disablepictureinpicture
+                  controlslist="nodownload nofullscreen noremoteplayback"
+                  tabindex="-1"
+                ></video>
+              ) : (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${p.videoId}?autoplay=1&mute=1&loop=1&playlist=${p.videoId}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&showinfo=0`}
+                  title={p.label}
+                  frameborder="0"
+                  allow="autoplay; encrypted-media"
+                  allowfullscreen="false"
+                  tabindex="-1"
+                  inert
+                  loading="lazy"
+                ></iframe>
+              )}
               <div class="pathway-tile-block" aria-hidden="true"></div>
             </div>
             <div class="pathway-tile-meta">
@@ -458,6 +493,16 @@ const faqSchema = {
       min-height: 56.25vw;
       transform: translate(-50%, -50%);
       border: 0;
+    }
+    /* Self-hosted MP4s have no chrome to crop - fill the tile normally. */
+    .pathway-tile-media video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 0;
+      pointer-events: none;
     }
     .pathway-tile-block {
       position: absolute;

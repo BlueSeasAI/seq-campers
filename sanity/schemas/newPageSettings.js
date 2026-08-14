@@ -37,7 +37,14 @@ export default {
       components: { field: withFieldIcon(PlayIcon) },
       options: { columns: 1, collapsible: true, collapsed: true },
       fields: [
-        { name: 'youtubeUrl', title: 'YouTube URL', type: 'url', description: 'Paste the full YouTube link. Leave blank to use the default placeholder.' },
+        {
+          name: 'videoFile',
+          title: 'Video file (MP4 - preferred, no YouTube branding)',
+          type: 'file',
+          options: { accept: 'video/mp4' },
+          description: 'Upload the MP4 clip directly - the same export you send to YouTube. Plays with no YouTube logo, title or controls. 15-30 seconds, 720p export, aim under 8 MB. If both fields are filled in, this file is used.',
+        },
+        { name: 'youtubeUrl', title: 'YouTube URL (backup - YouTube branding will show)', type: 'url', description: 'Paste the full YouTube link. Leave blank to use the default placeholder.' },
         { name: 'brandLabel', title: 'Brand label override', type: 'string' },
         { name: 'modelLabel', title: 'Model label override', type: 'string' },
         { name: 'priceLabel', title: 'Price label override', type: 'string', description: 'e.g. "From $203,350".' },
