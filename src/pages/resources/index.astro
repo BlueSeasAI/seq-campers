@@ -1,0 +1,519 @@
+---
+import fs from 'node:fs'
+import path from 'node:path'
+import Site from '../../layouts/Site.astro'
+import { guides, articles, PRICES, STRIPE, buyLink } from '../../data/guides.js'
+
+// Falls back to "Email us to buy" until the Stripe link exists, so the live
+// page never carries a dead checkout button.
+const buyBundle = buyLink(STRIPE.bundlePdf, `Both guides - PDF bundle, $${PRICES.bundle}`)
+import { getPublishedBlogPosts } from '../../lib/sanity.js'
+
+// Sanity blog posts join the Articles section. Maud writes these herself
+// (per the 14 Aug session - she wants them in her own words, not AI), so the
+// section is seeded with the weights article and grows from there.
+let posts = []
+try {
+  posts = (await getPublishedBlogPosts()) || []
+} catch (err) {
+  console.warn('Sanity unreachable on /resources:', err.message)
+}
+
+// Cover art is not in yet. Render a typeset placeholder until the files land
+// in /public/guides/, then the real image takes over with no code change.
+const hasCover = (p) => {
+  if (!p) return false
+  try {
+    return fs.existsSync(path.join(process.cwd(), 'public', p.replace(/^\//, '')))
+  } catch {
+    return false
+  }
+}
+
+const fmtDate = (iso) => {
+  if (!iso) return ''
+  try {
+    return new Date(iso).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' })
+  } catch {
+    return ''
+  }
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'CollectionPage',
+      name: 'Resources for off-road travellers',
+      description:
+        'Brand-neutral guides and articles on buying and living with an off-road camper, caravan or motorhome in Australia.',
+      url: 'https://seqcampers.com.au/resources',
+      inLanguage: 'en-AU',
+      publisher: { '@type': 'Organization', name: 'SEQ Campers', url: 'https://seqcampers.com.au' },
+    },
+    {
+      '@type': 'ItemList',
+      itemListOrder: 'https://schema.org/ItemListUnordered',
+      numberOfItems: guides.length + articles.length,
+      itemListElement: [...guides, ...articles].map((r, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: r.title,
+        url: `https://seqcampers.com.au/resources/${r.slug}`,
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://seqcampers.com.au' },
+        { '@type': 'ListItem', position: 2, name: 'Resources', item: 'https://seqcampers.com.au/resources' },
+      ],
+    },
+  ],
+}
+---
+
+<Site
+  title="Resources - off-road caravan guides and articles"
+  description="Brand-neutral guides to buying and living with an off-road camper, caravan or motorhome in Australia. Weights and towing explained in full, build types compared, plus set-up and pack-down checklists."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <div class="page-header page-header-tight">
+    <div class="container">
+      <p class="page-eyebrow">Resources</p>
+      <h1>Guides and articles for off-road travellers.</h1>
+      <p>Everything we wish someone had told us before our first long trip, written down properly.</p>
+    </div>
+  </div>
+
+  <!-- Intro -->
+  <section class="section" style="padding-top:44px; padding-bottom:8px;">
+    <div class="container">
+      <div class="res-intro">
+        <p>
+          Almost every buyer&rsquo;s guide in this industry is a brochure wearing a costume: a list of one
+          manufacturer&rsquo;s own models, with the awkward questions left out. These are not that.
+        </p>
+        <p>
+          We have deliberately written them without naming competitor brands, because brand rankings go stale
+          within a season and they teach you nothing transferable. What does not go stale is understanding why a
+          composite wall behaves differently to a timber-framed one, or why a 600&nbsp;kg payload disappears faster
+          than you expect. Learn the principles and you can assess any van on any dealership floor, including ours.
+        </p>
+        <p>
+          Several sections of each book are <strong>free to read in full</strong> on this website, including the
+          weights section that catches out more buyers than anything else, and the levelling section that prevents
+          the most common damage we see in the workshop. Nothing is held back within them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GUIDES ============ -->
+  <section class="section" id="guides" style="padding-top:36px; padding-bottom:56px;">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">The guides</h2>
+        <span class="res-price-note">
+          ${PRICES.pdf} each as a PDF &middot; both for ${PRICES.bundle}
+        </span>
+      </div>
+
+      <div class="guide-list">
+        {guides.map((g) => (
+          <article class="guide-card">
+            <a class="guide-card-cover" href={`/resources/${g.slug}`} aria-hidden="true" tabindex="-1">
+              {hasCover(g.cover) ? (
+                <img src={g.cover} alt="" width="620" height="876" loading="lazy" decoding="async" />
+              ) : (
+                <span class="guide-cover-fallback">
+                  <span class="gcf-rule"></span>
+                  <span class="gcf-title">{g.title}</span>
+                  <span class="gcf-brand">SEQ Campers</span>
+                </span>
+              )}
+            </a>
+
+            <div class="guide-card-body">
+              <h3 class="guide-card-title"><a href={`/resources/${g.slug}`}>{g.title}</a></h3>
+
+              <p class="guide-card-meta">
+                <span><b>{g.pages}</b> pages</span>
+                <span><b>{g.readMins}</b> min read</span>
+                <span>${PRICES.pdf} PDF</span>
+              </p>
+
+              <p class="guide-card-lede">{g.cardLede}</p>
+
+              <p class="guide-card-for"><b>Who it is for</b>{g.whoFor}</p>
+
+              <ul class="guide-card-points">
+                {g.cardPoints.map((pt) => <li>{pt}</li>)}
+              </ul>
+
+              <p class="guide-card-free">
+                Sections {g.sections.map((s) => s.n).join(', ').replace(/, ([^,]*)$/, ' and $1')} are free to read
+                in full. The complete guide adds the rest plus {g.locked.workbook.name}.
+              </p>
+
+              <div class="guide-card-cta">
+                <a class="btn-primary" href={`/resources/${g.slug}`}>Read it free</a>
+                <a class="btn-line" href={`/resources/${g.slug}#get-the-pdf`}>Buy the PDF &rarr;</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- Bundle -->
+      <div class="res-bundle">
+        <div>
+          <p class="res-bundle-eyebrow">Both books</p>
+          <h3>Buy the pair and save.</h3>
+          <p>
+            Choosing the right van and living with it well are two different problems. Together the two PDFs are
+            <strong>${PRICES.bundle}</strong>, against ${PRICES.bundleWas} bought separately.
+          </p>
+        </div>
+        <a class="btn-ghost" href={buyBundle.href}>{buyBundle.pending ? 'Email us to buy both' : 'Buy both books'}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARTICLES ============ -->
+  <section class="section res-articles" id="articles" style="padding-top:52px; padding-bottom:56px;">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Articles</h2>
+        <span class="res-price-note">Free to read, always</span>
+      </div>
+
+      <div class="article-grid">
+        {articles.map((a) => (
+          <a class="article-card" href={`/resources/${a.slug}`}>
+            <div class="article-card-body">
+              <div class="article-card-meta">{a.updated}{a.readMins ? ` · ${a.readMins} min read` : ''}</div>
+              <h3 class="article-card-title">{a.title}</h3>
+              <p class="article-card-excerpt">{a.cardLede}</p>
+              <span class="article-card-cta">Read it &rarr;</span>
+            </div>
+          </a>
+        ))}
+
+        {posts.map((p) => (
+          <a class="article-card" href={`/blog/${p.slug}`}>
+            {p.coverImage && (
+              <div class="article-card-media"><img src={p.coverImage} alt={p.title} loading="lazy" /></div>
+            )}
+            <div class="article-card-body">
+              <div class="article-card-meta">{fmtDate(p.publishedAt)}{p.author && ` · ${p.author}`}</div>
+              <h3 class="article-card-title">{p.title}</h3>
+              <p class="article-card-excerpt">{p.excerpt}</p>
+              <span class="article-card-cta">Read it &rarr;</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VISIT ============ -->
+  <section class="band-dark">
+    <div class="container res-visit">
+      <div>
+        <p class="res-visit-eyebrow">Or skip the reading</p>
+        <h2>Come and stand next to one.</h2>
+        <p>
+          Reading about payload is one thing. Lifting a drawbar is another. Bring your tow vehicle if you can and
+          we will talk you through the weights on your own compliance plate rather than a brochure. No appointment
+          needed, and no obligation to buy anything on the day.
+        </p>
+      </div>
+      <a class="btn-primary" href="/contact">Find us in Marcoola</a>
+    </div>
+  </section>
+
+  <style>
+    /* TEXT WIDTH DISCIPLINE: .container is the boundary, not the text.
+       Never add max-width (px, rem OR ch) to anything text-bearing. */
+    .res-intro p,
+    .res-bundle p,
+    .res-visit p,
+    .guide-card-lede,
+    .guide-card-for,
+    .guide-card-free,
+    .article-card-excerpt { max-width: none; }
+
+    .res-intro p { color: var(--ink); font-size: 1.02rem; line-height: 1.75; margin-bottom: 14px; }
+    .res-intro p:last-child { margin-bottom: 0; }
+
+    .res-price-note {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ---------------- guide cards ---------------- */
+    .guide-list { display: grid; gap: 28px; }
+
+    .guide-card {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+      background: #fff;
+      border: 1px solid var(--tan-border);
+      border-radius: 14px;
+      padding: 28px 30px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .guide-card:hover { border-color: var(--gold); box-shadow: var(--shadow-md); }
+
+    @media (max-width: 820px) {
+      .guide-card { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 22px; }
+      .guide-card-cover { max-width: 180px; }
+    }
+
+    .guide-card-cover {
+      display: block;
+      aspect-ratio: 620 / 876;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--sand-deep);
+      border: 1px solid var(--tan-border);
+    }
+    .guide-card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* Typeset stand-in until Maud sends the cover art */
+    .guide-cover-fallback {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100%;
+      padding: 22px 20px;
+      background: linear-gradient(160deg, #2A1608 0%, #1a0e06 100%);
+    }
+    .gcf-rule { display: block; width: 42px; height: 3px; background: var(--gold); margin-bottom: 14px; }
+    .gcf-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.32rem;
+      font-weight: 800;
+      line-height: 1.14;
+      color: var(--sand);
+      letter-spacing: -0.01em;
+    }
+    .gcf-brand {
+      margin-top: 12px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .guide-card-body { min-width: 0; }
+
+    .guide-card-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.015em;
+      margin-bottom: 10px;
+    }
+    .guide-card-title a { color: var(--ink); text-decoration: none; }
+    .guide-card-title a:hover { color: var(--rust); }
+
+    .guide-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .guide-card-meta b { color: var(--rust); font-weight: 800; }
+
+    .guide-card-lede { color: var(--ink); font-size: 1rem; line-height: 1.65; margin-bottom: 14px; }
+
+    .guide-card-for {
+      background: var(--sand);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 6px 6px 0;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 0.93rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    .guide-card-for b {
+      display: block;
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 4px;
+    }
+
+    .guide-card-points { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 7px; }
+    .guide-card-points li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 0.94rem;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+    .guide-card-points li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 7px;
+      height: 7px;
+      border-radius: 2px;
+      background: var(--gold);
+    }
+
+    .guide-card-free {
+      font-size: 0.75rem;
+      line-height: 1.6;
+      color: var(--muted);
+      padding-top: 14px;
+      border-top: 1px solid var(--tan-border);
+      margin-bottom: 18px;
+    }
+
+    .guide-card-cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+    .btn-line {
+      display: inline-block;
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--tan-border);
+      border-radius: 6px;
+      padding: 13px 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .btn-line:hover { border-color: var(--rust); color: var(--rust); background: #FFF7F2; }
+
+    /* ---------------- bundle ---------------- */
+    .res-bundle {
+      margin-top: 28px;
+      background: #fff;
+      border: 1px solid var(--gold);
+      border-radius: 14px;
+      padding: 26px 30px;
+      /* Column, not space-between: a right-hand button column steals width
+         from the text and makes the copy stop short of the right edge. */
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .res-bundle-eyebrow {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 4px;
+    }
+    .res-bundle h3 {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .res-bundle p { color: var(--muted); font-size: 0.96rem; line-height: 1.6; }
+    .res-bundle .btn-ghost { background: var(--ink); color: var(--sand); border-color: var(--ink); }
+    .res-bundle .btn-ghost:hover { background: var(--rust); border-color: var(--rust); }
+
+    /* ---------------- articles ---------------- */
+    .res-articles { background: var(--sand-deep); border-top: 1px solid var(--tan-border); }
+
+    .article-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .article-card {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--tan-border);
+      border-radius: 14px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .article-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--rust);
+      box-shadow: 0 10px 28px rgba(42, 22, 8, 0.14);
+    }
+
+    .article-card-media { aspect-ratio: 16 / 9; background: var(--sand-deep); overflow: hidden; }
+    .article-card-media img { width: 100%; height: 100%; object-fit: cover; }
+
+    .article-card-body { padding: 20px 22px 24px; }
+    .article-card-meta {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 8px;
+    }
+    .article-card-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1.28rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+    .article-card-excerpt { color: var(--ink); font-size: 0.95rem; line-height: 1.6; margin-bottom: 14px; }
+    .article-card-cta { color: var(--rust); font-weight: 600; font-size: 0.92rem; }
+
+    /* ---------------- visit ---------------- */
+    .res-visit {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .res-visit-eyebrow {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .res-visit h2 { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.015em; margin-bottom: 10px; }
+    .res-visit p { color: #E4D6C0; font-size: 0.98rem; line-height: 1.65; }
+  </style>
+</Site>
