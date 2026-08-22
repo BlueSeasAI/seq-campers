@@ -11,15 +11,15 @@
 // held back. The paid PDF adds the remaining sections PLUS the fillable
 // workbook, which is the thing you cannot get off a web page.
 //
-// !! TWO THINGS TO CONFIRM WITH MAUD BEFORE THIS GOES LIVE !!
+// PAGE COUNTS - SETTLED on the call of Thursday 20 Aug 2026. Buyer's Guide is
+// 31 pages, Camp Set-Up is 37. Those are the figures below and they are the
+// answer of record. Earlier sources all disagreed with each other and with
+// this ("4 pages of 23" on the preview PDF cover, "the full 24-page guide" in
+// its body, 16 then 17 for Camp Set-Up); ignore every one of them.
 //
-// 1. PAGE COUNTS. Every source disagrees. Buyer's Guide is "4 pages of 23" on
-//    the preview PDF cover, "the full 24-page guide" in the preview PDF body,
-//    "31 pages" in her HTML, and "38 page, 31 page guide" on the Friday call.
-//    Camp Set-Up is 16, then 17, then 37. The figures below are her HTML
-//    figures. They are the least likely to be right and the most visible.
+// !! ONE THING STILL TO CONFIRM WITH MAUD !!
 //
-// 2. PRINTED COPIES. Her guide pages sell printed copies for $39 / $65 right
+// PRINTED COPIES. Her guide pages sell printed copies for $39 / $65 right
 //    now, while her own printed-interest.html says "we are gauging numbers
 //    before we commit to a print run, no payment now". Until that is settled,
 //    printed renders as a register-interest link, not a buy button.

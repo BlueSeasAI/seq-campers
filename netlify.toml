@@ -1,9 +1,15 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# quote-email sends the buyer their own copy of the indicative quote. It reads
+# RESEND_API_KEY from the environment and no-ops without it, so the site is
+# safe to deploy before the Resend domain is verified. Route is declared in
+# the function's own `config.path` (/api/quote-email).
 
 # Astro emits clean URLs (e.g. /stock/foo/index.html). No extra redirects
 # needed for routing. The Netlify form submission redirect lives on the

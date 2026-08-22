@@ -19,6 +19,18 @@ import Site from '../layouts/Site.astro'
       <p style="font-size:1.1rem; line-height:1.7; color:#2A1608; margin-bottom:24px;">
         We have received your enquiry and will get back to you within one business day - usually faster.
       </p>
+
+      <!-- Shown only when the quote builder sent someone here (?sent=quote).
+           Every other form lands on the generic copy above. -->
+      <div data-quote-sent hidden style="background:#fff; border:1px solid #DCCBA8; border-radius:10px; padding:20px 22px; margin-bottom:28px; text-align:left;">
+        <div style="font:600 13px/1.4 system-ui, sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#C0341A;">Your quote is on its way</div>
+        <p style="margin:8px 0 0; line-height:1.7; color:#2A1608;">
+          We have emailed your spec and its indicative pricing to the address you gave us. It has a link in it that reopens your build with every option still ticked, so you can change it as many times as you like or send it to whoever is coming with you.
+        </p>
+        <p style="margin:10px 0 0; line-height:1.7; color:#8B6A40;">
+          If it has not landed in a few minutes, check your junk folder before calling us.
+        </p>
+      </div>
       <p style="color:#8B6A40; margin-bottom:32px;">
         If your enquiry is urgent, give us a call directly on
         <a href="tel:0753707933" style="color:#C0341A; font-weight:600; text-decoration:none;">(07) 5370 7933</a>.
@@ -29,4 +41,11 @@ import Site from '../layouts/Site.astro'
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    if (new URLSearchParams(window.location.search).get('sent') === 'quote') {
+      const el = document.querySelector('[data-quote-sent]')
+      if (el) el.hidden = false
+    }
+  </script>
 </Site>

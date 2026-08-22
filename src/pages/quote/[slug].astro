@@ -270,6 +270,9 @@ try {
           <input type="hidden" name="variant_base_price" data-hidden-variant-base />
           <input type="hidden" name="selected_options" data-hidden-options />
           <input type="hidden" name="total_indicative_price" data-hidden-total />
+          <!-- Deep link back into this exact spec (?v=&o=&shared=1). Goes in
+               the customer's quote email so they can reopen and change it. -->
+          <input type="hidden" name="spec_url" data-hidden-spec-url />
 
           <label>
             Anything else you'd like us to know? (optional)
@@ -447,6 +450,81 @@ try {
 
           unlocked = true
           applyLockState()
+        })
+      }
+
+      // ─── QUOTE SUBMIT ─────────────────────────────────────────────
+      // Two things have to happen on submit and they are not equal in
+      // importance:
+      //   1. The Netlify Forms post. This is the system of record and the
+      //      thing that notifies sales@. It must never be put at risk.
+      //   2. The customer's own copy of the quote, via /api/quote-email.
+      //      Additive. If it fails the lead is still captured.
+      //
+      // So: post to Netlify first and only continue once that has landed.
+      // If THAT fails we fall straight back to a native form submit, which
+      // is exactly the behaviour the page had before this handler existed.
+      // The customer email is then fired on its own, and a failure there is
+      // logged and swallowed rather than shown to the visitor, because from
+      // their side the enquiry did go through.
+      const quoteForm = document.querySelector('[data-qb-form]')
+      if (quoteForm) {
+        let submitting = false
+
+        quoteForm.addEventListener('submit', async (e) => {
+          if (submitting) return
+          e.preventDefault()
+          submitting = true
+
+          const btn = quoteForm.querySelector('.qb-submit')
+          const btnLabel = btn ? btn.textContent : ''
+          if (btn) {
+            btn.disabled = true
+            btn.textContent = 'Sending your quote...'
+          }
+
+          const fd = new FormData(quoteForm)
+          const payload = {}
+          for (const [k, v] of fd.entries()) payload[k] = v
+
+          // 1. Netlify Forms. Non-negotiable.
+          let recorded = false
+          try {
+            const body = new URLSearchParams()
+            for (const [k, v] of fd.entries()) body.set(k, v)
+            const res = await fetch('/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body,
+            })
+            recorded = res.ok
+          } catch (err) {
+            console.warn('Quote submit failed, falling back to native post:', err)
+          }
+
+          if (!recorded) {
+            // Let the browser do it the old way. Do not re-enter this handler.
+            if (btn) { btn.disabled = false; btn.textContent = btnLabel }
+            quoteForm.submit()
+            return
+          }
+
+          // 2. The customer's copy. Best effort, and capped at 6s so a slow
+          //    or unhappy mail provider cannot leave someone sitting on a
+          //    disabled button. The request keeps running past the cap; we
+          //    just stop waiting on it before moving them along.
+          try {
+            const send = fetch('/api/quote-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            }).catch((err) => { console.warn('Quote email request failed:', err) })
+            await Promise.race([send, new Promise((r) => setTimeout(r, 6000))])
+          } catch (err) {
+            console.warn('Quote email request failed:', err)
+          }
+
+          window.location.href = '/thanks/?sent=quote'
         })
       }
 
@@ -640,6 +718,15 @@ try {
             return `${label} (${priceStr})`
           })
         $('[data-hidden-options]').value = selectedOptList.join(' | ')
+
+        // Deep link back into this exact spec. Same shape the share buttons
+        // produce, so the quote email reopens the configurator pre-filled and
+        // past the lock overlay.
+        const specParams = new URLSearchParams()
+        specParams.set('v', currentVariant)
+        if (selected.size) specParams.set('o', Array.from(selected).join(','))
+        specParams.set('shared', '1')
+        $('[data-hidden-spec-url]').value = pageUrl + '?' + specParams.toString()
       }
 
       // Variant change
