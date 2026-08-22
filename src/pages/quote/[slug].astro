@@ -253,6 +253,7 @@ try {
           netlify-honeypot="bot-field"
           action="/thanks/"
           data-qb-form
+          data-ajax-skip
         >
           <input type="hidden" name="form-name" value="build-page-quote-request" />
           <p class="hp" style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
@@ -317,6 +318,7 @@ try {
         netlify-honeypot="bot-field"
         action="/thanks/"
         data-qb-lock-form
+        data-ajax-skip
       >
         <input type="hidden" name="form-name" value="build-page-lead-capture" />
         <input type="hidden" name="brand_name" value={brand.name} />
@@ -441,6 +443,12 @@ try {
           // Submit to Netlify Forms in the background. Convert FormData
           // to URLSearchParams to match Netlify's expected encoding.
           try {
+            // This form carries data-ajax-skip, so the layout's submit-time
+            // force-set of the page-tracking fields does not run for it. Set
+            // them here or Maud loses the "which page did this come from"
+            // column in the Netlify dashboard.
+            fd.set('source_page_url', window.location.href)
+            fd.set('source_page_title', document.title || '')
             const body = new URLSearchParams()
             for (const [k, v] of fd.entries()) body.set(k, v)
             await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
@@ -484,6 +492,10 @@ try {
           }
 
           const fd = new FormData(quoteForm)
+          // data-ajax-skip means the layout no longer force-sets these at
+          // submit time, so do it here, before the payload is built.
+          fd.set('source_page_url', window.location.href)
+          fd.set('source_page_title', document.title || '')
           const payload = {}
           for (const [k, v] of fd.entries()) payload[k] = v
 

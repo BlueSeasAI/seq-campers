@@ -643,6 +643,16 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
         if (f && forms.indexOf(f) === -1) forms.push(f)
       })
       forms.forEach(function (form) {
+        /* Opt-out for forms that ship their own submit handler. Without this
+           the form gets TWO listeners, both call preventDefault, and both
+           POST to '/' - one visitor action, two Netlify submissions, plus a
+           race between whatever each handler does next. The /quote build
+           pages are the case: their lock overlay and their quote request
+           both need bespoke behaviour (unlock in place, send the customer
+           their copy) that this generic handler cannot provide.
+           A form carrying data-ajax-skip is responsible for its own POST
+           AND for setting source_page_url + source_page_title. */
+        if (form.hasAttribute('data-ajax-skip')) return
         if (form.dataset.ajaxBound) return
         form.dataset.ajaxBound = '1'
         form.addEventListener('submit', async function (e) {
