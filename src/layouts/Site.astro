@@ -787,7 +787,7 @@ const fullTitle = title.includes('SEQ Campers') ? title : `${title} | SEQ Camper
           <div class="footer-hours-compact">
             {showroomHoursRows.map((row) => (
               <>
-                {row.label && <strong>{row.label}</strong>} {row.value}<br />
+                {row.label && <><strong>{row.label}</strong>{' '}</>}{row.value}<br />
               </>
             ))}
           </div>

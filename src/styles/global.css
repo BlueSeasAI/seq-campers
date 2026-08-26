@@ -809,6 +809,11 @@ a:focus-visible, button:focus-visible {
    ============================================================ */
 .condition-badge {
   display: inline-block;
+  /* The badge sits inside flex-column parents (Shane's Pick, caravan cards),
+     where the default align-items:stretch blows it out to the full card
+     width. Both lines keep it hugging the longest label instead. */
+  align-self: flex-start;
+  width: fit-content;
   font-family: 'Inter Tight', sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
