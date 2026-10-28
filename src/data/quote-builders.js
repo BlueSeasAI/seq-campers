@@ -583,7 +583,7 @@ export const quoteBuilders = [
           },
           {
             id: "bullbar-eco",
-            label: "KK ATTITUDE Bullbar - upgrade from Sports Bar (Ecoscape)",
+            label: "KK ATTITUDE Bullbar - upgrade from the included Sports Bar",
             priceByVariant: {
               classic: null,
               ecoscape: 2450
@@ -703,7 +703,7 @@ export const quoteBuilders = [
           },
           {
             id: "remove-ac",
-            label: "Remove Rooftop A/C (credit - Ecoscape)",
+            label: "Remove Rooftop A/C (credit)",
             priceByVariant: {
               classic: null,
               ecoscape: -3100
@@ -718,7 +718,7 @@ export const quoteBuilders = [
         options: [
           {
             id: "steel-rims",
-            label: "Steel Rims + BFG A/T Off-Road Tyres 255/70 R16 LT (Classic)",
+            label: "Steel Rims + BFG A/T Off-Road Tyres 255/70 R16 LT",
             priceByVariant: {
               classic: 1900,
               ecoscape: null
@@ -913,11 +913,15 @@ export const quoteBuilders = [
             id: "cockpit-curtain",
             label: "Cockpit Blackout Curtain - Thermal backed on rail",
             price: 785,
-            requires: ["cockpit-shelf"]
+            // The shelf carries a different id per variant, so either one
+            // satisfies the prerequisite (the old requires:["cockpit-shelf"]
+            // could never be met on the EcoScape - Maud, 3 Sep call).
+            requiresAny: ["cockpit-shelf", "cockpit-shelf-eco"],
+            depNote: "Add the cockpit shelf first"
           },
           {
             id: "cockpit-shelf",
-            label: "Cockpit Shelf - Lightweight composite shelf above front seats (Classic)",
+            label: "Cockpit Shelf - Lightweight composite shelf above front seats",
             priceByVariant: {
               classic: 790,
               ecoscape: null
@@ -926,7 +930,7 @@ export const quoteBuilders = [
           },
           {
             id: "cockpit-shelf-eco",
-            label: "Cockpit Shelf - Lightweight composite shelf above front seats (Ecoscape)",
+            label: "Cockpit Shelf - Lightweight composite shelf above front seats",
             priceByVariant: {
               classic: null,
               ecoscape: 400
@@ -1053,7 +1057,7 @@ export const quoteBuilders = [
         options: [
           {
             id: "5000wh",
-            label: "Upgrade to 5000Wh SMART 48V Battery (Classic)",
+            label: "Upgrade to 5000Wh SMART 48V Battery",
             priceByVariant: {
               classic: 3720,
               ecoscape: 0
@@ -1063,16 +1067,25 @@ export const quoteBuilders = [
             id: "2nd-5000wh",
             label: "Second 5000Wh SMART 48V Battery (total 10,000Wh)",
             price: 7820,
-            requires: ["battery-wiring"]
+            // Needs the 5000Wh battery (already standard on the EcoScape,
+            // which counts). The wiring prep is NOT a prerequisite - Maud,
+            // 8 Sep email: the cabling is already included in the second
+            // battery.
+            requires: ["5000wh"]
           },
           {
             id: "battery-wiring",
             label: "2nd Battery Wiring Ready - Cabling etc",
-            price: 750
+            price: 750,
+            // Prep for adding a battery later. Once the second battery is
+            // ticked the cabling comes with it, so this unticks to avoid
+            // charging it twice.
+            blockedBy: ["2nd-5000wh"],
+            blockedNote: "Included with the second battery"
           },
           {
             id: "solar400",
-            label: "Upgrade to 400W Roof Solar (Classic)",
+            label: "Upgrade to 400W Roof Solar",
             priceByVariant: {
               classic: 1250,
               ecoscape: 0
@@ -1091,7 +1104,7 @@ export const quoteBuilders = [
           },
           {
             id: "solar800-eco",
-            label: "Upgrade to 800W Roof Solar - upgrade from included 400W (Ecoscape)",
+            label: "Upgrade to 800W Roof Solar - upgrade from the included 400W",
             priceByVariant: {
               classic: null,
               ecoscape: 1080
@@ -1111,7 +1124,7 @@ export const quoteBuilders = [
           },
           {
             id: "solar1200-eco",
-            label: "Upgrade to 1200W Roof Solar - upgrade from included 400W (Ecoscape)",
+            label: "Upgrade to 1200W Roof Solar - upgrade from the included 400W",
             priceByVariant: {
               classic: null,
               ecoscape: 2160

@@ -16,6 +16,27 @@ const { slug } = Astro.params
 // way - the ONLY thing that swaps is where the numbers come from.
 let brand = await getSanityQuoteBuilder(slug)
 if (!brand) brand = getQuoteBuilder(slug)
+else {
+  // Sanity owns prices and labels; the CODE file owns the dependency rules
+  // (requires / requiresAny / blockedBy and their notes). Overlay them by
+  // option id so a logic fix ships with a deploy and a content edit can
+  // never resurrect a stale rule. (The 2 Jul Sanity seed froze the rules
+  // as they were then - that is how the EcoScape lock bugs survived.)
+  const codeBrand = getQuoteBuilder(slug)
+  if (codeBrand) {
+    const codeOpts = {}
+    codeBrand.categories.forEach((c) => c.options.forEach((o) => { codeOpts[o.id] = o }))
+    const DEP_KEYS = ['requires', 'requiresAny', 'blockedBy', 'depNote', 'blockedNote', 'naNote']
+    brand.categories.forEach((c) => c.options.forEach((o) => {
+      const src = codeOpts[o.id]
+      if (!src) return
+      DEP_KEYS.forEach((k) => {
+        if (src[k] !== undefined) o[k] = src[k]
+        else delete o[k]
+      })
+    }))
+  }
+}
 
 if (!brand) return Astro.redirect('/stock')
 
@@ -207,23 +228,23 @@ try {
                 <div class="qb-weight-title">Weight &amp; payload</div>
                 <div class="qb-weight-row">
                   <span>Est. TARE (dry, fitted)</span>
-                  <strong data-weight-tare>&mdash;</strong>
+                  <strong data-weight-tare>-</strong>
                 </div>
                 <div class="qb-weight-row">
                   <span>GVM limit</span>
-                  <strong data-weight-gvm>&mdash;</strong>
+                  <strong data-weight-gvm>-</strong>
                 </div>
                 <div class="qb-weight-row">
                   <span>Gross payload</span>
-                  <strong data-weight-gross>&mdash;</strong>
+                  <strong data-weight-gross>-</strong>
                 </div>
                 <div class="qb-weight-deductions" data-weight-deductions></div>
                 <div class="qb-weight-row qb-weight-payload-row">
                   <span>Ready-to-travel payload</span>
-                  <strong data-weight-payload>&mdash;</strong>
+                  <strong data-weight-payload>-</strong>
                 </div>
                 <div class="qb-weight-status" data-weight-status></div>
-                <p class="qb-weight-note">Weights are indicative only &mdash; confirm with your dealer.</p>
+                <p class="qb-weight-note">Weights are indicative only - confirm with your dealer.</p>
               </div>
               <p class="qb-summary-fineprint" data-fineprint>
                 Indicative only. Final quote confirmed by SEQ Campers within one business day. Ex-factory {exFactoryLocation}, incl. GST.
@@ -375,9 +396,9 @@ try {
       const variantData = {}
       brandData.variants.forEach((v) => { variantData[v.id] = v })
 
-      // Option metadata (requires / blockedBy / notes) keyed by option id.
-      // Only the Rover defines these; other models leave them undefined and
-      // fall straight through to the original availability logic below.
+      // Option metadata (requires / requiresAny / blockedBy / notes) keyed by
+      // option id. Models without dependency rules leave them undefined and
+      // fall straight through to the plain availability logic below.
       const optMeta = {}
       brandData.categories.forEach((c) => c.options.forEach((o) => { optMeta[o.id] = o }))
 
@@ -554,6 +575,12 @@ try {
         return getOptionPrice(el, currentVariant) === 0 || selected.has(optId)
       }
 
+      // Label lookup for the dynamic lock messages ("Add X first").
+      function labelFor(optId) {
+        const el = document.querySelector('.qb-opt[data-opt-id="' + optId + '"] .qb-opt-label')
+        return el ? el.textContent.trim() : optId
+      }
+
       function renderOptionPrices() {
         $$('.qb-opt').forEach((optEl) => {
           const optId = optEl.dataset.optId
@@ -567,20 +594,65 @@ try {
             display.textContent = text
             check.disabled = disabled
             if (disabled) { check.checked = false; selected.delete(optId) }
+            else check.checked = selected.has(optId)
           }
 
-          if (p === null || p === undefined) { apply(true, meta.naNote || 'N/A', true); return }
-          if (p === 0) { apply(false, 'Included', false); return }
+          // Not offered on this variant at all - hide the row. Maud (3 Sep
+          // call): a buyer who picked one model should not see the other
+          // model's version of the same option greyed out beside it.
+          const offered = p !== null && p !== undefined
+          optEl.hidden = !offered
+          optEl.classList.toggle('qb-opt-included', offered && p === 0)
+          if (!offered) { apply(true, meta.naNote || 'N/A', true); return }
 
-          // Priced option - apply dynamic dependency rules (Rover only).
-          const blocked = (meta.blockedBy || []).some((dep) => isPresent(dep))
-          if (blocked) { apply(true, meta.blockedNote || 'N/A', true); return }
-          const missing = (meta.requires || []).some((dep) => !isPresent(dep))
-          if (missing) { apply(true, meta.depNote || 'Locked', true); return }
+          // Included as standard - shown pre-ticked and not clickable. It
+          // used to render as a tickable $0 box, which read as "click this
+          // to unlock the upgrades" when it never unlocked anything.
+          if (p === 0) {
+            optEl.classList.remove('qb-opt-unavailable')
+            display.textContent = 'Included'
+            check.disabled = true
+            check.checked = true
+            selected.delete(optId)
+            return
+          }
+
+          // Priced option - dependency rules.
+          // blockedBy = mutually exclusive with a choice the visitor TICKED.
+          // An item included as standard never blocks: it is the baseline the
+          // upgrade replaces. (The included Sports Bar was perma-locking the
+          // ATTITUDE bullbar upgrade on the EcoScape; same for the solar
+          // upgrades, the ducted heater and the 151L tank.)
+          const blocker = (meta.blockedBy || []).find((dep) => selected.has(dep))
+          if (blocker) { apply(true, meta.blockedNote || 'Not with ' + labelFor(blocker), true); return }
+
+          // requires = ALL prerequisites present (included-as-standard counts).
+          // requiresAny = at least ONE present - for a prerequisite that has a
+          // different option id per variant (e.g. the two cockpit shelves).
+          const missing = (meta.requires || []).filter((dep) => !isPresent(dep))
+          const anyList = meta.requiresAny || []
+          if (anyList.length && !anyList.some((dep) => isPresent(dep))) {
+            const offeredDep = anyList.find((dep) => {
+              const el = document.querySelector('.qb-opt[data-opt-id="' + dep + '"]')
+              const dp = el ? getOptionPrice(el, currentVariant) : null
+              return dp !== null && dp !== undefined
+            })
+            missing.push(offeredDep || anyList[0])
+          }
+          if (missing.length) {
+            apply(true, meta.depNote || 'Add ' + missing.map(labelFor).join(' + ') + ' first', true)
+            return
+          }
 
           if (p === 'POA') apply(false, 'POA', false)
           else if (p < 0) apply(false, fmtSigned(p) + ' credit', false)
           else apply(false, fmtSigned(p), false)
+        })
+
+        // A category whose every option is hidden for this variant hides too.
+        $$('.qb-cat').forEach((catEl) => {
+          const opts = Array.from(catEl.querySelectorAll('.qb-opt'))
+          catEl.hidden = opts.length > 0 && opts.every((o) => o.hidden)
         })
       }
 
@@ -863,6 +935,19 @@ try {
       color: var(--muted, #8B6A40);
       font-size: 0.95rem;
     }
+
+    /* Rows / whole categories not offered on the chosen variant are removed,
+       not greyed (Maud, 3 Sep). [hidden] alone loses to display:grid. */
+    .qb-opt[hidden],
+    .qb-cat[hidden] { display: none !important; }
+
+    /* Included-as-standard rows: pre-ticked, not clickable. */
+    .qb-opt-included,
+    .qb-opt-included .qb-opt-check { cursor: default; }
+
+    /* Lock reasons ("Add X first") are sentences - let them wrap instead of
+       stretching the price column. */
+    .qb-opt-unavailable .qb-opt-price { white-space: normal; text-align: right; }
 
     /* Configurator wrap - blurred while locked. */
     .qb-wrap[data-locked="true"] {
